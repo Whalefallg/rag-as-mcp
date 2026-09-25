@@ -1,0 +1,86 @@
+{
+  "version": "1.0",
+  "description": "RAG AS MCP golden test set，用于 Hit Rate / MRR 离线回归测试",
+  "test_cases": [
+    {
+      "id": "tc_001",
+      "query": "如何配置 Azure OpenAI 端点？",
+      "expected_chunk_ids": [],
+      "expected_sources": ["config_guide.pdf", "azure_setup.pdf"],
+      "expected_answer": "在 settings.yaml 中设置 llm.provider: azure 并填写 azure_endpoint 字段。",
+      "tags": ["configuration", "azure"]
+    },
+    {
+      "id": "tc_002",
+      "query": "BM25 的 k1 和 b 参数分别控制什么？",
+      "expected_chunk_ids": [],
+      "expected_sources": ["rag_concepts.pdf", "bm25_guide.pdf"],
+      "expected_answer": "k1 控制词频饱和速度，b 控制文档长度归一化强度。",
+      "tags": ["retrieval", "bm25"]
+    },
+    {
+      "id": "tc_003",
+      "query": "什么是 RRF 融合算法？",
+      "expected_chunk_ids": [],
+      "expected_sources": ["hybrid_search.pdf", "fusion_methods.pdf"],
+      "expected_answer": "RRF（Reciprocal Rank Fusion）通过对各检索结果的倒数排名求和来融合多路检索结果。",
+      "tags": ["retrieval", "fusion"]
+    },
+    {
+      "id": "tc_004",
+      "query": "如何安装项目依赖？",
+      "expected_chunk_ids": [],
+      "expected_sources": ["README.md", "setup_guide.pdf"],
+      "expected_answer": "运行 pip install -r requirements.txt 安装所有依赖。",
+      "tags": ["setup"]
+    },
+    {
+      "id": "tc_005",
+      "query": "Faithfulness 指标衡量什么？",
+      "expected_chunk_ids": [],
+      "expected_sources": ["evaluation_guide.pdf", "ragas_docs.pdf"],
+      "expected_answer": "Faithfulness 衡量生成答案是否忠实于检索到的上下文，避免模型捏造内容。",
+      "tags": ["evaluation", "ragas"]
+    },
+    {
+      "id": "tc_006",
+      "query": "Chunk 切分时 overlap 的作用是什么？",
+      "expected_chunk_ids": [],
+      "expected_sources": ["chunking_guide.pdf"],
+      "expected_answer": "Chunk overlap 确保语义边界处的信息不被截断，相邻 chunk 共享部分文本。",
+      "tags": ["ingestion", "chunking"]
+    },
+    {
+      "id": "tc_007",
+      "query": "如何在 MCP Client 中调用 query_knowledge_hub？",
+      "expected_chunk_ids": [],
+      "expected_sources": ["mcp_guide.pdf", "README.md"],
+      "expected_answer": "在 mcp.json 中配置服务端路径后，通过 tools/call 调用 query_knowledge_hub 工具。",
+      "tags": ["mcp", "integration"]
+    },
+    {
+      "id": "tc_008",
+      "query": "ImageCaptioner 如何处理 PDF 中的图片？",
+      "expected_chunk_ids": [],
+      "expected_sources": ["multimodal_guide.pdf"],
+      "expected_answer": "ImageCaptioner 提取 PDF 页面中的图片，调用 LLM 生成描述文字，附加到对应 chunk 的 metadata 中。",
+      "tags": ["multimodal", "ingestion"]
+    },
+    {
+      "id": "tc_009",
+      "query": "TraceContext 的 span() 上下文管理器有什么作用？",
+      "expected_chunk_ids": [],
+      "expected_sources": ["observability_guide.pdf"],
+      "expected_answer": "span() 自动计时并将耗时、异常信息记录到 TraceContext 的 stages 列表中。",
+      "tags": ["observability", "tracing"]
+    },
+    {
+      "id": "tc_010",
+      "query": "DocumentManager 删除文档时会操作哪些存储？",
+      "expected_chunk_ids": [],
+      "expected_sources": ["architecture_guide.pdf"],
+      "expected_answer": "delete_document 依次删除 ChromaDB 向量、BM25 索引、ImageStorage 图片文件、FileIntegrity 记录。",
+      "tags": ["document_management", "storage"]
+    }
+  ]
+}

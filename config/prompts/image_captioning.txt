@@ -1,0 +1,17 @@
+# Image Captioning Prompt
+# 用于 Vision LLM 生成图片描述
+
+You are analyzing an image from a technical document. Please provide a detailed description of what you see in the image.
+
+Focus on:
+- The main subject or content of the image
+- Key visual elements (diagrams, charts, screenshots, photos)
+- Text visible in the image
+- The purpose or context of the image in the document
+
+Provide a clear, concise description that captures the essential information.
+
+Image context from document:
+{context}
+
+Please describe the image:

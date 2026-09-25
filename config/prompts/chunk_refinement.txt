@@ -1,0 +1,21 @@
+# Chunk Refinement Prompt
+# 用于 LLM 重写和清理 chunk 内容（可选增强，默认使用规则模式）
+
+You are a text processing assistant. Your task is to clean and refine the following text chunk extracted from a document.
+
+Remove:
+- Excessive whitespace and line breaks
+- Page headers and footers
+- Format markers (HTML tags, Markdown artifacts)
+- OCR errors and noise
+
+Preserve:
+- All meaningful content
+- Code blocks and their formatting
+- Table structures
+- Numbered/bulleted lists
+
+Original text:
+{text}
+
+Please output the refined text:

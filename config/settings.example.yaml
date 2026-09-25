@@ -1,0 +1,65 @@
+llm:
+  provider: ollama
+  model: llama3.2
+  azure_endpoint: ""
+  api_key: ""
+
+embedding:
+  provider: ollama
+  model: nomic-embed-text
+  api_key: ""
+  base_url: "http://localhost:11434"
+
+vision_llm:
+  provider: azure
+  model: gpt-4o
+  azure_endpoint: ""
+  api_key: ""
+
+vector_store:
+  backend: chroma
+  persist_path: ./data/db/chroma
+
+splitter:
+  method: recursive
+  chunk_size: 1000
+  chunk_overlap: 200
+
+retrieval:
+  sparse_backend: bm25
+  fusion_algorithm: rrf
+  top_k_dense: 20
+  top_k_sparse: 20
+  top_k_final: 10
+
+rerank:
+  backend: none
+  model: ""
+  top_m: 30
+
+ingestion:
+  chunk_refiner:
+    enabled: true
+    use_llm: false
+  metadata_enricher:
+    enabled: true
+    use_llm: false
+  image_captioner:
+    enabled: false
+
+evaluation:
+  backends: [custom]
+  golden_test_set: ./tests/fixtures/golden_test_set.json
+
+observability:
+  enabled: true
+  log_file: ./logs/traces.jsonl
+  log_level: INFO
+  detail_level: standard
+
+dashboard:
+  enabled: true
+  port: 8501
+  traces_dir: ./logs
+  auto_refresh: true
+  refresh_interval: 5

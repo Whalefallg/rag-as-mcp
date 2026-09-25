@@ -1,0 +1,47 @@
+[project]
+name = "rag-as-mcp"
+version = "0.1.0"
+description = "A modular RAG system exposed through the Model Context Protocol"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { file = "LICENSE" }
+authors = [{ name = "Tianzhuo Gao" }]
+dependencies = [
+    "chromadb>=0.4.0",
+    "langchain-text-splitters>=0.0.1",
+    "openai>=1.0.0",
+    "PyMuPDF>=1.23.0",
+    "PyYAML>=6.0",
+    "requests>=2.31.0",
+]
+
+[project.optional-dependencies]
+dashboard = ["pandas>=2.0.0", "streamlit>=1.28.0"]
+rerank = ["sentence-transformers>=2.2.0"]
+evaluation = ["datasets>=2.14.0", "ragas>=0.1.0"]
+dev = ["pytest>=7.4.0", "pytest-asyncio>=0.21.0", "pytest-mock>=3.11.0"]
+all = [
+    "datasets>=2.14.0",
+    "pandas>=2.0.0",
+    "ragas>=0.1.0",
+    "sentence-transformers>=2.2.0",
+    "streamlit>=1.28.0",
+]
+
+[tool.setuptools.packages.find]
+include = ["src*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+markers = [
+    "unit: Unit tests",
+    "integration: Integration tests",
+    "e2e: End-to-end tests",
+]
+
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
