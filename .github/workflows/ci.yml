@@ -5,9 +5,12 @@ on:
   pull_request:
 
 jobs:
-  test:
+  unit:
+    name: unit (Python ${{ matrix.python-version }})
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     strategy:
+      fail-fast: false
       matrix:
         python-version: ["3.10", "3.12"]
     steps:
@@ -20,5 +23,35 @@ jobs:
         run: python -m pip install -e ".[dev]"
       - name: Import smoke test
         run: python -c "from src.mcp_server.protocol_handler import ProtocolHandler"
-      - name: Test
-        run: python -m pytest -q
+      - name: Unit tests
+        run: python -m pytest tests/unit -q
+
+  integration:
+    name: integration (Python 3.12)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install
+        run: python -m pip install -e ".[dev]"
+      - name: Integration tests
+        run: python -m pytest tests/integration -q
+
+  e2e:
+    name: e2e (Python 3.12)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install
+        run: python -m pip install -e ".[dev]"
+      - name: E2E tests
+        run: python -m pytest tests/e2e -q
