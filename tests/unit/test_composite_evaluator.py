@@ -9,6 +9,7 @@ CompositeEvaluator 单元测试 (tests/unit/test_composite_evaluator.py)
   - evaluators 属性返回副本
 """
 import time
+import threading
 import pytest
 from unittest.mock import MagicMock
 from src.observability.evaluation.composite_evaluator import CompositeEvaluator
@@ -105,12 +106,29 @@ class TestCompositeEvaluatorMerge:
         assert call_kwargs["query"] == "my query"
         assert call_kwargs["generated_answer"] == "answer"
 
-    def test_parallel_execution_faster_than_sequential(self):
-        """并行执行比串行快（各 evaluator sleep 0.05s，2 个共 0.05s 而非 0.1s）"""
-        ev1 = _make_ev("A", {"a": 1.0}, delay=0.05)
-        ev2 = _make_ev("B", {"b": 1.0}, delay=0.05)
+    def test_parallel_execution_overlaps_evaluators(self):
+        """用 Barrier 验证两个 evaluator 确实并发进入执行区，不依赖 wall-clock 阈值。"""
+        barrier = threading.Barrier(2)
+
+        def _make_barrier_ev(name: str, result: dict):
+            ev = MagicMock(spec=BaseEvaluator)
+            ev.__class__.__name__ = name
+
+            def _evaluate(**kwargs):
+                # 若是串行执行，第一个任务会在这里超时/打破 barrier；
+                # 两个 worker 并发时二者会互相释放。
+                barrier.wait(timeout=1.0)
+                return result
+
+            ev.evaluate.side_effect = _evaluate
+            return ev
+
+        ev1 = _make_barrier_ev("A", {"a": 1.0})
+        ev2 = _make_barrier_ev("B", {"b": 1.0})
         comp = CompositeEvaluator([ev1, ev2], max_workers=2)
-        t0 = time.monotonic()
-        comp.evaluate(query="q", retrieved_chunks=[])
-        elapsed = time.monotonic() - t0
-        assert elapsed < 0.09, f"并行执行耗时 {elapsed:.3f}s，应 < 0.09s"
+
+        result = comp.evaluate(query="q", retrieved_chunks=[])
+
+        assert result["a"] == 1.0
+        assert result["b"] == 1.0
+        assert "_errors" not in result
