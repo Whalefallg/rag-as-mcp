@@ -171,7 +171,12 @@ class DocumentManager:
 
         # 2. BM25
         try:
-            self._bm25.remove_document(source_path)
+            if collection == "default":
+                self._bm25.remove_document(source_path)
+            else:
+                self._bm25.remove_document(
+                    source_path, collection=collection
+                )
             result.details["bm25"] = "ok"
         except Exception as exc:
             errors.append(f"bm25: {exc}")
@@ -186,7 +191,12 @@ class DocumentManager:
 
         # 4. FileIntegrity（最后删）
         try:
-            self._integrity.remove_record(source_path)
+            if collection == "default":
+                self._integrity.remove_record(source_path)
+            else:
+                self._integrity.remove_record(
+                    source_path, collection=collection
+                )
             result.details["integrity"] = "ok"
         except Exception as exc:
             errors.append(f"integrity: {exc}")

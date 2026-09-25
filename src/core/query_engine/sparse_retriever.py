@@ -47,6 +47,7 @@ class SparseRetriever:
         self,
         keywords: List[str],
         top_k: int = 20,
+        collection: str = "default",
         trace: Optional[TraceContext] = None,
     ) -> List[RetrievalResult]:
         """
@@ -65,7 +66,10 @@ class SparseRetriever:
         # Step 1: BM25 查询，得到 [{chunk_id, score}]
         # 把关键词列表转为 {term: 1.0} 作为查询向量（等权重）
         query_terms: Dict[str, float] = {kw: 1.0 for kw in keywords}
-        bm25_hits = self._bm25.query(query_terms, top_k=top_k)
+        bm25_kwargs = {"top_k": top_k}
+        if collection != "default":
+            bm25_kwargs["collection"] = collection
+        bm25_hits = self._bm25.query(query_terms, **bm25_kwargs)
 
         if not bm25_hits:
             return []
@@ -74,7 +78,12 @@ class SparseRetriever:
         chunk_ids = [hit["chunk_id"] for hit in bm25_hits]
         id_to_score = {hit["chunk_id"]: hit["score"] for hit in bm25_hits}
 
-        records = self._store.get_by_ids(chunk_ids)
+        if collection == "default":
+            records = self._store.get_by_ids(chunk_ids)
+        else:
+            records = self._store.get_by_ids(
+                chunk_ids, collection_name=collection
+            )
         id_to_record = {r["id"]: r for r in records}
 
         # Step 3: 合并，按 BM25 分数降序排列

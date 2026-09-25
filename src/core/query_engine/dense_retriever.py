@@ -73,17 +73,18 @@ class DenseRetriever:
         query_vector = vectors[0]
 
         # Step 2: 向量相似度检索
-        # filters 中补充 collection 条件（如果 store 支持按 collection 过滤）
-        resolved_filters = dict(filters or {})
+        # collection 是物理命名空间；filters 只表达 collection 内部的 metadata 条件。
+        query_kwargs = {
+            "vector": query_vector,
+            "top_k": top_k,
+            "filters": dict(filters or {}) or None,
+            "trace": trace,
+        }
+        # 默认 collection 省略参数，兼容轻量 mock；非默认 collection 必须显式路由。
         if collection != "default":
-            resolved_filters["collection"] = collection
+            query_kwargs["collection_name"] = collection
 
-        raw_results = self._store.query(
-            vector=query_vector,
-            top_k=top_k,
-            filters=resolved_filters or None,
-            trace=trace,
-        )
+        raw_results = self._store.query(**query_kwargs)
 
         # Step 3: 归一化为 RetrievalResult
         results = []

@@ -59,9 +59,8 @@ class VectorUpserter:
 
         records = []
         for chunk in chunks:
-            source_path = chunk.metadata.get("source_path", "")
-            content_hash = chunk.metadata.get("content_hash", "")
-            stable_id = _stable_chunk_id(source_path, chunk.index, content_hash)
+            # DocumentChunker 已保证 Chunk.id 的确定性；这里不再生成第二套 ID。
+            record_id = chunk.id
 
             # 过滤 metadata，不将向量本身放入 metadata（向量单独存）
             meta = {
@@ -73,7 +72,7 @@ class VectorUpserter:
             meta["chunk_id"] = chunk.id
 
             records.append({
-                "id": stable_id,
+                "id": record_id,
                 "text": chunk.text,
                 "metadata": meta,
                 "dense_vector": chunk.metadata.get("dense_vector", []),

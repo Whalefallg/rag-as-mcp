@@ -124,11 +124,14 @@ class HybridSearch:
         sparse_results: List[RetrievalResult] = []
         _t0 = time.monotonic()
         try:
-            sparse_results = self._sparse.retrieve(
-                keywords=processed.keywords,
-                top_k=self._top_k_sparse,
-                trace=trace,
-            )
+            sparse_kwargs = {
+                "keywords": processed.keywords,
+                "top_k": self._top_k_sparse,
+                "trace": trace,
+            }
+            if collection != "default":
+                sparse_kwargs["collection"] = collection
+            sparse_results = self._sparse.retrieve(**sparse_kwargs)
             if trace:
                 trace.record_stage(
                     "sparse_retrieval",

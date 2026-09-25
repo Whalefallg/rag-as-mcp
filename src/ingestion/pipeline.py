@@ -151,7 +151,9 @@ class IngestionPipeline:
         _t = time.monotonic()
         try:
             file_hash = self._integrity.compute_sha256(abs_path)
-            if not force and self._integrity.should_skip(file_hash):
+            if not force and self._integrity.should_skip(
+                file_hash, collection=self._collection
+            ):
                 trace.record_stage("integrity",
                                    duration_ms=(time.monotonic() - _t) * 1000,
                                    status="skipped", method="sha256")
@@ -222,7 +224,7 @@ class IngestionPipeline:
             _t = time.monotonic()
             try:
                 self._upserter.upsert(chunks, collection=self._collection, trace=trace)
-                self._bm25.build(chunks)
+                self._bm25.update(chunks, collection=self._collection)
             except Exception as e:
                 raise PipelineError("upsert", e)
             trace.record_stage("upsert",
@@ -246,7 +248,9 @@ class IngestionPipeline:
                 self._notify("store_images", image_count, image_count)
 
             # ── 成功 ───────────────────────────────────────────────────────
-            self._integrity.mark_success(file_hash, abs_path)
+            self._integrity.mark_success(
+                file_hash, abs_path, collection=self._collection
+            )
             return {
                 "skipped": False,
                 "chunk_count": n,
@@ -257,7 +261,9 @@ class IngestionPipeline:
         except PipelineError:
             if file_hash:
                 try:
-                    self._integrity.mark_failed(file_hash, "pipeline_error")
+                    self._integrity.mark_failed(
+                        file_hash, "pipeline_error", collection=self._collection
+                    )
                 except Exception:
                     pass
             raise
