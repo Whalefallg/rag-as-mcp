@@ -178,6 +178,54 @@ class BM25Indexer:
             })
         return results
 
+    def remove_chunks(
+        self,
+        chunk_ids: List[str],
+        collection: str = "default",
+    ) -> int:
+        """按业务 chunk_id 精确删除指定 collection 中的 BM25 记录。"""
+        self._load_if_needed()
+        ids = {str(chunk_id) for chunk_id in chunk_ids}
+        if not ids:
+            return 0
+
+        candidate_keys = {
+            self._index_key(collection, chunk_id)
+            for chunk_id in ids
+        }
+        # 兼容 Phase 1A 之前的 default 索引格式。
+        if collection == "default":
+            candidate_keys.update(ids)
+
+        to_remove = {
+            key
+            for key in candidate_keys
+            if (
+                key in self._chunk_meta
+                and self._meta_collection(self._chunk_meta[key]) == collection
+            )
+        }
+        if not to_remove:
+            return 0
+
+        for key in to_remove:
+            del self._chunk_meta[key]
+
+        for term in list(self._postings.keys()):
+            postings = [
+                posting
+                for posting in self._postings[term]["postings"]
+                if self._posting_key(posting) not in to_remove
+            ]
+            if postings:
+                self._postings[term]["postings"] = postings
+            else:
+                del self._postings[term]
+
+        self._recompute_idf()
+        self._save()
+        return len(to_remove)
+
     def remove_document(
         self,
         source_path: str,

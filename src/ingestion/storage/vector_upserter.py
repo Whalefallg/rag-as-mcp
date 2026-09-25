@@ -80,3 +80,42 @@ class VectorUpserter:
 
         self._store.upsert(records, trace=trace)
         return len(records)
+
+    def list_source_ids(
+        self,
+        source_path: str,
+        collection: str = "default",
+    ) -> List[str]:
+        """返回指定文档当前已存在的向量记录 ID。"""
+        getter = getattr(self._store, "get_by_metadata", None)
+        if not callable(getter):
+            raise RuntimeError(
+                "当前 VectorStore 不支持按 metadata 枚举文档记录，"
+                "无法安全执行文档替换"
+            )
+        items = getter(
+            filters={"source_path": source_path},
+            collection=collection,
+            limit=50000,
+        )
+        ids: List[str] = []
+        for item in items:
+            chunk_id = getattr(item, "chunk_id", None)
+            if chunk_id is None and isinstance(item, dict):
+                chunk_id = item.get("id") or item.get("chunk_id")
+            if chunk_id:
+                ids.append(str(chunk_id))
+        return ids
+
+    def delete_ids(
+        self,
+        ids: List[str],
+        collection: str = "default",
+    ) -> int:
+        """精确删除指定 collection 中的一组向量记录。"""
+        deleter = getattr(self._store, "delete_by_ids", None)
+        if not callable(deleter):
+            raise RuntimeError(
+                "当前 VectorStore 不支持按 ID 删除，无法清理 stale chunks"
+            )
+        return int(deleter(ids, collection_name=collection))

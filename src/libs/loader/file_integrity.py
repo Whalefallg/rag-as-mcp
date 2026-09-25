@@ -184,6 +184,17 @@ class SQLiteIntegrityChecker(FileIntegrityChecker):
     ) -> None:
         now = self._now()
         with self._connect() as conn:
+            # 同一路径在同一 collection 中只保留当前成功版本。
+            # 这样 v1 -> v2 成功后，如果文件又回退到 v1，不会被旧 hash 错误跳过。
+            conn.execute(
+                """
+                DELETE FROM ingestion_history
+                WHERE file_path = ?
+                  AND collection = ?
+                  AND file_hash <> ?
+                """,
+                (file_path, collection, file_hash),
+            )
             conn.execute(
                 """
                 INSERT INTO ingestion_history (

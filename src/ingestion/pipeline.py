@@ -219,18 +219,40 @@ class IngestionPipeline:
                                chunk_count=len(chunks))
             self._notify("encode", n, n)
 
-            # ── 6. 存储向量 + BM25 ─────────────────────────────────────────
+            # ── 6. 安全替换向量 + BM25 ───────────────────────────────────
+            # 先写新版本，再精确删除旧版本中真正 stale 的 IDs。
+            # 这样前半段失败时不会先把旧文档删掉；失败后重试可最终收敛。
             self._notify("upsert", 0, n)
             _t = time.monotonic()
+            stale_chunk_ids = []
             try:
-                self._upserter.upsert(chunks, collection=self._collection, trace=trace)
+                old_chunk_ids = set(self._upserter.list_source_ids(
+                    abs_path, collection=self._collection
+                ))
+                new_chunk_ids = {str(chunk.id) for chunk in chunks}
+
+                self._upserter.upsert(
+                    chunks, collection=self._collection, trace=trace
+                )
                 self._bm25.update(chunks, collection=self._collection)
+
+                stale_chunk_ids = sorted(old_chunk_ids - new_chunk_ids)
+                if stale_chunk_ids:
+                    # BM25 先清理：如果这里失败，不碰 Chroma 旧向量。
+                    # 若后续 Chroma 删除失败，重试仍能再次看到 stale vector IDs。
+                    self._bm25.remove_chunks(
+                        stale_chunk_ids, collection=self._collection
+                    )
+                    self._upserter.delete_ids(
+                        stale_chunk_ids, collection=self._collection
+                    )
             except Exception as e:
                 raise PipelineError("upsert", e)
             trace.record_stage("upsert",
                                duration_ms=(time.monotonic() - _t) * 1000,
                                method="chroma",
-                               chunk_count=n)
+                               chunk_count=n,
+                               stale_chunk_count=len(stale_chunk_ids))
             self._notify("upsert", n, n)
 
             # ── 7. 存储图片 ────────────────────────────────────────────────
@@ -255,6 +277,7 @@ class IngestionPipeline:
                 "skipped": False,
                 "chunk_count": n,
                 "image_count": image_count,
+                "stale_chunk_count": len(stale_chunk_ids),
                 "trace_id": trace.trace_id,
             }
 

@@ -146,6 +146,21 @@ class ChromaStore(BaseVectorStore):
             })
         return records
 
+    def delete_by_ids(
+        self,
+        ids: List[str],
+        collection_name: str = "default",
+    ) -> int:
+        """按 ID 精确删除记录，返回实际删除数量。"""
+        if not ids:
+            return 0
+        col = self.get_or_create_collection(collection_name)
+        existing = col.get(ids=list(ids), include=[])
+        existing_ids = list(existing.get("ids", []))
+        if existing_ids:
+            col.delete(ids=existing_ids)
+        return len(existing_ids)
+
     def delete_by_metadata(
         self,
         filter: Dict = None,
