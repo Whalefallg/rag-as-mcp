@@ -59,6 +59,7 @@ class BaseVectorStore(ABC):
         vector: List[float],
         top_k: int,
         filters: Optional[Dict] = None,
+        collection_name: str = "default",
         trace=None,
     ) -> List[Dict]:
         """
@@ -75,7 +76,11 @@ class BaseVectorStore(ABC):
         pass
 
     @abstractmethod
-    def get_by_ids(self, ids: List[str]) -> List[Dict]:
+    def get_by_ids(
+        self,
+        ids: List[str],
+        collection_name: str = "default",
+    ) -> List[Dict]:
         """
         按 ID 批量取回完整记录。
 

@@ -31,7 +31,7 @@ from src.core.types import RetrievalResult
 from src.core.query_engine.query_processor import QueryProcessor
 from src.core.query_engine.dense_retriever import DenseRetriever
 from src.core.query_engine.sparse_retriever import SparseRetriever
-from src.core.query_engine.fusion import RRFusion
+from src.core.query_engine.fusion import RRFusion, create_fusion
 
 
 class HybridSearch:
@@ -57,7 +57,8 @@ class HybridSearch:
         self._query_proc = query_processor or QueryProcessor()
         self._dense = dense_retriever or DenseRetriever(settings)
         self._sparse = sparse_retriever or SparseRetriever(settings)
-        self._fusion = fusion or RRFusion(k=60)
+        self._fusion_algorithm = getattr(retrieval_cfg, "fusion_algorithm", "rrf")
+        self._fusion = fusion or create_fusion(self._fusion_algorithm)
         self._top_k_dense = retrieval_cfg.top_k_dense
         self._top_k_sparse = retrieval_cfg.top_k_sparse
         self._top_k_final = retrieval_cfg.top_k_final
@@ -124,11 +125,14 @@ class HybridSearch:
         sparse_results: List[RetrievalResult] = []
         _t0 = time.monotonic()
         try:
-            sparse_results = self._sparse.retrieve(
-                keywords=processed.keywords,
-                top_k=self._top_k_sparse,
-                trace=trace,
-            )
+            sparse_kwargs = {
+                "keywords": processed.keywords,
+                "top_k": self._top_k_sparse,
+                "trace": trace,
+            }
+            if collection != "default":
+                sparse_kwargs["collection"] = collection
+            sparse_results = self._sparse.retrieve(**sparse_kwargs)
             if trace:
                 trace.record_stage(
                     "sparse_retrieval",
@@ -160,7 +164,7 @@ class HybridSearch:
             trace.record_stage(
                 "fusion",
                 duration_ms=(time.monotonic() - _t0) * 1000,
-                algorithm="rrf",
+                algorithm=self._fusion_algorithm,
                 input_lists=len(result_lists),
                 result_count=len(fused),
             )

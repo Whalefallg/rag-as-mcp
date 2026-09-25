@@ -160,7 +160,7 @@ def load_settings(config_path: str = "config/settings.yaml") -> Settings:
 
         retrieval_cfg = RetrievalConfig(
             sparse_backend=config['retrieval']['sparse_backend'],
-            fusion_algorithm=config['retrieval']['fusion_algorithm'],
+            fusion_algorithm=config['retrieval'].get('fusion_algorithm', 'rrf'),
             top_k_dense=config['retrieval']['top_k_dense'],
             top_k_sparse=config['retrieval']['top_k_sparse'],
             top_k_final=config['retrieval']['top_k_final']
@@ -193,23 +193,82 @@ def load_settings(config_path: str = "config/settings.yaml") -> Settings:
 
 def validate_settings(settings: Settings) -> None:
     """
-    校验配置有效性，不合法时 raise ValueError（含字段路径）。
+    校验配置有效性。
 
-    把校验逻辑独立出来有两个好处：
-      1. 单元测试可以直接测试校验规则，不需要准备真实的 YAML 文件
-      2. 其他代码（如测试里手动构造的 Settings）也能复用这套校验
+    可插拔组件的合法值直接来自各 factory registry，避免 Settings 与运行时
+    实现各维护一份白名单而发生漂移。只有尚未工厂化的 sparse backend
+    仍使用显式的真实能力列表。
     """
-    if settings.llm.provider not in ['azure', 'openai', 'ollama', 'deepseek']:
-        raise ValueError(f"不支持的 LLM provider: {settings.llm.provider}")
+    # 延迟导入避免 settings <-> factory 的模块初始化循环。
+    from src.libs.llm.llm_factory import (
+        get_supported_providers as get_llm_providers,
+        get_supported_vision_providers,
+    )
+    from src.libs.embedding.embedding_factory import (
+        get_supported_providers as get_embedding_providers,
+    )
+    from src.libs.vector_store.vector_store_factory import (
+        get_supported_backends as get_vector_backends,
+    )
+    from src.libs.splitter.splitter_factory import (
+        get_supported_methods as get_splitter_methods,
+    )
+    from src.libs.reranker.reranker_factory import (
+        get_supported_backends as get_reranker_backends,
+    )
+    from src.core.query_engine.fusion import get_supported_algorithms
 
-    if settings.embedding.provider not in ['openai', 'azure', 'ollama']:
-        raise ValueError(f"不支持的 embedding provider: {settings.embedding.provider}")
+    def require_registered(label: str, value: str, supported) -> None:
+        supported_values = sorted(set(supported))
+        if value not in supported_values:
+            choices = ", ".join(supported_values) or "（无）"
+            raise ValueError(
+                f"不支持的 {label}: {value}。已注册: {choices}"
+            )
 
-    if settings.vector_store.backend not in ['chroma', 'qdrant', 'pinecone']:
-        raise ValueError(f"不支持的 vector_store backend: {settings.vector_store.backend}")
+    require_registered(
+        "LLM provider", settings.llm.provider, get_llm_providers()
+    )
+    require_registered(
+        "embedding provider",
+        settings.embedding.provider,
+        get_embedding_providers(),
+    )
+    require_registered(
+        "vector_store backend",
+        settings.vector_store.backend,
+        get_vector_backends(),
+    )
+    require_registered(
+        "splitter method",
+        settings.splitter.method,
+        get_splitter_methods(),
+    )
+    require_registered(
+        "rerank backend",
+        settings.rerank.backend,
+        get_reranker_backends(),
+    )
+    require_registered(
+        "fusion algorithm",
+        settings.retrieval.fusion_algorithm,
+        get_supported_algorithms(),
+    )
 
-    if settings.splitter.method not in ['recursive', 'semantic', 'fixed']:
-        raise ValueError(f"不支持的 splitter method: {settings.splitter.method}")
+    if settings.retrieval.sparse_backend != "bm25":
+        raise ValueError(
+            "不支持的 sparse backend: "
+            f"{settings.retrieval.sparse_backend}。已实现: bm25"
+        )
+
+    vision_cfg = (settings.raw_config or {}).get("vision_llm", {})
+    vision_provider = vision_cfg.get("provider")
+    if vision_provider:
+        require_registered(
+            "Vision LLM provider",
+            vision_provider,
+            get_supported_vision_providers(),
+        )
 
     if settings.splitter.chunk_size <= 0:
         raise ValueError("splitter.chunk_size 必须大于 0")
@@ -220,8 +279,14 @@ def validate_settings(settings: Settings) -> None:
     if settings.splitter.chunk_overlap >= settings.splitter.chunk_size:
         raise ValueError("splitter.chunk_overlap 必须小于 chunk_size")
 
-    if settings.retrieval.top_k_dense <= 0 or settings.retrieval.top_k_sparse <= 0:
-        raise ValueError("retrieval.top_k_dense 和 top_k_sparse 必须大于 0")
+    if (
+        settings.retrieval.top_k_dense <= 0
+        or settings.retrieval.top_k_sparse <= 0
+        or settings.retrieval.top_k_final <= 0
+    ):
+        raise ValueError(
+            "retrieval.top_k_dense、top_k_sparse 和 top_k_final 必须大于 0"
+        )
 
-    if settings.rerank.backend not in ['none', 'cross_encoder', 'llm']:
-        raise ValueError(f"不支持的 rerank backend: {settings.rerank.backend}")
+    if settings.rerank.top_m <= 0:
+        raise ValueError("rerank.top_m 必须大于 0")

@@ -22,22 +22,22 @@ from src.libs.evaluator.base_evaluator import BaseEvaluator
 from src.core.settings import load_settings
 
 @register_llm("test_llm")
-class TestLLM(BaseLLM):
+class FactoryLLM(BaseLLM):
     def chat(self, messages):
         return ChatResponse(content="test", model=self.model)
 
 @register_embedding("test_emb")
-class TestEmbedding(BaseEmbedding):
+class FactoryEmbedding(BaseEmbedding):
     def embed(self, texts, trace=None):
         return [[1.0] * 3 for _ in texts]
 
 @register_splitter("test_split")
-class TestSplitter(BaseSplitter):
+class FactorySplitter(BaseSplitter):
     def split_text(self, text, trace=None):
         return [text[:100], text[100:]]
 
 @register_vector_store("test_store")
-class TestVectorStore(BaseVectorStore):
+class FactoryVectorStore(BaseVectorStore):
     def upsert(self, records, trace=None):
         pass
     def query(self, vector, top_k, filters=None, trace=None):
@@ -48,7 +48,7 @@ class TestVectorStore(BaseVectorStore):
         return 0
 
 @register_evaluator("test_eval")
-class TestEvaluator(BaseEvaluator):
+class FactoryEvaluator(BaseEvaluator):
     def evaluate(self, query, retrieved_chunks, generated_answer=None, ground_truth=None):
         return {"hit_rate": 0.9}
 

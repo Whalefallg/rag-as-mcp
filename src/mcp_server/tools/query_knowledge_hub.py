@@ -18,6 +18,8 @@ query_knowledge_hub Tool (src/mcp_server/tools/query_knowledge_hub.py)
 from typing import Any, Dict, List
 
 from src.core.settings import Settings
+from src.core.trace.trace_context import TraceContext
+from src.core.trace.trace_collector import global_collector
 from src.observability.logger import get_logger
 
 logger = get_logger(__name__)
@@ -82,53 +84,118 @@ def _get_components(settings: Settings):
 
 
 def execute(arguments: Dict[str, Any], settings: Settings) -> List[Dict[str, Any]]:
-    """
-    执行知识库混合检索并返回 MCP content 数组。
-
-    流程：
-      1. 参数校验
-      2. HybridSearch.search()   → 混合召回 Top-K 候选
-      3. Reranker.rerank()       → 精排（backend=none 时透传）
-      4. MultimodalAssembler     → 收集关联图片
-      5. ResponseBuilder         → 构建 Markdown + ImageContent
-    """
+    """执行知识库混合检索，并让一个 TraceContext 贯穿整条 query 链路。"""
     query: str = arguments.get("query", "").strip()
-    if not query:
-        return [{"type": "text", "text": "错误：查询内容不能为空。"}]
-
     top_k: int = min(int(arguments.get("top_k", 10)), 50)
     collection: str = arguments.get("collection", "default")
 
-    logger.info(f"[query_knowledge_hub] query={query!r} top_k={top_k} collection={collection}")
+    trace = TraceContext(trace_type="query")
+    trace.set_metadata("user_query", query)
+    trace.set_metadata("collection", collection)
+    trace.set_metadata("top_k", top_k)
+    trace.set_metadata("status", "running")
 
     try:
-        components = _get_components(settings)
-        hybrid_search = components["hybrid_search"]
-        reranker = components["reranker"]
-        builder = components["builder"]
-        assembler = components["assembler"]
-    except Exception as e:
-        logger.error(f"Failed to initialize search components: {e}", exc_info=True)
-        return [{"type": "text", "text": f"检索组件初始化失败，请检查配置。错误：{e}"}]
+        if not query:
+            trace.record_stage(
+                "validation",
+                status="error",
+                error="empty query",
+            )
+            trace.set_metadata("status", "error")
+            return [{"type": "text", "text": "错误：查询内容不能为空。"}]
 
-    # 混合检索
-    try:
-        results = hybrid_search.search(query=query, top_k=top_k, collection=collection)
-    except Exception as e:
-        logger.error(f"HybridSearch error: {e}", exc_info=True)
-        return [{"type": "text", "text": f"检索时发生错误：{e}"}]
+        logger.info(
+            f"[query_knowledge_hub] query={query!r} "
+            f"top_k={top_k} collection={collection}"
+        )
 
-    # 精排
-    if results:
         try:
-            results = reranker.rerank(query=query, candidates=results)
-        except Exception as e:
-            logger.warning(f"Reranker failed, using fusion results: {e}")
-            # 精排失败时降级使用融合结果，不中断
+            components = _get_components(settings)
+            hybrid_search = components["hybrid_search"]
+            reranker = components["reranker"]
+            builder = components["builder"]
+            assembler = components["assembler"]
+            trace.record_stage("component_init", status="ok")
+        except Exception as exc:
+            trace.record_stage(
+                "component_init",
+                status="error",
+                error=str(exc),
+            )
+            trace.set_metadata("status", "error")
+            logger.error(
+                f"Failed to initialize search components: {exc}",
+                exc_info=True,
+            )
+            return [{
+                "type": "text",
+                "text": f"检索组件初始化失败，请检查配置。错误：{exc}",
+            }]
 
-    # 多模态组装
-    image_contents = assembler.assemble(results, max_images=3)
+        rerank_enabled = settings.rerank.backend != "none"
+        candidate_k = (
+            max(top_k, settings.rerank.top_m)
+            if rerank_enabled
+            else top_k
+        )
+        trace.set_metadata("candidate_k", candidate_k)
+        trace.set_metadata("rerank_backend", settings.rerank.backend)
 
-    # 构建响应
-    content = builder.build(results, query, image_contents)
-    return content
+        try:
+            results = hybrid_search.search(
+                query=query,
+                top_k=candidate_k,
+                collection=collection,
+                trace=trace,
+            )
+        except Exception as exc:
+            trace.record_stage(
+                "hybrid_search",
+                status="error",
+                error=str(exc),
+            )
+            trace.set_metadata("status", "error")
+            logger.error(f"HybridSearch error: {exc}", exc_info=True)
+            return [{
+                "type": "text",
+                "text": f"检索时发生错误：{exc}",
+            }]
+
+        if results:
+            try:
+                results = reranker.rerank(
+                    query=query,
+                    candidates=results,
+                    top_k=top_k,
+                    trace=trace,
+                )
+            except Exception as exc:
+                trace.record_stage(
+                    "rerank_tool_fallback",
+                    status="degraded",
+                    error=str(exc),
+                )
+                logger.warning(
+                    f"Reranker failed, using fusion results: {exc}"
+                )
+                results = results[:top_k]
+
+        image_contents = assembler.assemble(
+            results,
+            max_images=3,
+            trace=trace,
+        )
+
+        content = builder.build(
+            results,
+            query,
+            image_contents,
+            trace=trace,
+        )
+        trace.set_metadata("result_count", len(results))
+        trace.set_metadata("status", "ok")
+        return content
+    finally:
+        global_collector.collect(trace)
+

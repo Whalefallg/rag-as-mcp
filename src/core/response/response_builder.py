@@ -12,9 +12,11 @@ ResponseBuilder (src/core/response/response_builder.py)
     content[1..n]: ImageContent（Base64 图片，可选）
     structuredContent: 机器可读的结构化引用（供高级 Client 解析）
 """
+import time
 from typing import Any, Dict, List, Optional
 
 from src.core.types import RetrievalResult
+from src.core.trace.trace_context import TraceContext
 
 
 class ResponseBuilder:
@@ -38,6 +40,7 @@ class ResponseBuilder:
         results: List[RetrievalResult],
         query: str,
         image_contents: Optional[List[Dict[str, Any]]] = None,
+        trace: Optional[TraceContext] = None,
     ) -> List[Dict[str, Any]]:
         """
         构建完整的 MCP content 数组。
@@ -49,8 +52,17 @@ class ResponseBuilder:
         Returns:
             符合 MCP 规范的 content 数组。
         """
+        started = time.monotonic()
         if not results:
-            return [{"type": "text", "text": _NO_RESULT_MSG}]
+            content = [{"type": "text", "text": _NO_RESULT_MSG}]
+            if trace:
+                trace.record_stage(
+                    "response_build",
+                    duration_ms=(time.monotonic() - started) * 1000,
+                    result_count=0,
+                    image_count=0,
+                )
+            return content
 
         # 1. 构建 Markdown 文本（含引用标注）
         markdown = self._build_markdown(results, query)
@@ -60,6 +72,13 @@ class ResponseBuilder:
         if image_contents:
             content.extend(image_contents)
 
+        if trace:
+            trace.record_stage(
+                "response_build",
+                duration_ms=(time.monotonic() - started) * 1000,
+                result_count=len(results),
+                image_count=len(image_contents or []),
+            )
         return content
 
     def build_with_structured(
@@ -67,6 +86,7 @@ class ResponseBuilder:
         results: List[RetrievalResult],
         query: str,
         image_contents: Optional[List[Dict[str, Any]]] = None,
+        trace: Optional[TraceContext] = None,
     ) -> Dict[str, Any]:
         """
         构建包含 structuredContent 的完整 tool 响应体。
@@ -75,7 +95,12 @@ class ResponseBuilder:
           {"content": [...], "structuredContent": {"citations": [...]}}
         """
         from src.core.response.citation_generator import CitationGenerator
-        content = self.build(results, query, image_contents)
+        content = self.build(
+            results,
+            query,
+            image_contents,
+            trace=trace,
+        )
         citations = CitationGenerator().generate(results)
         return {
             "content": content,

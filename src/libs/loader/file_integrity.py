@@ -1,27 +1,14 @@
 """
 文件完整性检查 (src/libs/loader/file_integrity.py)
 ===================================================
-为什么需要这个文件：
-  重复摄取是 RAG 系统最常见的运营问题——同一文件摄取两次会产生重复向量。
-  SQLiteIntegrityChecker 用 SHA256 哈希 + SQLite 记录解决：
-  成功摄取的文件下次会被跳过，失败的文件允许重试（幂等核心语义）。
+基于 SHA256 + SQLite 的摄取幂等记录。
 
-本文件实现基于 SHA256 的文件去重与摄取历史管理。
-
-类说明:
-  - FileIntegrityChecker    : 抽象基类，定义"计算 hash / 是否跳过 / 标记结果"三个接口，
-                              方便后续替换 Redis / PostgreSQL 等后端。
-
-  - SQLiteIntegrityChecker  : 默认实现，使用本地 SQLite（WAL 模式）持久化摄取历史。
-                              compute_sha256()：读文件按 64KB 分块流式计算，避免大文件 OOM。
-                              should_skip()    ：hash 存在且状态为 success 时返回 True，
-                                                 状态为 failed 时允许重试。
-                              mark_success()   ：写入/更新记录，status=success。
-                              mark_failed()    ：写入/更新记录，status=failed，记录错误原因。
+同一个文件允许进入多个 collection，因此幂等键必须是
+(file_hash, collection)，而不是全局 file_hash。
 """
 import hashlib
-import sqlite3
 import os
+import sqlite3
 from abc import ABC, abstractmethod
 from datetime import datetime, timezone
 from pathlib import Path
@@ -29,52 +16,68 @@ from typing import Optional
 
 
 class FileIntegrityChecker(ABC):
-    """文件完整性检查抽象基类"""
+    """文件完整性检查抽象基类。"""
 
     @abstractmethod
     def compute_sha256(self, path: str) -> str:
-        """计算文件的 SHA256 哈希值"""
         pass
 
     @abstractmethod
-    def should_skip(self, file_hash: str) -> bool:
-        """hash 已成功摄取时返回 True，表示可跳过"""
+    def should_skip(
+        self,
+        file_hash: str,
+        collection: str = "default",
+    ) -> bool:
         pass
 
     @abstractmethod
-    def mark_success(self, file_hash: str, file_path: str, metadata: Optional[dict] = None) -> None:
-        """将此 hash 标记为摄取成功"""
+    def mark_success(
+        self,
+        file_hash: str,
+        file_path: str,
+        metadata: Optional[dict] = None,
+        collection: str = "default",
+    ) -> None:
         pass
 
     @abstractmethod
-    def mark_failed(self, file_hash: str, error_msg: str) -> None:
-        """将此 hash 标记为摄取失败"""
+    def mark_failed(
+        self,
+        file_hash: str,
+        error_msg: str,
+        collection: str = "default",
+    ) -> None:
         pass
 
 
 class SQLiteIntegrityChecker(FileIntegrityChecker):
-    """基于 SQLite 的文件完整性检查实现（WAL 模式，支持并发）"""
+    """基于 SQLite 的文件完整性检查实现（WAL 模式）。"""
 
-    _SCHEMA = """
+    _TABLE_SCHEMA = """
     CREATE TABLE IF NOT EXISTS ingestion_history (
-        file_hash   TEXT PRIMARY KEY,
+        file_hash   TEXT NOT NULL,
+        collection  TEXT NOT NULL DEFAULT 'default',
         file_path   TEXT NOT NULL,
         status      TEXT NOT NULL DEFAULT 'pending',
         error_msg   TEXT,
         ingested_at TEXT,
-        updated_at  TEXT NOT NULL
+        updated_at  TEXT NOT NULL,
+        PRIMARY KEY (file_hash, collection)
     );
-    CREATE INDEX IF NOT EXISTS idx_status ON ingestion_history(status);
+    """
+
+    _INDEX_SCHEMA = """
+    CREATE INDEX IF NOT EXISTS idx_status
+        ON ingestion_history(status);
+    CREATE INDEX IF NOT EXISTS idx_collection
+        ON ingestion_history(collection);
     """
 
     def __init__(self, db_path: str = "data/db/ingestion_history.db"):
         self._db_path = db_path
         self._ensure_db()
 
-    # ── 内部工具 ──────────────────────────────────────────────────────────────
-
     def _connect(self) -> sqlite3.Connection:
-        """创建连接，自动开启 WAL 模式"""
         os.makedirs(Path(self._db_path).parent, exist_ok=True)
         conn = sqlite3.connect(self._db_path, check_same_thread=False)
         conn.execute("PRAGMA journal_mode=WAL")
@@ -83,90 +86,222 @@ class SQLiteIntegrityChecker(FileIntegrityChecker):
         return conn
 
     def _ensure_db(self) -> None:
-        """初始化数据库 schema"""
+        """
+        初始化 schema，并把旧版 file_hash PRIMARY KEY 表迁移到复合主键。
+
+        旧记录归入 default collection，保证升级后原有默认知识库仍可识别。
+        """
         with self._connect() as conn:
-            conn.executescript(self._SCHEMA)
+            exists = conn.execute(
+                """
+                SELECT 1
+                FROM sqlite_master
+                WHERE type = 'table' AND name = 'ingestion_history'
+                """
+            ).fetchone()
+
+            if not exists:
+                conn.execute(self._TABLE_SCHEMA)
+                conn.executescript(self._INDEX_SCHEMA)
+                return
+
+            columns = conn.execute(
+                "PRAGMA table_info(ingestion_history)"
+            ).fetchall()
+            names = {row["name"] for row in columns}
+            pk_rows = [row for row in columns if row["pk"]]
+            pk_cols = [
+                row["name"]
+                for row in sorted(pk_rows, key=lambda row: row["pk"])
+            ]
+
+            if (
+                "collection" not in names
+                or pk_cols != ["file_hash", "collection"]
+            ):
+                conn.execute(
+                    "ALTER TABLE ingestion_history "
+                    "RENAME TO ingestion_history_legacy"
+                )
+                conn.execute(self._TABLE_SCHEMA)
+
+                if "collection" in names:
+                    collection_expr = (
+                        "COALESCE(collection, 'default')"
+                    )
+                else:
+                    collection_expr = "'default'"
+
+                conn.execute(
+                    f"""
+                    INSERT OR REPLACE INTO ingestion_history (
+                        file_hash, collection, file_path, status,
+                        error_msg, ingested_at, updated_at
+                    )
+                    SELECT
+                        file_hash, {collection_expr}, file_path, status,
+                        error_msg, ingested_at, updated_at
+                    FROM ingestion_history_legacy
+                    """
+                )
+                conn.execute("DROP TABLE ingestion_history_legacy")
+
+            conn.executescript(self._INDEX_SCHEMA)
 
     @staticmethod
     def _now() -> str:
         return datetime.now(timezone.utc).isoformat()
 
-    # ── 公共接口 ──────────────────────────────────────────────────────────────
-
     def compute_sha256(self, path: str) -> str:
-        """分块流式计算 SHA256，避免大文件 OOM（64KB/块）"""
         h = hashlib.sha256()
         with open(path, "rb") as f:
             for chunk in iter(lambda: f.read(65536), b""):
                 h.update(chunk)
         return h.hexdigest()
 
-    def should_skip(self, file_hash: str) -> bool:
-        """hash 对应记录存在且 status=success 时返回 True"""
+    def should_skip(
+        self,
+        file_hash: str,
+        collection: str = "default",
+    ) -> bool:
         with self._connect() as conn:
             row = conn.execute(
-                "SELECT status FROM ingestion_history WHERE file_hash = ?",
-                (file_hash,),
+                """
+                SELECT status
+                FROM ingestion_history
+                WHERE file_hash = ? AND collection = ?
+                """,
+                (file_hash, collection),
             ).fetchone()
         return row is not None and row["status"] == "success"
 
-    def mark_success(self, file_hash: str, file_path: str, metadata: Optional[dict] = None) -> None:
-        """写入/更新为 success 状态"""
+    def mark_success(
+        self,
+        file_hash: str,
+        file_path: str,
+        metadata: Optional[dict] = None,
+        collection: str = "default",
+    ) -> None:
         now = self._now()
         with self._connect() as conn:
+            # 同一路径在同一 collection 中只保留当前成功版本。
+            # 这样 v1 -> v2 成功后，如果文件又回退到 v1，不会被旧 hash 错误跳过。
             conn.execute(
                 """
-                INSERT INTO ingestion_history (file_hash, file_path, status, ingested_at, updated_at)
-                VALUES (?, ?, 'success', ?, ?)
-                ON CONFLICT(file_hash) DO UPDATE SET
+                DELETE FROM ingestion_history
+                WHERE file_path = ?
+                  AND collection = ?
+                  AND file_hash <> ?
+                """,
+                (file_path, collection, file_hash),
+            )
+            conn.execute(
+                """
+                INSERT INTO ingestion_history (
+                    file_hash, collection, file_path,
+                    status, ingested_at, updated_at
+                )
+                VALUES (?, ?, ?, 'success', ?, ?)
+                ON CONFLICT(file_hash, collection) DO UPDATE SET
                     file_path   = excluded.file_path,
                     status      = 'success',
                     error_msg   = NULL,
                     ingested_at = excluded.ingested_at,
                     updated_at  = excluded.updated_at
                 """,
-                (file_hash, file_path, now, now),
+                (file_hash, collection, file_path, now, now),
             )
 
-    def mark_failed(self, file_hash: str, error_msg: str) -> None:
-        """写入/更新为 failed 状态，保留错误原因"""
+    def mark_failed(
+        self,
+        file_hash: str,
+        error_msg: str,
+        collection: str = "default",
+    ) -> None:
         now = self._now()
         with self._connect() as conn:
             conn.execute(
                 """
-                INSERT INTO ingestion_history (file_hash, file_path, status, error_msg, updated_at)
-                VALUES (?, '', 'failed', ?, ?)
-                ON CONFLICT(file_hash) DO UPDATE SET
+                INSERT INTO ingestion_history (
+                    file_hash, collection, file_path,
+                    status, error_msg, updated_at
+                )
+                VALUES (?, ?, '', 'failed', ?, ?)
+                ON CONFLICT(file_hash, collection) DO UPDATE SET
                     status     = 'failed',
                     error_msg  = excluded.error_msg,
                     updated_at = excluded.updated_at
                 """,
-                (file_hash, error_msg, now),
+                (file_hash, collection, error_msg, now),
             )
 
-    def get_record(self, file_hash: str) -> Optional[dict]:
-        """调试用：返回完整记录"""
+    def get_record(
+        self,
+        file_hash: str,
+        collection: str = "default",
+    ) -> Optional[dict]:
         with self._connect() as conn:
             row = conn.execute(
-                "SELECT * FROM ingestion_history WHERE file_hash = ?",
-                (file_hash,),
+                """
+                SELECT *
+                FROM ingestion_history
+                WHERE file_hash = ? AND collection = ?
+                """,
+                (file_hash, collection),
             ).fetchone()
         return dict(row) if row else None
 
-    def remove_record(self, file_path: str) -> bool:
-        """按 file_path 删除完整性记录，返回是否找到并删除。"""
+    def remove_record(
+        self,
+        file_path: str,
+        collection: Optional[str] = None,
+    ) -> bool:
+        """
+        删除摄取历史。
+
+        collection=None 保留旧行为（删除该路径所有 collection 的记录）；
+        指定 collection 时只删除该知识库的记录。
+        """
         with self._connect() as conn:
-            cur = conn.execute(
-                'DELETE FROM ingestion_history WHERE file_path = ?',
-                (file_path,),
-            )
+            if collection is None:
+                cur = conn.execute(
+                    "DELETE FROM ingestion_history WHERE file_path = ?",
+                    (file_path,),
+                )
+            else:
+                cur = conn.execute(
+                    """
+                    DELETE FROM ingestion_history
+                    WHERE file_path = ? AND collection = ?
+                    """,
+                    (file_path, collection),
+                )
             return cur.rowcount > 0
 
-    def list_processed(self, status: str = 'success') -> list:
-        """返回指定状态的所有记录列表，供 DocumentManager 查询。"""
+    def list_processed(
+        self,
+        status: str = "success",
+        collection: Optional[str] = None,
+    ) -> list:
         with self._connect() as conn:
-            rows = conn.execute(
-                'SELECT * FROM ingestion_history WHERE status = ? ORDER BY ingested_at DESC',
-                (status,),
-            ).fetchall()
-        return [dict(r) for r in rows]
+            if collection is None:
+                rows = conn.execute(
+                    """
+                    SELECT *
+                    FROM ingestion_history
+                    WHERE status = ?
+                    ORDER BY ingested_at DESC
+                    """,
+                    (status,),
+                ).fetchall()
+            else:
+                rows = conn.execute(
+                    """
+                    SELECT *
+                    FROM ingestion_history
+                    WHERE status = ? AND collection = ?
+                    ORDER BY ingested_at DESC
+                    """,
+                    (status, collection),
+                ).fetchall()
+        return [dict(row) for row in rows]

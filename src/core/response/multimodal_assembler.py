@@ -21,11 +21,14 @@ MultimodalAssembler (src/core/response/multimodal_assembler.py)
     - ImageStorage 未配置 → 直接返回空列表
 """
 import base64
+import json
 import mimetypes
+import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from src.core.types import RetrievalResult
+from src.core.trace.trace_context import TraceContext
 from src.observability.logger import get_logger
 
 logger = get_logger(__name__)
@@ -55,6 +58,7 @@ class MultimodalAssembler:
         self,
         results: List[RetrievalResult],
         max_images: int = 3,
+        trace: Optional[TraceContext] = None,
     ) -> List[Dict[str, Any]]:
         """
         从检索结果中收集图片，返回 MCP ImageContent 列表。
@@ -66,7 +70,15 @@ class MultimodalAssembler:
             MCP ImageContent 列表，每项格式：
             {"type": "image", "data": "<base64>", "mimeType": "image/png"}
         """
+        started = time.monotonic()
         if self._storage is None:
+            if trace:
+                trace.record_stage(
+                    "multimodal_assembly",
+                    duration_ms=(time.monotonic() - started) * 1000,
+                    image_count=0,
+                    storage_available=False,
+                )
             return []
 
         image_contents: List[Dict[str, Any]] = []
@@ -75,23 +87,46 @@ class MultimodalAssembler:
         for result in results:
             if len(image_contents) >= max_images:
                 break
-            image_refs = result.metadata.get("image_refs", [])
+
+            collection = result.metadata.get("collection")
+            image_refs = _parse_image_refs(
+                result.metadata.get("image_refs", [])
+            )
             for image_id in image_refs:
-                if image_id in seen_ids:
+                dedup_key = (collection, image_id)
+                if dedup_key in seen_ids:
                     continue
-                seen_ids.add(image_id)
-                content = self._load_image(image_id)
+                seen_ids.add(dedup_key)
+                content = self._load_image(
+                    image_id, collection=collection
+                )
                 if content is not None:
                     image_contents.append(content)
                     if len(image_contents) >= max_images:
                         break
 
+        if trace:
+            trace.record_stage(
+                "multimodal_assembly",
+                duration_ms=(time.monotonic() - started) * 1000,
+                image_count=len(image_contents),
+                storage_available=True,
+            )
         return image_contents
 
-    def _load_image(self, image_id: str) -> Optional[Dict[str, Any]]:
-        """加载单张图片并编码为 Base64 ImageContent"""
+    def _load_image(
+        self,
+        image_id: str,
+        collection: Optional[str] = None,
+    ) -> Optional[Dict[str, Any]]:
+        """加载单张图片并编码为 Base64 ImageContent。"""
         try:
-            path_str = self._storage.get_path(image_id)
+            if collection is None:
+                path_str = self._storage.get_path(image_id)
+            else:
+                path_str = self._storage.get_path(
+                    image_id, collection=collection
+                )
             if path_str is None:
                 logger.debug(f"Image not found in storage: {image_id}")
                 return None
@@ -113,6 +148,23 @@ class MultimodalAssembler:
         except Exception as e:
             logger.warning(f"Failed to load image {image_id}: {e}")
             return None
+
+
+def _parse_image_refs(raw) -> List[str]:
+    """兼容内存 list 与 Chroma 中 JSON-string 两种 image_refs 表示。"""
+    if isinstance(raw, list):
+        return [str(item) for item in raw]
+    if isinstance(raw, str):
+        if not raw:
+            return []
+        try:
+            parsed = json.loads(raw)
+        except (TypeError, ValueError, json.JSONDecodeError):
+            return [raw]
+        if isinstance(parsed, list):
+            return [str(item) for item in parsed]
+        return [str(parsed)]
+    return []
 
 
 def _detect_mime(path: Path) -> str:

@@ -86,17 +86,18 @@ export MCP_SETTINGS_PATH="/absolute/path/to/settings.yaml"
 
 ## 无付费 API 的最小验证
 
-核心算法和协议测试不访问外部模型服务：
+核心算法和协议测试不访问外部模型服务。测试按目录分层：
 
 ```bash
+python -m pytest tests/unit -q
+python -m pytest tests/integration -q
+python -m pytest tests/e2e -q
 python -m pytest -q
 ```
 
-也可以单独验证 RRF 融合与 MCP 协议：
-
-```bash
-python -m pytest tests/unit/test_fusion_rrf.py tests/integration/test_mcp_server.py -q
-```
+CI 在 Python 3.10 和 3.12 上运行 unit tests，并在 Python 3.12 上独立运行
+integration / e2e tests。`PytestCollectionWarning` 会被视为错误，避免测试 helper
+因命名问题被静默跳过。
 
 ## 运行完整流程
 
@@ -159,19 +160,23 @@ python scripts/evaluate.py --evaluator local
 
 Server 使用 stdout 传输 JSON-RPC 消息，运行日志写入 stderr。
 
-## 已知限制
+## 当前运行契约与已知限制
 
 - 当前 Loader 主要面向 PDF，其他文档格式尚未实现。
-- 默认向量存储实现为 ChromaDB；其他后端仅保留配置接口。
+- 当前已注册的 VectorStore backend 是 Chroma；未注册 backend 会在配置校验阶段直接拒绝，而不是延迟到运行时失败。
+- Dense / BM25 / ImageStorage / FileIntegrity 都按 collection 隔离；文档更新采用“先写新版本、再清 stale”的可重试收敛策略。
+- `DocumentManager.delete_document()` 是 best-effort 协调删除，不是跨四类存储的 ACID 事务；返回结果会明确列出成功和失败的 store。
+- Query tool 创建单一 `TraceContext` 并贯穿 Dense / Sparse / Fusion / Rerank / Multimodal / Response，失败路径也会收集 trace。
 - 外部模型服务的输出、速率限制和费用不由本项目控制。
-- 演示测试覆盖核心组件与协议行为，但不代表生产环境容量或性能结论。
-- 多进程写入和分布式部署不在当前范围内。
+- 测试覆盖核心组件与协议行为，但不代表生产环境容量或性能结论；多进程写入和分布式部署不在当前范围内。
+
+当前 correctness hardening 的具体语义见 `knowledge/CORRECTNESS-HARDENING.md`。
 
 ## 后续计划
 
-- 增加可重复执行的检索基准和实验记录
+- 增加基于真实已摄取数据的可重复检索基准和实验记录
 - 补充更多文档 Loader
-- 改进配置校验与 Provider 错误信息
+- 扩展新的 VectorStore / Fusion 实现，并通过 registry 暴露能力
 - 为 MCP 客户端增加完整的端到端示例
 
 ## License
