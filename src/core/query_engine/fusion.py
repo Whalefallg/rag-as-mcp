@@ -84,3 +84,23 @@ class RRFusion:
             )
             for cid, score in ranked
         ]
+
+_FUSION_REGISTRY = {
+    "rrf": RRFusion,
+}
+
+
+def create_fusion(algorithm: str):
+    """按算法名创建 fusion 实现。"""
+    if algorithm not in _FUSION_REGISTRY:
+        supported = ", ".join(sorted(_FUSION_REGISTRY))
+        raise ValueError(
+            f"不支持的 fusion algorithm: '{algorithm}'。"
+            f"已注册的算法: {supported}"
+        )
+    return _FUSION_REGISTRY[algorithm]()
+
+
+def get_supported_algorithms() -> list:
+    """返回当前真实注册的 fusion 算法。"""
+    return list(_FUSION_REGISTRY.keys())

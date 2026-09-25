@@ -112,8 +112,20 @@ def execute(arguments: Dict[str, Any], settings: Settings) -> List[Dict[str, Any
         return [{"type": "text", "text": f"检索组件初始化失败，请检查配置。错误：{e}"}]
 
     # 混合检索
+    # rerank.top_m 表示精排前希望至少保留的候选池大小。
+    # 用户请求的 top_k 更大时尊重用户请求，因此候选池取两者最大值。
+    rerank_enabled = settings.rerank.backend != "none"
+    candidate_k = (
+        max(top_k, settings.rerank.top_m)
+        if rerank_enabled
+        else top_k
+    )
     try:
-        results = hybrid_search.search(query=query, top_k=top_k, collection=collection)
+        results = hybrid_search.search(
+            query=query,
+            top_k=candidate_k,
+            collection=collection,
+        )
     except Exception as e:
         logger.error(f"HybridSearch error: {e}", exc_info=True)
         return [{"type": "text", "text": f"检索时发生错误：{e}"}]
@@ -121,7 +133,11 @@ def execute(arguments: Dict[str, Any], settings: Settings) -> List[Dict[str, Any
     # 精排
     if results:
         try:
-            results = reranker.rerank(query=query, candidates=results)
+            results = reranker.rerank(
+                query=query,
+                candidates=results,
+                top_k=top_k,
+            )
         except Exception as e:
             logger.warning(f"Reranker failed, using fusion results: {e}")
             # 精排失败时降级使用融合结果，不中断

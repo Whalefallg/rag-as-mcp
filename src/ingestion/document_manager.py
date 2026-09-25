@@ -4,7 +4,7 @@ DocumentManager (src/ingestion/document_manager.py)
 为什么需要这个文件：
   文档的"删除"操作跨越四个存储：ChromaDB、BM25 索引、ImageStorage、FileIntegrity。
   如果各存储各自删除，任一步失败就会造成数据不一致（Chroma 删了但 BM25 还在）。
-  DocumentManager 把四个存储的协调删除封装成一次原子性操作（尽力而为），
+  DocumentManager 把四个存储的删除封装成一次 best-effort 协调操作，
   提供明确的成功/失败报告。
 
   与 DataService 的区别：
@@ -72,13 +72,29 @@ class DocumentManager:
 
     @classmethod
     def from_settings(cls, settings) -> "DocumentManager":
-        from src.libs.vector_store.chroma_store import ChromaStore
+        from src.libs.vector_store.vector_store_factory import create_vector_store
         from src.ingestion.storage.bm25_indexer import BM25Indexer
         from src.ingestion.storage.image_storage import ImageStorage
         from src.libs.loader.file_integrity import SQLiteIntegrityChecker
 
+        store = create_vector_store(settings)
+        required = (
+            "get_by_metadata",
+            "delete_by_metadata",
+            "list_collections",
+        )
+        missing = [
+            name for name in required
+            if not callable(getattr(store, name, None))
+        ]
+        if missing:
+            raise ValueError(
+                "当前 VectorStore 不支持 DocumentManager 生命周期接口: "
+                + ", ".join(missing)
+            )
+
         return cls(
-            chroma_store=ChromaStore(settings),
+            chroma_store=store,
             bm25_indexer=BM25Indexer(),
             image_storage=ImageStorage(),
             file_integrity=SQLiteIntegrityChecker(),
@@ -99,7 +115,7 @@ class DocumentManager:
         """
         try:
             collections = self._get_collections(collection)
-            docs: Dict[str, DocumentInfo] = {}
+            docs: Dict[tuple, DocumentInfo] = {}
 
             for col_name in collections:
                 items = self._chroma.get_by_metadata(
@@ -107,14 +123,15 @@ class DocumentManager:
                 )
                 for item in items:
                     src = item.metadata.get("source_path", "unknown")
-                    if src not in docs:
-                        docs[src] = DocumentInfo(
+                    key = (col_name, src)
+                    if key not in docs:
+                        docs[key] = DocumentInfo(
                             source_path=src,
                             collection=col_name,
                             chunk_count=0,
                             title=item.metadata.get("title", _basename(src)),
                         )
-                    docs[src].chunk_count += 1
+                    docs[key].chunk_count += 1
             return sorted(docs.values(), key=lambda d: d.source_path)
         except Exception:
             return []
@@ -157,6 +174,9 @@ class DocumentManager:
         """
         result = DeleteResult(source_path=source_path, success=False)
         errors = []
+        successful_stores = []
+        failed_stores = []
+        result.details["mode"] = "best_effort"
 
         # 1. Chroma
         try:
@@ -166,8 +186,10 @@ class DocumentManager:
             )
             result.deleted_chunks = deleted_chunks
             result.details["chroma"] = f"deleted {deleted_chunks} chunks"
+            successful_stores.append("chroma")
         except Exception as exc:
             errors.append(f"chroma: {exc}")
+            failed_stores.append("chroma")
 
         # 2. BM25
         try:
@@ -178,8 +200,10 @@ class DocumentManager:
                     source_path, collection=collection
                 )
             result.details["bm25"] = "ok"
+            successful_stores.append("bm25")
         except Exception as exc:
             errors.append(f"bm25: {exc}")
+            failed_stores.append("bm25")
 
         # 3. ImageStorage
         try:
@@ -191,8 +215,10 @@ class DocumentManager:
                 )
             result.deleted_images = deleted_images
             result.details["images"] = f"deleted {deleted_images} images"
+            successful_stores.append("images")
         except Exception as exc:
             errors.append(f"images: {exc}")
+            failed_stores.append("images")
 
         # 4. FileIntegrity（最后删）
         try:
@@ -203,8 +229,13 @@ class DocumentManager:
                     source_path, collection=collection
                 )
             result.details["integrity"] = "ok"
+            successful_stores.append("integrity")
         except Exception as exc:
             errors.append(f"integrity: {exc}")
+            failed_stores.append("integrity")
+
+        result.details["successful_stores"] = successful_stores
+        result.details["failed_stores"] = failed_stores
 
         if errors:
             result.error = "; ".join(errors)
