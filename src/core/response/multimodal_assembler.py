@@ -23,10 +23,12 @@ MultimodalAssembler (src/core/response/multimodal_assembler.py)
 import base64
 import json
 import mimetypes
+import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from src.core.types import RetrievalResult
+from src.core.trace.trace_context import TraceContext
 from src.observability.logger import get_logger
 
 logger = get_logger(__name__)
@@ -56,6 +58,7 @@ class MultimodalAssembler:
         self,
         results: List[RetrievalResult],
         max_images: int = 3,
+        trace: Optional[TraceContext] = None,
     ) -> List[Dict[str, Any]]:
         """
         从检索结果中收集图片，返回 MCP ImageContent 列表。
@@ -67,7 +70,15 @@ class MultimodalAssembler:
             MCP ImageContent 列表，每项格式：
             {"type": "image", "data": "<base64>", "mimeType": "image/png"}
         """
+        started = time.monotonic()
         if self._storage is None:
+            if trace:
+                trace.record_stage(
+                    "multimodal_assembly",
+                    duration_ms=(time.monotonic() - started) * 1000,
+                    image_count=0,
+                    storage_available=False,
+                )
             return []
 
         image_contents: List[Dict[str, Any]] = []
@@ -94,6 +105,13 @@ class MultimodalAssembler:
                     if len(image_contents) >= max_images:
                         break
 
+        if trace:
+            trace.record_stage(
+                "multimodal_assembly",
+                duration_ms=(time.monotonic() - started) * 1000,
+                image_count=len(image_contents),
+                storage_available=True,
+            )
         return image_contents
 
     def _load_image(

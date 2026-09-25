@@ -124,11 +124,11 @@ def test_query_tool_uses_top_m_as_rerank_candidate_window():
             return kwargs["candidates"][: kwargs["top_k"]]
 
     class Assembler:
-        def assemble(self, results, max_images=3):
+        def assemble(self, results, max_images=3, trace=None):
             return []
 
     class Builder:
-        def build(self, results, query, image_contents):
+        def build(self, results, query, image_contents, trace=None):
             calls["final_count"] = len(results)
             return [{"type": "text", "text": "ok"}]
 
@@ -163,11 +163,11 @@ def test_query_tool_does_not_expand_candidates_when_rerank_disabled():
             return []
 
     class Assembler:
-        def assemble(self, results, max_images=3):
+        def assemble(self, results, max_images=3, trace=None):
             return []
 
     class Builder:
-        def build(self, results, query, image_contents):
+        def build(self, results, query, image_contents, trace=None):
             return [{"type": "text", "text": "ok"}]
 
     components = {
