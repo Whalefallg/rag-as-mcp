@@ -183,7 +183,12 @@ class DocumentManager:
 
         # 3. ImageStorage
         try:
-            deleted_images = self._images.delete_by_source(source_path)
+            if collection == "default":
+                deleted_images = self._images.delete_by_source(source_path)
+            else:
+                deleted_images = self._images.delete_by_source(
+                    source_path, collection=collection
+                )
             result.deleted_images = deleted_images
             result.details["images"] = f"deleted {deleted_images} images"
         except Exception as exc:

@@ -255,18 +255,25 @@ class IngestionPipeline:
                                stale_chunk_count=len(stale_chunk_ids))
             self._notify("upsert", n, n)
 
-            # ── 7. 存储图片 ────────────────────────────────────────────────
+            # ── 7. 安全替换图片 ────────────────────────────────────────────
+            # 与文本 chunk 一样：先写新版本，再删除 stale 图片。
+            # 写入失败时旧图片不删，重试可最终收敛。
             image_count = len(document.metadata.get("images", []))
+            stale_image_count = 0
             if image_count:
                 self._notify("store_images", 0, image_count)
-                _t = time.monotonic()
-                try:
-                    self._store_images(document)
-                except Exception as e:
-                    raise PipelineError("store_images", e)
-                trace.record_stage("store_images",
-                                   duration_ms=(time.monotonic() - _t) * 1000,
-                                   image_count=image_count)
+            _t = time.monotonic()
+            try:
+                stale_image_count = self._replace_images(document, abs_path)
+            except Exception as e:
+                raise PipelineError("store_images", e)
+            trace.record_stage(
+                "store_images",
+                duration_ms=(time.monotonic() - _t) * 1000,
+                image_count=image_count,
+                stale_image_count=stale_image_count,
+            )
+            if image_count:
                 self._notify("store_images", image_count, image_count)
 
             # ── 成功 ───────────────────────────────────────────────────────
@@ -278,6 +285,7 @@ class IngestionPipeline:
                 "chunk_count": n,
                 "image_count": image_count,
                 "stale_chunk_count": len(stale_chunk_ids),
+                "stale_image_count": stale_image_count,
                 "trace_id": trace.trace_id,
             }
 
@@ -308,19 +316,44 @@ class IngestionPipeline:
         except Exception:
             pass
 
-    def _store_images(self, document) -> None:
-        doc_hash = document.id
+    def _replace_images(self, document, source_path: str) -> int:
+        """
+        先保存当前版本图片，再删除同 source/collection 下的 stale 图片。
+
+        返回 stale 图片删除数量。任何新图片写入失败都会在删除 stale 之前抛错，
+        因而不会先破坏旧版本图片。
+        """
+        old_rows = self._img_store.list_by_source(
+            source_path, collection=self._collection
+        )
+        old_ids = {row["image_id"] for row in old_rows}
+        new_ids = set()
+
         for img in document.metadata.get("images", []):
+            image_id = img.get("image_id")
             img_path = img.get("path", "")
+            if not image_id:
+                raise ValueError("image metadata missing image_id")
             if not img_path:
-                continue
-            p = Path(img_path)
-            if not p.exists():
-                continue
+                raise ValueError(f"image {image_id} missing path")
+
+            path = Path(img_path)
+            if not path.exists():
+                raise FileNotFoundError(f"image file missing: {path}")
+
             self._img_store.save(
-                image_id=img["image_id"],
-                image_bytes=p.read_bytes(),
+                image_id=image_id,
+                image_bytes=path.read_bytes(),
                 collection=self._collection,
-                doc_hash=doc_hash,
+                doc_hash=document.id,
+                source_path=source_path,
                 page_num=img.get("page"),
             )
+            new_ids.add(image_id)
+
+        stale_ids = sorted(old_ids - new_ids)
+        if stale_ids:
+            self._img_store.delete_by_ids(
+                stale_ids, collection=self._collection
+            )
+        return len(stale_ids)

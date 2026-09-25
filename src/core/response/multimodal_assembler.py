@@ -21,6 +21,7 @@ MultimodalAssembler (src/core/response/multimodal_assembler.py)
     - ImageStorage 未配置 → 直接返回空列表
 """
 import base64
+import json
 import mimetypes
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -75,12 +76,19 @@ class MultimodalAssembler:
         for result in results:
             if len(image_contents) >= max_images:
                 break
-            image_refs = result.metadata.get("image_refs", [])
+
+            collection = result.metadata.get("collection")
+            image_refs = _parse_image_refs(
+                result.metadata.get("image_refs", [])
+            )
             for image_id in image_refs:
-                if image_id in seen_ids:
+                dedup_key = (collection, image_id)
+                if dedup_key in seen_ids:
                     continue
-                seen_ids.add(image_id)
-                content = self._load_image(image_id)
+                seen_ids.add(dedup_key)
+                content = self._load_image(
+                    image_id, collection=collection
+                )
                 if content is not None:
                     image_contents.append(content)
                     if len(image_contents) >= max_images:
@@ -88,10 +96,19 @@ class MultimodalAssembler:
 
         return image_contents
 
-    def _load_image(self, image_id: str) -> Optional[Dict[str, Any]]:
-        """加载单张图片并编码为 Base64 ImageContent"""
+    def _load_image(
+        self,
+        image_id: str,
+        collection: Optional[str] = None,
+    ) -> Optional[Dict[str, Any]]:
+        """加载单张图片并编码为 Base64 ImageContent。"""
         try:
-            path_str = self._storage.get_path(image_id)
+            if collection is None:
+                path_str = self._storage.get_path(image_id)
+            else:
+                path_str = self._storage.get_path(
+                    image_id, collection=collection
+                )
             if path_str is None:
                 logger.debug(f"Image not found in storage: {image_id}")
                 return None
@@ -113,6 +130,23 @@ class MultimodalAssembler:
         except Exception as e:
             logger.warning(f"Failed to load image {image_id}: {e}")
             return None
+
+
+def _parse_image_refs(raw) -> List[str]:
+    """兼容内存 list 与 Chroma 中 JSON-string 两种 image_refs 表示。"""
+    if isinstance(raw, list):
+        return [str(item) for item in raw]
+    if isinstance(raw, str):
+        if not raw:
+            return []
+        try:
+            parsed = json.loads(raw)
+        except (TypeError, ValueError, json.JSONDecodeError):
+            return [raw]
+        if isinstance(parsed, list):
+            return [str(item) for item in parsed]
+        return [str(parsed)]
+    return []
 
 
 def _detect_mime(path: Path) -> str:

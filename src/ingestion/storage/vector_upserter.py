@@ -18,6 +18,7 @@ VectorUpserter 实现 (src/ingestion/storage/vector_upserter.py)
                      — 内容变更时 id 变更（触发覆盖），内容不变时 id 稳定（跳过重复写入）。
 """
 import hashlib
+import json
 from typing import List, Optional
 
 from src.core.types import Chunk
@@ -65,9 +66,16 @@ class VectorUpserter:
             # 过滤 metadata，不将向量本身放入 metadata（向量单独存）
             meta = {
                 k: v for k, v in chunk.metadata.items()
-                if k not in ("dense_vector", "sparse_vector", "images")
+                if k not in ("dense_vector", "sparse_vector", "images", "image_refs")
                 and isinstance(v, (str, int, float, bool))
             }
+            image_refs = chunk.metadata.get("image_refs")
+            if isinstance(image_refs, list) and image_refs:
+                # Chroma metadata 不接受 list，使用 JSON 字符串持久化。
+                meta["image_refs"] = json.dumps(
+                    [str(image_id) for image_id in image_refs],
+                    ensure_ascii=False,
+                )
             meta["collection"] = collection
             meta["chunk_id"] = chunk.id
 
