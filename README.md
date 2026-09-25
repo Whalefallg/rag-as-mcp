@@ -139,6 +139,42 @@ python scripts/start_dashboard.py
 python scripts/evaluate.py --evaluator local
 ```
 
+## Docker 与 CI/CD
+
+项目使用 GitHub Actions 进行持续集成：Push / Pull Request 会分层执行 Unit、
+Integration 和 E2E 测试，并覆盖 Python 3.10 / 3.12。
+
+发布使用 Git tag 驱动的 Continuous Delivery。推送 `v*` tag 后，
+`Release Container` workflow 会自动执行：
+
+```text
+Full pytest regression
+        ↓
+Build Docker image
+        ↓
+MCP stdio smoke test
+        ↓
+Push version tag + latest to GHCR
+```
+
+本地可以先验证容器：
+
+```bash
+docker build -t rag-as-mcp:local .
+python scripts/smoke_mcp_container.py rag-as-mcp:local
+```
+
+发布示例：
+
+```bash
+git tag v0.1.0
+git push origin v0.1.0
+```
+
+发布成功后可从 GitHub Container Registry 拉取对应版本。容器默认使用
+`config/settings.example.yaml` 完成无密钥的 MCP 协议启动；实际使用时可通过
+`MCP_SETTINGS_PATH` 和 volume mount 注入本地配置与数据目录。
+
 ## MCP 客户端配置
 
 以下示例适用于支持 stdio MCP Server 的客户端。请替换项目绝对路径和 Python 解释器路径。
