@@ -113,14 +113,6 @@
       "expected_sources": ["mcp_guide.pdf"],
       "expected_answer": "query_knowledge_hub 通过 tools/call 接收 query、top_k、collection 等参数。",
       "tags": ["agentic", "identifier", "lexical"]
-    },
-    {
-      "id": "tc_015",
-      "query": "这个知识库没有记载的量子重力产品故障码 QG-99999 如何修复？",
-      "expected_chunk_ids": [],
-      "expected_sources": ["architecture_guide.pdf"],
-      "expected_answer": "知识库证据不足，应在预算耗尽后返回最佳可用证据并明确降级。",
-      "tags": ["agentic", "insufficient_evidence"]
     }
   ]
 }

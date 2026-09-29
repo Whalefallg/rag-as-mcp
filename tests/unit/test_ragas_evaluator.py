@@ -1,13 +1,4 @@
-"""
-RagasEvaluator 单元测试 (tests/unit/test_ragas_evaluator.py)
-=============================================================
-验收标准 (DEV_SPEC H1)：
-  - Ragas 未安装时构造 RagasEvaluator 抛出 ImportError，含安装提示
-  - Ragas 已安装时，mock _run_ragas 后 evaluate() 返回含所需指标的 dict
-  - 注册到工厂：create_evaluator("ragas") 不报 ValueError
-  - 无 answer 时指标只含 context_precision
-  - RuntimeError 封装：_run_ragas 抛异常时被包装成 RuntimeError
-"""
+"""RagasEvaluator 单元测试 (tests/unit/test_ragas_evaluator.py)"""
 import pytest
 from unittest.mock import patch, MagicMock
 

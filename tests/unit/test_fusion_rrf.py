@@ -1,15 +1,4 @@
-"""
-RRFusion 单元测试 (tests/unit/test_fusion_rrf.py)
-=================================================
-验收标准（DEV_SPEC D4）：
-  - 对构造的排名输入，输出 deterministic（相同输入相同输出）
-  - k 参数可配置，影响分数计算
-  - 同时出现在多路结果中的 chunk 得分最高
-  - 只在一路中出现的 chunk 也被保留
-  - top_k 截断正确
-  - source 字段标记为 "fused"
-  - 空输入列表返回空结果
-"""
+"""RRFusion 单元测试 (tests/unit/test_fusion_rrf.py)"""
 import pytest
 from src.core.types import RetrievalResult
 from src.core.query_engine.fusion import RRFusion

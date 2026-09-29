@@ -1,14 +1,4 @@
-"""
-QueryProcessor 单元测试 (tests/unit/test_query_processor.py)
-============================================================
-验收标准（DEV_SPEC D1）：
-  - 对非空 query 输出 keywords 非空
-  - filters 为 dict（可为空）
-  - 停用词被过滤掉
-  - 空 query 抛 ValueError
-  - 关键词去重
-  - 全停用词 query 有保底关键词
-"""
+"""QueryProcessor 单元测试 (tests/unit/test_query_processor.py)"""
 import pytest
 from src.core.query_engine.query_processor import QueryProcessor
 from src.core.types import ProcessedQuery

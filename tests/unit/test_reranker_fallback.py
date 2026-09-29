@@ -1,13 +1,4 @@
-"""
-CoreReranker fallback 测试 (tests/unit/test_reranker_fallback.py)
-=================================================================
-验收标准（DEV_SPEC D6）：
-  - 正常情况：后端返回有效排序，结果重新排列
-  - 失败降级：后端抛出异常时，返回原始顺序并标记 fallback=True
-  - 空候选列表返回空
-  - top_k 截断正确
-  - 精排后 source 标记为 "reranked"
-"""
+"""CoreReranker fallback 测试 (tests/unit/test_reranker_fallback.py)"""
 import pytest
 from src.core.types import RetrievalResult
 from src.core.settings import Settings, LLMConfig, EmbeddingConfig, VectorStoreConfig, SplitterConfig, RetrievalConfig, RerankConfig

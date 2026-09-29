@@ -39,6 +39,7 @@ env/
 config/settings.yaml
 
 # Data & Logs
+data/documents/
 data/db/
 data/images/
 logs/

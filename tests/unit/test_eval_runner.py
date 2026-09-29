@@ -1,15 +1,4 @@
-"""
-EvalRunner 单元测试 (tests/unit/test_eval_runner.py)
-=====================================================
-验收标准 (DEV_SPEC H3)：
-  - run() 返回 EvalReport，summary 含均值指标
-  - per_query 长度 == 测试用例数
-  - golden_test_set 不存在时抛 FileNotFoundError
-  - 空 test_cases 时抛 ValueError
-  - 检索失败时 QueryResult.error 非 None，failed_cases 计数
-  - compute_summary 对空列表返回 {}
-  - EvalReport.print_summary() 不抛异常
-"""
+"""EvalRunner 单元测试 (tests/unit/test_eval_runner.py)"""
 import json
 import pytest
 from pathlib import Path

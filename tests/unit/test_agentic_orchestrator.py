@@ -52,3 +52,25 @@ def test_multi_query_deduplicates_chunks():
     ids = [r.chunk_id for r in result.results]
     assert len(ids) == len(set(ids))
 
+
+def test_no_evidence_stops_at_budget_without_fabricating_results():
+    search = MagicMock()
+    search.search.return_value = []
+    grader = MagicMock()
+    grader.grade.return_value = EvidenceAssessment(
+        False, 0.0, 0.0, ["NO_RESULTS"]
+    )
+    rewriter = MagicMock()
+    rewriter.rewrite.return_value = "unknown topic explicit lookup"
+
+    result = AgenticRAGOrchestrator(
+        _settings(max_iterations=2),
+        search,
+        grader=grader,
+        rewriter=rewriter,
+    ).search("unknown topic")
+
+    assert result.results == []
+    assert result.exhausted
+    assert result.iteration_count == 2
+    assert result.termination_reason == TerminationReason.NO_RESULTS

@@ -1,15 +1,4 @@
-"""
-LocalRetrievalEvaluator 单元测试 (tests/unit/test_local_retrieval_evaluator.py)
-================================================================================
-验收标准：
-  - hit_rate=1 当 expected chunk_id 在 top-k 中
-  - hit_rate=0 当 expected chunk_id 不在 top-k 中
-  - mrr 按第一个命中的倒数排名计算
-  - precision_at_k = 命中数 / top_k
-  - ground_truth 为 None 或空时返回全 0
-  - expected_sources 匹配（完整路径 / 文件名两种格式）
-  - 注册到工厂 create_evaluator("local") 可用
-"""
+"""LocalRetrievalEvaluator 单元测试 (tests/unit/test_local_retrieval_evaluator.py)"""
 import pytest
 from src.observability.evaluation.local_retrieval_evaluator import LocalRetrievalEvaluator
 

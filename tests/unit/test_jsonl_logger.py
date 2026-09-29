@@ -1,13 +1,4 @@
-"""
-JSON Lines Logger 单元测试 (tests/unit/test_jsonl_logger.py)
-=============================================================
-验收标准 (DEV_SPEC F2)：
-  - write_trace() 写入后文件新增一行合法 JSON
-  - 该行包含 trace_type 字段
-  - 并发写入不产生乱行（多线程安全）
-  - 目录不存在时自动创建
-  - get_logger() 仍正常输出到 stderr（人类可读）
-"""
+"""JSON Lines Logger 单元测试 (tests/unit/test_jsonl_logger.py)"""
 import json
 import os
 import tempfile

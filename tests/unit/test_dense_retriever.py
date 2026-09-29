@@ -1,13 +1,4 @@
-"""
-DenseRetriever 单元测试 (tests/unit/test_dense_retriever.py)
-============================================================
-验收标准（DEV_SPEC D2）：
-  - 对输入 query 能生成 embedding 并调用 VectorStore 检索
-  - 返回结果包含 chunk_id、score、text、metadata
-  - 空 query 返回空列表
-  - mock EmbeddingClient 和 VectorStore 时能正确编排调用
-  - source 字段标记为 "dense"
-"""
+"""DenseRetriever 单元测试 (tests/unit/test_dense_retriever.py)"""
 import pytest
 from src.core.types import RetrievalResult
 from src.core.settings import Settings, LLMConfig, EmbeddingConfig, VectorStoreConfig, SplitterConfig, RetrievalConfig, RerankConfig

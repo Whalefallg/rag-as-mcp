@@ -1,16 +1,4 @@
-"""
-Dashboard 冒烟测试 (tests/e2e/test_dashboard_smoke.py)
-=======================================================
-验收标准 (DEV_SPEC I2)：
-  - 六个页面的 render() 函数均可被调用、不抛 Python 异常
-  - 每个页面的服务层依赖均用 Mock 替代（无需真实 ChromaDB/File）
-  - 各 service 返回空数据时页面不崩溃（空状态覆盖）
-  - 各 service 返回错误时页面不崩溃（错误状态覆盖）
-
-  测试策略：
-    patch sys.modules["streamlit"] 为 MagicMock，
-    直接调用各页面 render() 函数验证"不抛异常"这一核心约束。
-"""
+"""Dashboard 冒烟测试 (tests/e2e/test_dashboard_smoke.py)"""
 from __future__ import annotations
 
 import importlib

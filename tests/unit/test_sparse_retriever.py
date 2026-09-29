@@ -1,13 +1,4 @@
-"""
-SparseRetriever 单元测试 (tests/unit/test_sparse_retriever.py)
-==============================================================
-验收标准（DEV_SPEC D3）：
-  - 对已构建索引的语料，关键词检索命中预期 chunk_id
-  - 返回结果包含完整 text 和 metadata
-  - BM25 无命中时返回空列表
-  - source 字段标记为 "sparse"
-  - keywords 为空时返回空列表
-"""
+"""SparseRetriever 单元测试 (tests/unit/test_sparse_retriever.py)"""
 import pytest
 from src.core.types import RetrievalResult
 from src.core.settings import Settings, LLMConfig, EmbeddingConfig, VectorStoreConfig, SplitterConfig, RetrievalConfig, RerankConfig

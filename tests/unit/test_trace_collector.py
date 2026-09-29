@@ -1,13 +1,4 @@
-"""
-TraceCollector 单元测试 (tests/unit/test_trace_collector.py)
-=============================================================
-验收标准 (DEV_SPEC F3)：
-  - collect() 自动调用 trace.finish()（幂等）
-  - collect() 把 trace 写入指定 traces.jsonl 文件
-  - 文件内容可被解析为包含 trace_type 的合法 JSON
-  - 写入失败时不抛出异常（降级日志）
-  - global_collector 是 TraceCollector 实例
-"""
+"""TraceCollector 单元测试 (tests/unit/test_trace_collector.py)"""
 import json
 import pytest
 from pathlib import Path

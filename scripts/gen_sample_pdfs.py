@@ -116,7 +116,7 @@ DOCS = {
             " 格式为 https://<resource-name>.openai.azure.com/。"
             " 在 llm.api_key 字段填写 Azure 门户中的 API Key。"
             " llm.model 字段填写你在 Azure 中创建的部署名称（不是模型名）。"
-            " 注意：azure_endpoint 末尾必须有斜杠，否则请求会失败。"
+            " endpoint 和 deployment 必须与 Azure 资源配置一致。"
             " 同理，embedding.provider 也可设置为 azure，并填写对应的 embedding 部署名。"
         ),
     ],
@@ -129,8 +129,7 @@ DOCS = {
             " 步骤四：在 settings.yaml 中配置如下：llm.provider: azure，"
             " llm.model: 你的部署名，llm.azure_endpoint: 你的端点 URL，"
             " llm.api_key: 你的密钥。"
-            " 如果出现 AuthenticationError，检查 api_key 是否正确，"
-            " 以及 azure_endpoint 是否以 / 结尾。"
+            " 如果出现 AuthenticationError，检查 api_key、endpoint 和 deployment 是否匹配。"
         ),
     ],
     "bm25_guide.pdf": [
@@ -144,7 +143,7 @@ DOCS = {
             " b 参数控制文档长度归一化的强度。"
             " b=1 表示完全按文档长度归一化；b=0 表示不做归一化。"
             " 典型取值为 0.75。"
-            " BM25 对专有名词和精确关键词匹配效果极好，是混合检索中稀疏路线的首选。"
+            " BM25 为专有名词和精确关键词提供词法信号，与 Dense Retrieval 形成互补。"
         ),
     ],
     "rag_concepts.pdf": [
@@ -153,10 +152,10 @@ DOCS = {
             "RAG（Retrieval-Augmented Generation）检索增强生成是一种将知识检索与语言生成结合的技术。"
             " 核心流程分为离线摄取和在线查询两个阶段。"
             " 离线摄取：将文档解析、切分为 Chunk，生成向量存入数据库，同时建立稀疏索引。"
-            " 在线查询：对用户问题进行向量化，从数据库中检索相关 Chunk，结合 Rerank 精排，"
-            " 最后将 Chunk 作为上下文拼接给 LLM 生成答案。"
+            " 在线查询：系统根据 classic、auto 或 agentic mode 规划查询，检索相关 Chunk，"
+            " 可选执行 Rerank，并通过 MCP 返回带引用的证据。"
             " 混合检索结合 BM25 稀疏检索和 Dense Embedding 语义检索，通过 RRF 融合两路结果，"
-            " 兼顾精确关键词匹配和语义相似度，显著提升召回质量。"
+            " 同时利用精确关键词和语义相似度信号；实际质量应通过 evaluation set 测量。"
         ),
     ],
     "hybrid_search.pdf": [
@@ -178,8 +177,8 @@ DOCS = {
             " RRF（Reciprocal Rank Fusion）：基于排名的融合，对分数分布不敏感，鲁棒性强，推荐默认使用。"
             " 加权求和（Weighted Sum）：对各路分数乘以权重后求和，需要各路分数归一化到同一量纲。"
             " CombSUM：直接对分数求和，实现简单但对量纲差异敏感。"
-            " 在 settings.yaml 中通过 retrieval.fusion_algorithm 字段选择融合算法：rrf 或 weighted_sum。"
-            " 实践中 RRF 效果稳定，通常无需调参，是大多数 RAG 系统的首选。"
+            " 当前实现通过 retrieval.fusion_algorithm: rrf 选择已注册的 RRF 融合器。"
+            " 未注册的融合算法会在配置校验阶段被拒绝。"
         ),
     ],
     "setup_guide.pdf": [
@@ -189,9 +188,8 @@ DOCS = {
             " 第一步：克隆仓库，进入项目目录。"
             " 第二步：创建并激活虚拟环境：python -m venv .venv && source .venv/bin/activate。"
             " 第三步：安装依赖：pip install -e '.[dev]'。"
-            " 如需 Dashboard，额外安装：pip install streamlit。"
-            " 如需 ChromaDB 向量存储：pip install chromadb。"
-            " 如需 LangChain 文本切分：pip install langchain-text-splitters。"
+            " 如需 Dashboard，安装项目可选依赖：pip install -e '.[dashboard]'。"
+            " Cross-Encoder 和评估依赖分别通过 '.[rerank]' 与 '.[evaluation]' 安装。"
             " 第四步：配置 config/settings.yaml，填写 API Key 和 Provider。"
             " 第五步：摄取文档：python scripts/ingest.py --path data/documents/。"
             " 第六步：查询：python scripts/query.py --query '你的问题'。"
@@ -215,23 +213,24 @@ DOCS = {
     "ragas_docs.pdf": [
         "Ragas 评估框架使用说明",
         (
-            "Ragas 是专为 RAG 系统设计的自动评估框架，无需人工标注答案。"
-            " 安装：pip install ragas datasets。"
+            "Ragas 是可选的 RAG 评估框架，部分指标需要参考答案或 LLM judge。"
+            " 安装项目评估依赖：pip install -e '.[evaluation]'。"
             " Faithfulness 指标衡量生成答案是否忠实于检索到的上下文，避免模型幻觉（Hallucination）。"
             " 计算方式：将答案分解为若干陈述，检查每个陈述是否可以从上下文中推导出来。"
             " 取值范围 0 到 1，越高越好。"
             " Answer Relevancy 衡量答案与问题的相关程度，通过反向生成问题并计算余弦相似度实现。"
             " Context Recall 衡量检索到的上下文覆盖了标准答案多少内容。"
-            " 在本项目中，通过 evaluation_panel 或 scripts/evaluate.py 一键运行 Ragas 评估。"
+            " 本项目默认提供 deterministic local retrieval evaluation；"
+            " scripts/evaluate.py 可选择 local、ragas 或 composite evaluator。"
         ),
     ],
     "chunking_guide.pdf": [
         "文档切分策略指南",
         (
             "Chunk（文本块）是 RAG 系统的基本检索单元，切分策略直接影响检索质量。"
-            " 固定长度切分（Fixed）：按字符数切分，简单但可能在句子中间截断。"
-            " 递归切分（Recursive）：优先按大分隔符（段落、标题）切分，再按小分隔符细切，保留语义完整性。"
-            " 语义切分（Semantic）：基于语义相似度确定切分点，计算开销较大但效果最好。"
+            " 常见方法包括固定长度、递归和语义切分。"
+            " 当前项目注册的是 RecursiveSplitter：优先按段落等分隔符切分，再逐级细分。"
+            " 配置中未注册的 splitter method 会在启动校验时被拒绝。"
             " Chunk Overlap（重叠）的作用：在相邻 Chunk 之间保留一部分重叠文本，"
             " 确保跨 Chunk 的信息不会因切分边界而丢失，避免语义断裂。"
             " 典型配置：chunk_size=1000，chunk_overlap=200（约 20% 重叠）。"
@@ -247,7 +246,7 @@ DOCS = {
             " 在 VS Code 中配置 Copilot：在 .vscode/mcp.json 中添加服务器配置，"
             " command 填写 Python 解释器路径，args 填写 ['-m', 'src.mcp_server.server']，"
             " cwd 填写项目根目录。"
-            " 配置完成后，AI 助手可调用以下工具：query_knowledge_hub 执行混合检索，"
+            " 配置完成后，AI 助手可调用以下工具：query_knowledge_hub 执行 classic、auto 或 agentic 检索，"
             " list_collections 列出知识库集合，get_document_summary 获取文档摘要。"
             " tools/call 调用格式：发送 JSON-RPC 请求，method 为 tools/call，"
             " params 包含 name（工具名）和 arguments（参数字典）。"
@@ -258,8 +257,8 @@ DOCS = {
         (
             "多模态处理允许 RAG 系统理解 PDF 中的图片内容，实现图文联合检索。"
             " 本项目采用 Image-to-Text 策略：提取 PDF 页面中的图片，"
-            " 调用 Vision LLM（如 gpt-4o）自动生成图片描述文字，"
-            " 将描述文字附加到对应 Chunk 的 metadata 中，同时在文本中插入 [IMAGE: id] 占位符。"
+            " 调用 Vision LLM（如 gpt-4o）生成图片描述文字，"
+            " 将 caption 保存到 Chunk metadata 的 images 记录；Loader 使用 [IMAGE: id] 占位符关联图片。"
             " ImageCaptioner 是负责此流程的组件，在 settings.yaml 中通过"
             " ingestion.image_captioner.enabled: true 开启。"
             " 开启后，摄取含图文档时会自动调用 Vision LLM 生成图片描述。"
@@ -271,10 +270,9 @@ DOCS = {
         "可观测性与追踪系统指南",
         (
             "全链路可观测性是调试和优化 RAG 系统的关键能力。"
-            " 本项目通过 TraceContext 和 TraceCollector 实现每个阶段的自动追踪。"
-            " TraceContext.span() 是一个上下文管理器，进入时记录开始时间，"
-            " 退出时自动计算耗时，并将阶段名称、耗时、异常信息写入 stages 列表。"
-            " 使用方式：with trace.span('dense_retrieval'): 执行检索逻辑。"
+            " 本项目通过 TraceContext 和 TraceCollector 记录查询与摄取阶段。"
+            " 组件可使用 record_stage() 写入已有耗时，或使用 span() 上下文管理器自动计时。"
+            " Agentic trace 还记录 route、plan、grade、rewrite、termination 和 degraded 状态。"
             " TraceCollector 负责将完整的 TraceContext 序列化为 JSON Lines 格式，"
             " 追加写入 logs/traces.jsonl 文件。"
             " Dashboard 的摄取追踪和查询追踪页面读取此文件，可视化每次操作的各阶段耗时分布，"
@@ -284,17 +282,18 @@ DOCS = {
     "architecture_guide.pdf": [
         "系统架构与存储层设计",
         (
-            "RAG AS MCP 采用四层可插拔架构：Loader、Chunker、Embedding、Storage。"
+            "RAG AS MCP 由 ingestion、HybridSearch、bounded Agentic orchestration、MCP 和 observability 模块组成。"
             " 存储层由四个独立组件构成，分别负责不同类型的数据持久化。"
             " ChromaDB：存储 Dense Embedding 向量，支持高效相似度查询。"
             " BM25Index：存储倒排索引，支持关键词精确匹配检索。"
             " ImageStorage：存储从 PDF 中提取的图片文件，按 source_path 组织目录。"
-            " FileIntegrity（SQLite）：存储文件 MD5 指纹，实现摄取去重，避免重复处理。"
+            " FileIntegrity（SQLite）：按 SHA256 与 collection 存储摄取记录，实现幂等处理。"
             " DocumentManager 是跨四个存储的协调层。"
             " delete_document 操作依次执行：删除 ChromaDB 中对应向量，"
             " 从 BM25 索引移除文档，删除 ImageStorage 中关联图片，"
             " 最后清除 FileIntegrity 中的文件记录。"
-            " 这种设计确保删除操作的原子性，不会留下孤立数据。"
+            " 删除是 explicit best-effort coordination，不是跨存储原子事务；"
+            " 返回结果会明确记录成功和失败的存储，失败后可重试或重新摄取。"
         ),
     ],
 }

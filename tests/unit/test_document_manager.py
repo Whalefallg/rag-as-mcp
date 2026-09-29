@@ -1,13 +1,4 @@
-"""
-DocumentManager 单元测试 (tests/unit/test_document_manager.py)
-==============================================================
-验收标准 (DEV_SPEC G2)：
-  - list_documents 返回已摄入文档列表
-  - delete_document 协调删除四个存储
-  - 删除后 list 不包含已删除文档
-  - 任一存储失败时 DeleteResult.success=False 且 error 有描述
-  - get_collection_stats 返回正确统计
-"""
+"""DocumentManager 单元测试 (tests/unit/test_document_manager.py)"""
 import pytest
 from unittest.mock import MagicMock, patch
 from src.ingestion.document_manager import DocumentManager, DocumentInfo, DeleteResult

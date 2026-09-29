@@ -1,22 +1,4 @@
-"""
-MCP Client 端到端模拟测试 (tests/e2e/test_mcp_client.py)
-=========================================================
-验收标准 (DEV_SPEC I1)：
-  - 以子进程启动 MCP Server（stdin/stdout Stdio Transport）
-  - 完整走通 initialize → tools/list → tools/call(query_knowledge_hub)
-  - 每个响应都是合法 JSON-RPC 2.0 格式
-  - tools/list 返回包含 query_knowledge_hub 的工具列表
-  - tools/call 返回 {"content": [...], "isError": false} 格式
-  - 未知 method 返回 -32601 错误码
-  - Server 在 stdin 关闭后正常退出（不挂起）
-
-  测试策略：
-    - 不启动真实 ChromaDB/Embedding（会挂起），改用内联子进程配置
-    - ProtocolHandler 在真实 tools/call 执行 HybridSearch 前失败 OK：
-      测试关注协议层面的正确性（JSON-RPC 格式、工具注册），
-      不关注 RAG 结果质量
-    - 超时保护：每次 readline() 最多等待 5 秒
-"""
+"""MCP Client 端到端模拟测试 (tests/e2e/test_mcp_client.py)"""
 import json
 import subprocess
 import sys

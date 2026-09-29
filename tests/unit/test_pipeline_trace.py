@@ -1,13 +1,4 @@
-"""
-Pipeline 进度回调 & Ingestion trace 打点测试 (tests/unit/test_pipeline_trace.py)
-================================================================================
-验收标准 (DEV_SPEC F5 / F6)：
-  - on_progress(stage, current, total) 在每个阶段被正确调用
-  - run() 结束后 trace.stages 包含 integrity/load/split/transform/encode/upsert
-  - 幂等跳过时 trace 记录 status="skipped"
-  - PipelineError 时 trace 仍被 collect（finally 保证）
-  - 进度回调抛异常时不中断主流程
-"""
+"""Pipeline 进度回调 & Ingestion trace 打点测试 (tests/unit/test_pipeline_trace.py)"""
 import pytest
 from unittest.mock import MagicMock, patch, PropertyMock
 from src.core.trace.trace_context import TraceContext
