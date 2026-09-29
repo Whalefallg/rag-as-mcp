@@ -1,13 +1,4 @@
-"""
-CompositeEvaluator 单元测试 (tests/unit/test_composite_evaluator.py)
-=====================================================================
-验收标准 (DEV_SPEC H2)：
-  - 两个 evaluator 时返回的 metrics 包含两者的指标
-  - 任一 evaluator 失败时 _errors 字段有记录，其余指标正常返回
-  - 空 evaluators 列表时 __init__ 抛 ValueError
-  - 并行执行（结果顺序不影响合并）
-  - evaluators 属性返回副本
-"""
+"""CompositeEvaluator 单元测试 (tests/unit/test_composite_evaluator.py)"""
 import time
 import threading
 import pytest

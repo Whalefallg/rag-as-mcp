@@ -44,21 +44,37 @@ RAG as MCP 将 Retrieval-Augmented Generation 的核心链路拆分为可替换�
 
 ## 架构
 
+查询服务统一通过 `query_knowledge_hub` 暴露三种模式：
+
 ```text
-MCP Query -> Adaptive Router -> Classic --------------------+
-                         \-> Agentic -> Analyze -> Plan      |
-                                      -> Decompose ----------+
-                                                             v
-                                           Dense + BM25 -> RRF
-                                                             |
-                                                    Evidence Grader
-                                                     /          \
-                                                 enough       rewrite
-                                                     \          /
-                                                      Final Rerank
-                                                           |
-                                                      MCP Response
+MCP query_knowledge_hub(mode=classic | auto | agentic)
+                         |
+                         v
+                  Adaptive Router
+                  /             \
+       classic/direct          agentic
+             |                   |
+             |             Query Analysis
+             |                   |
+             |             Retrieval Plan
+             |                   |
+             |        Multi-query / Decomposition
+             |                   |
+             +----------> HybridSearch
+                         Dense + BM25 + RRF
+                                  |
+                         Evidence Grader
+                         /              \
+                    sufficient       rewrite + retry
+                         \              /
+                          Final Reranker
+                                  |
+                       Citation / MCP Response
 ```
+
+`auto` 对简单查询选择 classic path，对复杂查询选择 agentic path。`agentic` 是带明确预算、终止原因和 fallback 的 bounded adaptive retrieval loop。
+
+摄取链路独立于查询路由：
 
 ```text
                          Ingestion
@@ -69,26 +85,6 @@ PDF -> Loader -> Chunker -> Transform -> Embedding -> ChromaDB
                                +------------------> BM25 Index
                                |
                                +------------------> File / Image Metadata
-
-
-                           Query
-                            |
-                            v
-             +--------------+--------------+
-             |                             |
-             v                             v
-      Dense Retrieval                BM25 Retrieval
-             |                             |
-             +--------------+--------------+
-                            |
-                            v
-                         RRF Fusion
-                            |
-                            v
-                     Optional Reranker
-                            |
-                            v
-                       MCP Response
 ```
 
 核心模块：
@@ -103,30 +99,11 @@ src/observability/        Trace、Dashboard 与评估
 
 ## 查询链路
 
-典型查询流程：
+三种模式共享同一个 MCP contract 和 HybridSearch primitive：
 
-```text
-MCP tools/call
-    |
-    v
-query_knowledge_hub (mode=classic | agentic | auto)
-    |
-    v
-Query Engine
-    |
-    +---- Dense Retriever
-    |
-    +---- BM25 Retriever
-    |
-    v
-RRF Fusion
-    |
-    v
-Optional Rerank
-    |
-    v
-Citation / MCP Response
-```
+- `classic`：单次 HybridSearch，随后执行可选 final rerank。
+- `agentic`：分析与规划查询，必要时拆分多路检索；证据不足时在预算内 rewrite/retry，最后只 rerank 一次。
+- `auto`：使用 deterministic analyzer 路由，避免简单查询承担 agent loop 成本。
 
 混合检索的目标不是简单增加召回通道，而是把语义召回与关键词精确匹配放在同一可评估管线中：
 
@@ -146,6 +123,19 @@ Agentic 模式不是无界 autonomous agent，而是一个 **bounded adaptive re
 | `query_knowledge_hub` | 对指定 collection 执行知识检索 |
 | `list_collections` | 列出可用 collection |
 | `get_document_summary` | 获取文档摘要信息 |
+
+`query_knowledge_hub` 的 `mode` 是可选参数：
+
+```json
+{
+  "query": "比较 BM25 与 Dense Retrieval 的失败模式",
+  "collection": "default",
+  "top_k": 10,
+  "mode": "auto"
+}
+```
+
+允许值为 `classic`、`auto`、`agentic`；省略时使用 `agentic.default_mode`。
 
 Server 使用 **stdout 传输 JSON-RPC**，运行日志写入 **stderr**，避免污染 MCP transport。
 
@@ -191,15 +181,16 @@ Dense index、BM25 index、ImageStorage 和 FileIntegrity 都按 collection 隔�
 一次 query 创建单一 `TraceContext`，贯穿：
 
 ```text
-Dense
-  -> Sparse
-  -> Fusion
-  -> Rerank
-  -> Multimodal
-  -> Response
+adaptive_route
+  -> query_analysis / retrieval_plan       (agentic)
+  -> retrieval_attempt_N
+     -> Dense -> BM25 -> RRF
+  -> evidence_grade_N / query_rewrite_N    (agentic)
+  -> final_rerank
+  -> multimodal / response
 ```
 
-失败路径同样记录 trace，便于定位“召回失败”“fusion 异常”“rerank 异常”或响应阶段问题。
+Trace metadata 记录 retrieval mode、strategy、iteration/rewrite/retrieval-call 计数、termination reason 与 degraded 状态。失败路径同样记录，便于区分智能模块降级、召回失败、fusion 异常或 rerank fallback。
 
 ## 环境要求
 
@@ -265,6 +256,27 @@ export MCP_SETTINGS_PATH="/absolute/path/to/settings.yaml"
 
 不要将真实密钥写入示例配置或提交到 Git。
 
+Agentic retrieval 的默认配置：
+
+```yaml
+agentic:
+  enabled: true
+  default_mode: auto
+  max_iterations: 2
+  max_subqueries: 3
+  max_candidate_results: 30
+  planner:
+    use_llm: false
+  grader:
+    use_llm: false
+    min_results: 2
+    min_confidence: 0.45
+  rewriter:
+    use_llm: false
+```
+
+LLM 辅助默认关闭；deterministic analyzer、grader 和 rewriter 可在无 API key 的环境运行。
+
 ## 运行完整流程
 
 生成演示 PDF：
@@ -301,10 +313,12 @@ python main.py
 python scripts/start_dashboard.py
 ```
 
-运行本地检索评估：
+运行本地检索评估或并排比较：
 
 ```bash
-python scripts/evaluate.py --evaluator local
+python scripts/evaluate.py --mode classic
+python scripts/evaluate.py --mode agentic
+python scripts/evaluate.py --mode compare
 ```
 
 ## 测试与 CI
@@ -446,21 +460,37 @@ It can run as a standalone retrieval service or as the external knowledge backen
 
 ## Architecture
 
+The query service exposes three modes through one `query_knowledge_hub` contract:
+
 ```text
-MCP Query -> Adaptive Router -> Classic --------------------+
-                         \-> Agentic -> Analyze -> Plan      |
-                                      -> Decompose ----------+
-                                                             v
-                                           Dense + BM25 -> RRF
-                                                             |
-                                                    Evidence Grader
-                                                     /          \
-                                                 enough       rewrite
-                                                     \          /
-                                                      Final Rerank
-                                                           |
-                                                      MCP Response
+MCP query_knowledge_hub(mode=classic | auto | agentic)
+                         |
+                         v
+                  Adaptive Router
+                  /             \
+       classic/direct          agentic
+             |                   |
+             |             Query Analysis
+             |                   |
+             |             Retrieval Plan
+             |                   |
+             |        Multi-query / Decomposition
+             |                   |
+             +----------> HybridSearch
+                         Dense + BM25 + RRF
+                                  |
+                         Evidence Grader
+                         /              \
+                    sufficient       rewrite + retry
+                         \              /
+                          Final Reranker
+                                  |
+                       Citation / MCP Response
 ```
+
+`auto` selects the classic path for simple queries and the agentic path for complex queries. Agentic execution is bounded by explicit budgets, termination reasons, and fallbacks.
+
+Ingestion remains independent from query routing:
 
 ```text
                          Ingestion
@@ -471,26 +501,6 @@ PDF -> Loader -> Chunker -> Transform -> Embedding -> ChromaDB
                                +------------------> BM25 Index
                                |
                                +------------------> File / Image Metadata
-
-
-                           Query
-                            |
-                            v
-             +--------------+--------------+
-             |                             |
-             v                             v
-      Dense Retrieval                BM25 Retrieval
-             |                             |
-             +--------------+--------------+
-                            |
-                            v
-                         RRF Fusion
-                            |
-                            v
-                     Optional Reranker
-                            |
-                            v
-                       MCP Response
 ```
 
 Core modules:
@@ -498,36 +508,18 @@ Core modules:
 ```text
 src/ingestion/            ingestion and storage coordination
 src/core/query_engine/    query processing, hybrid retrieval, fusion, reranking
+src/core/agentic/         adaptive analysis, planning, grading, rewriting, orchestration
 src/mcp_server/           MCP protocol and tools
 src/observability/        traces, dashboard, and evaluation
 ```
 
 ## Query Pipeline
 
-A typical MCP query follows this path:
+All modes share the same MCP contract and HybridSearch primitive:
 
-```text
-MCP tools/call
-    |
-    v
-query_knowledge_hub
-    |
-    v
-Query Engine
-    |
-    +---- Dense Retriever
-    |
-    +---- BM25 Retriever
-    |
-    v
-RRF Fusion
-    |
-    v
-Optional Rerank
-    |
-    v
-Citation / MCP Response
-```
+- `classic`: one HybridSearch pass followed by optional final reranking.
+- `agentic`: analyze and plan the query, optionally retrieve multiple subqueries, grade evidence, and rewrite/retry within the configured budget; rerank only the final pool.
+- `auto`: route with the deterministic analyzer so simple queries avoid agent-loop overhead.
 
 Each retrieval stage addresses a different signal:
 
@@ -535,6 +527,8 @@ Each retrieval stage addresses a different signal:
 - BM25 is effective for lexical signals such as service names, identifiers, and error codes
 - RRF merges rankings without assuming the underlying scores are calibrated
 - the optional reranker refines the final candidate order
+
+Agentic mode is a bounded adaptive retrieval loop, not an unbounded autonomous agent. Intelligent components degrade to deterministic or classic retrieval when they fail.
 
 ## MCP Tools
 
@@ -545,6 +539,19 @@ The server currently exposes the following primary tools:
 | `query_knowledge_hub` | Query a selected knowledge collection |
 | `list_collections` | List available collections |
 | `get_document_summary` | Return document summary information |
+
+`query_knowledge_hub` accepts an optional `mode` argument:
+
+```json
+{
+  "query": "Compare failure modes of BM25 and dense retrieval",
+  "collection": "default",
+  "top_k": 10,
+  "mode": "auto"
+}
+```
+
+Valid values are `classic`, `auto`, and `agentic`. When omitted, the server uses `agentic.default_mode`.
 
 The server writes JSON-RPC messages to **stdout** and operational logs to **stderr**, keeping the MCP transport clean.
 
@@ -590,15 +597,16 @@ Document replacement follows a convergence-oriented strategy: write the new vers
 A query creates one `TraceContext` that spans:
 
 ```text
-Dense
-  -> Sparse
-  -> Fusion
-  -> Rerank
-  -> Multimodal
-  -> Response
+adaptive_route
+  -> query_analysis / retrieval_plan       (agentic)
+  -> retrieval_attempt_N
+     -> Dense -> BM25 -> RRF
+  -> evidence_grade_N / query_rewrite_N    (agentic)
+  -> final_rerank
+  -> multimodal / response
 ```
 
-Failure paths are traced as well, making it easier to distinguish retrieval, fusion, reranking, and response-stage failures.
+Trace metadata includes retrieval mode, strategy, iteration/rewrite/retrieval-call counts, termination reason, and degradation state. Failure paths distinguish intelligent-component degradation, retrieval failures, fusion errors, and reranker fallback.
 
 ## Requirements
 
@@ -664,6 +672,27 @@ export MCP_SETTINGS_PATH="/absolute/path/to/settings.yaml"
 
 Do not commit real credentials.
 
+Default Agentic retrieval configuration:
+
+```yaml
+agentic:
+  enabled: true
+  default_mode: auto
+  max_iterations: 2
+  max_subqueries: 3
+  max_candidate_results: 30
+  planner:
+    use_llm: false
+  grader:
+    use_llm: false
+    min_results: 2
+    min_confidence: 0.45
+  rewriter:
+    use_llm: false
+```
+
+LLM assistance is disabled by default. Deterministic analysis, grading, and rewriting work without API credentials.
+
 ## End-to-End Usage
 
 Generate the bundled sample PDFs:
@@ -700,10 +729,12 @@ Start the dashboard:
 python scripts/start_dashboard.py
 ```
 
-Run local retrieval evaluation:
+Run retrieval evaluation or a side-by-side comparison:
 
 ```bash
-python scripts/evaluate.py --evaluator local
+python scripts/evaluate.py --mode classic
+python scripts/evaluate.py --mode agentic
+python scripts/evaluate.py --mode compare
 ```
 
 ## Testing and CI

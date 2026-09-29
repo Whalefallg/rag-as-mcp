@@ -1,14 +1,4 @@
-"""
-HybridSearch 集成测试 (tests/integration/test_hybrid_search.py)
-================================================================
-验收标准（DEV_SPEC D5）：
-  - 对 fixtures 数据，能返回 Top-K（包含 chunk 文本与 metadata）
-  - 支持 filters 参数过滤
-  - Dense 路径失败时能降级到 Sparse 单路结果
-  - Sparse 路径失败时能降级到 Dense 单路结果
-  - 两路都失败时返回空列表
-  - 结果数量不超过 top_k
-"""
+"""HybridSearch 集成测试 (tests/integration/test_hybrid_search.py)"""
 import pytest
 from src.core.types import RetrievalResult
 from src.core.settings import Settings, LLMConfig, EmbeddingConfig, VectorStoreConfig, SplitterConfig, RetrievalConfig, RerankConfig

@@ -1,12 +1,4 @@
-"""
-关键抽象契约测试 (tests/unit/test_contracts.py)
-================================================
-验收标准 (DEV_SPEC I4)：
-  VectorStore / Reranker / Evaluator / DocumentManager 接口形状契约
-
-  VectorStore 测试使用 Mock ChromaDB client（chromadb 可能未安装）。
-  Reranker factory 测试通过传入完整 Settings 对象调用。
-"""
+"""关键抽象契约测试 (tests/unit/test_contracts.py)"""
 from __future__ import annotations
 import pytest
 from unittest.mock import MagicMock, patch

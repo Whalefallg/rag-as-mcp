@@ -1,12 +1,4 @@
-"""
-get_document_summary Tool 单元测试 (tests/unit/test_get_document_summary.py)
-============================================================================
-验收标准 (DEV_SPEC E5)：
-  - 对不存在的 doc_id 返回规范错误提示
-  - 存在时返回结构化信息（title/chunk_count/tags 等）
-  - doc_id 为空时返回错误
-  - ChromaDB 不可用时优雅降级
-"""
+"""get_document_summary Tool 单元测试 (tests/unit/test_get_document_summary.py)"""
 import pytest
 from unittest.mock import patch, MagicMock
 

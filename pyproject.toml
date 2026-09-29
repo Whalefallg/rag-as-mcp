@@ -1,7 +1,7 @@
 [project]
 name = "rag-as-mcp"
 version = "0.1.0"
-description = "A modular RAG system exposed through the Model Context Protocol"
+description = "A bounded Agentic Hybrid RAG engine exposed through the Model Context Protocol"
 readme = "README.md"
 requires-python = ">=3.10"
 license = { file = "LICENSE" }

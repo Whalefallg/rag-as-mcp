@@ -1,15 +1,4 @@
-"""
-TraceService 单元测试 (tests/unit/test_trace_service.py)
-=========================================================
-验收标准 (DEV_SPEC G5)：
-  - list() 按时间倒序返回记录
-  - trace_type 过滤正确
-  - keyword 关键词过滤（user_query / source_path）
-  - 文件不存在时返回空列表
-  - get() 按 trace_id 精确查找
-  - exists() 正确反映文件是否存在
-  - 格式错误的行被跳过（容错）
-"""
+"""TraceService 单元测试 (tests/unit/test_trace_service.py)"""
 import json
 import pytest
 from pathlib import Path

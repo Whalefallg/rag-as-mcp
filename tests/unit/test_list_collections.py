@@ -1,11 +1,4 @@
-"""
-list_collections Tool 单元测试 (tests/unit/test_list_collections.py)
-====================================================================
-验收标准 (DEV_SPEC E4)：
-  - 对 fixtures 目录结构能返回集合名列表
-  - Chroma 不可用时回退到文件系统扫描
-  - 无集合时返回友好提示
-"""
+"""list_collections Tool 单元测试 (tests/unit/test_list_collections.py)"""
 import os
 import tempfile
 import pytest

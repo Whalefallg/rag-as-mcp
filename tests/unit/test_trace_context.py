@@ -1,14 +1,4 @@
-"""
-TraceContext 单元测试 (tests/unit/test_trace_context.py)
-=========================================================
-验收标准 (DEV_SPEC F1)：
-  - record_stage 追加阶段数据
-  - finish() 后 to_dict() 输出包含所有必填字段
-  - to_dict() 输出可直接 json.dumps() 序列化
-  - elapsed_ms() 查询指定阶段或总耗时
-  - trace_type 字段正确传递
-  - span() 上下文管理器自动计时
-"""
+"""TraceContext 单元测试 (tests/unit/test_trace_context.py)"""
 import json
 import time
 import pytest

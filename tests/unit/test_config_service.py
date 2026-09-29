@@ -1,12 +1,4 @@
-"""
-ConfigService 单元测试 (tests/unit/test_config_service.py)
-===========================================================
-验收标准 (DEV_SPEC G1)：
-  - load() 成功时返回 SystemConfig 含所有组件 card
-  - load() 失败时返回 load_error 非空的 SystemConfig（不抛异常）
-  - ComponentCard 含 category/provider/model
-  - get_collection_stats() Chroma 不可用时返回 error 字段（不抛异常）
-"""
+"""ConfigService 单元测试 (tests/unit/test_config_service.py)"""
 import pytest
 from unittest.mock import patch, MagicMock
 from src.observability.dashboard.services.config_service import (
