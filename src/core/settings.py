@@ -24,7 +24,7 @@
   - validate_settings(): 独立的校验函数，不合法直接 raise ValueError，
                          错误信息明确指出哪个字段不对，方便快速定位。
 """
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Optional, Dict, Any
 import os
 import yaml
@@ -83,6 +83,36 @@ class RerankConfig:
 
 
 @dataclass
+class AgenticPlannerConfig:
+    use_llm: bool = False
+
+
+@dataclass
+class AgenticGraderConfig:
+    use_llm: bool = False
+    min_results: int = 2
+    min_confidence: float = 0.45
+
+
+@dataclass
+class AgenticRewriterConfig:
+    use_llm: bool = False
+
+
+@dataclass
+class AgenticConfig:
+    """Bounded adaptive-retrieval configuration with safe legacy defaults."""
+    enabled: bool = True
+    default_mode: str = "auto"
+    max_iterations: int = 2
+    max_subqueries: int = 3
+    max_candidate_results: int = 30
+    planner: AgenticPlannerConfig = field(default_factory=AgenticPlannerConfig)
+    grader: AgenticGraderConfig = field(default_factory=AgenticGraderConfig)
+    rewriter: AgenticRewriterConfig = field(default_factory=AgenticRewriterConfig)
+
+
+@dataclass
 class Settings:
     """全局配置容器，持有所有子配置和原始 YAML dict"""
     llm: LLMConfig
@@ -91,7 +121,8 @@ class Settings:
     splitter: SplitterConfig
     retrieval: RetrievalConfig
     rerank: RerankConfig
-    raw_config: Dict[str, Any]
+    raw_config: Dict[str, Any] = field(default_factory=dict)
+    agentic: AgenticConfig = field(default_factory=AgenticConfig)
 
 
 def load_settings(config_path: str = "config/settings.yaml") -> Settings:
@@ -172,6 +203,25 @@ def load_settings(config_path: str = "config/settings.yaml") -> Settings:
             top_m=config['rerank'].get('top_m', 30)
         )
 
+        agentic_raw = config.get('agentic') or {}
+        planner_raw = agentic_raw.get('planner') or {}
+        grader_raw = agentic_raw.get('grader') or {}
+        rewriter_raw = agentic_raw.get('rewriter') or {}
+        agentic_cfg = AgenticConfig(
+            enabled=agentic_raw.get('enabled', True),
+            default_mode=agentic_raw.get('default_mode', 'auto'),
+            max_iterations=agentic_raw.get('max_iterations', 2),
+            max_subqueries=agentic_raw.get('max_subqueries', 3),
+            max_candidate_results=agentic_raw.get('max_candidate_results', 30),
+            planner=AgenticPlannerConfig(use_llm=planner_raw.get('use_llm', False)),
+            grader=AgenticGraderConfig(
+                use_llm=grader_raw.get('use_llm', False),
+                min_results=grader_raw.get('min_results', 2),
+                min_confidence=grader_raw.get('min_confidence', 0.45),
+            ),
+            rewriter=AgenticRewriterConfig(use_llm=rewriter_raw.get('use_llm', False)),
+        )
+
         settings = Settings(
             llm=llm_cfg,
             embedding=embedding_cfg,
@@ -179,7 +229,8 @@ def load_settings(config_path: str = "config/settings.yaml") -> Settings:
             splitter=splitter_cfg,
             retrieval=retrieval_cfg,
             rerank=rerank_cfg,
-            raw_config=config
+            raw_config=config,
+            agentic=agentic_cfg,
         )
 
         validate_settings(settings)
@@ -290,3 +341,16 @@ def validate_settings(settings: Settings) -> None:
 
     if settings.rerank.top_m <= 0:
         raise ValueError("rerank.top_m 必须大于 0")
+
+    if settings.agentic.default_mode not in {"classic", "agentic", "auto"}:
+        raise ValueError("agentic.default_mode 必须是 classic、agentic 或 auto")
+    if settings.agentic.max_iterations <= 0:
+        raise ValueError("agentic.max_iterations 必须大于 0")
+    if settings.agentic.max_subqueries <= 0:
+        raise ValueError("agentic.max_subqueries 必须大于 0")
+    if settings.agentic.max_candidate_results <= 0:
+        raise ValueError("agentic.max_candidate_results 必须大于 0")
+    if settings.agentic.grader.min_results <= 0:
+        raise ValueError("agentic.grader.min_results 必须大于 0")
+    if not 0.0 <= settings.agentic.grader.min_confidence <= 1.0:
+        raise ValueError("agentic.grader.min_confidence 必须在 0 到 1 之间")

@@ -34,6 +34,10 @@ class QueryResult:
     expected_chunk_ids: List[str] = field(default_factory=list)
     expected_sources: List[str] = field(default_factory=list)
     error: Optional[str] = None
+    iterations: int = 0
+    retrieval_calls: int = 0
+    rewrites: int = 0
+    degraded: bool = False
 
 
 @dataclass
@@ -75,6 +79,7 @@ class EvalRunner:
         hybrid_search=None,
         evaluator=None,
         collection: str = "default",
+        mode: str = "classic",
     ) -> None:
         """
         Args:
@@ -87,6 +92,7 @@ class EvalRunner:
         self._search = hybrid_search
         self._evaluator = evaluator
         self._collection = collection
+        self._mode = mode
 
     def run(self, test_set_path: str = "tests/fixtures/golden_test_set.json") -> EvalReport:
         """
@@ -110,6 +116,17 @@ class EvalRunner:
 
         elapsed_ms = (time.monotonic() - t_start) * 1000
         summary = self._compute_summary(results)
+        if summary and results:
+            summary["average_latency_ms"] = round(elapsed_ms / len(results), 4)
+        if self._mode == "agentic" and results:
+            successful = [r for r in results if r.error is None]
+            if successful:
+                summary.update({
+                    "average_iterations": round(sum(r.iterations for r in successful) / len(successful), 4),
+                    "average_retrieval_calls": round(sum(r.retrieval_calls for r in successful) / len(successful), 4),
+                    "rewrite_rate": round(sum(r.rewrites > 0 for r in successful) / len(successful), 4),
+                    "degradation_rate": round(sum(r.degraded for r in successful) / len(successful), 4),
+                })
         failed = sum(1 for r in results if r.error is not None)
 
         return EvalReport(
@@ -129,11 +146,21 @@ class EvalRunner:
         expected_sources = case.get("expected_sources", [])
 
         try:
-            raw_results = search.search(
+            raw = search.search(
                 query=query,
                 top_k=self._settings.retrieval.top_k_final,
                 collection=self._collection,
             )
+            if self._mode == "agentic":
+                raw_results = raw.results
+                iterations = raw.iteration_count
+                retrieval_calls = raw.retrieval_calls
+                rewrites = raw.rewrite_count
+                degraded = raw.degraded
+            else:
+                raw_results = raw
+                iterations = retrieval_calls = rewrites = 0
+                degraded = False
             chunks = [
                 {
                     "id": r.chunk_id,
@@ -161,6 +188,10 @@ class EvalRunner:
                 metrics=metrics,
                 expected_chunk_ids=expected_ids,
                 expected_sources=expected_sources,
+                iterations=iterations,
+                retrieval_calls=retrieval_calls,
+                rewrites=rewrites,
+                degraded=degraded,
             )
         except Exception as exc:
             return QueryResult(
@@ -187,7 +218,12 @@ class EvalRunner:
         if self._search is not None:
             return self._search
         from src.core.query_engine.hybrid_search import HybridSearch
-        self._search = HybridSearch(self._settings)
+        hybrid = HybridSearch(self._settings)
+        if self._mode == "agentic":
+            from src.core.agentic.orchestrator import AgenticRAGOrchestrator
+            self._search = AgenticRAGOrchestrator(self._settings, hybrid_search=hybrid)
+        else:
+            self._search = hybrid
         return self._search
 
     def _get_evaluator(self):

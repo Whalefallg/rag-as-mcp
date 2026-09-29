@@ -81,6 +81,46 @@
       "expected_sources": ["architecture_guide.pdf"],
       "expected_answer": "delete_document 依次删除 ChromaDB 向量、BM25 索引、ImageStorage 图片文件、FileIntegrity 记录。",
       "tags": ["document_management", "storage"]
+    },
+    {
+      "id": "tc_011",
+      "query": "RRF 和 Cross Encoder 在 RAG Pipeline 中分别位于什么阶段，它们解决的问题有什么区别？",
+      "expected_chunk_ids": [],
+      "expected_sources": ["fusion_methods.pdf", "rag_concepts.pdf"],
+      "expected_answer": "RRF 在多路召回后融合排名，Cross Encoder 在候选集上精排并建模 query-document 交互。",
+      "tags": ["agentic", "multi_hop", "comparison"]
+    },
+    {
+      "id": "tc_012",
+      "query": "Dense Retrieval 和 BM25 各自容易在哪些 query 上失败，Hybrid Search 如何弥补？",
+      "expected_chunk_ids": [],
+      "expected_sources": ["hybrid_search.pdf", "bm25_guide.pdf"],
+      "expected_answer": "Dense 容易遗漏精确词法信号，BM25 不理解语义；Hybrid Search 融合两路互补召回。",
+      "tags": ["agentic", "comparison"]
+    },
+    {
+      "id": "tc_013",
+      "query": "麻烦解释一下混合搜索里倒数名次合并怎么工作",
+      "expected_chunk_ids": [],
+      "expected_sources": ["fusion_methods.pdf", "hybrid_search.pdf"],
+      "expected_answer": "RRF 按各检索列表中的排名累加倒数分数。",
+      "tags": ["agentic", "corrective_query"]
+    },
+    {
+      "id": "tc_014",
+      "query": "MCP tool query_knowledge_hub 的 tools/call 参数是什么？",
+      "expected_chunk_ids": [],
+      "expected_sources": ["mcp_guide.pdf"],
+      "expected_answer": "query_knowledge_hub 通过 tools/call 接收 query、top_k、collection 等参数。",
+      "tags": ["agentic", "identifier", "lexical"]
+    },
+    {
+      "id": "tc_015",
+      "query": "这个知识库没有记载的量子重力产品故障码 QG-99999 如何修复？",
+      "expected_chunk_ids": [],
+      "expected_sources": ["architecture_guide.pdf"],
+      "expected_answer": "知识库证据不足，应在预算耗尽后返回最佳可用证据并明确降级。",
+      "tags": ["agentic", "insufficient_evidence"]
     }
   ]
 }

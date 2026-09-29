@@ -1,6 +1,6 @@
 # RAG as MCP
 
-一个模块化 RAG 引擎与 MCP Knowledge Service：覆盖文档摄取、Dense + BM25 混合检索、RRF 融合、可选重排序、评估与链路追踪，并通过 Model Context Protocol 向 Agent / LLM 应用暴露统一知识查询能力。
+一个面向生产的 Agentic Hybrid RAG 引擎与 MCP Knowledge Service：在可靠的 Dense + BM25 + RRF 基础上提供自适应查询规划、证据驱动的纠正检索、有界执行、评估与链路追踪。
 
 **中文** · [English](#english)
 
@@ -26,6 +26,11 @@ RAG as MCP 将 Retrieval-Augmented Generation 的核心链路拆分为可替换�
 
 ## 核心能力
 
+- **Adaptive Query Planning**：`auto` 路由让简单查询走低延迟 classic path，复杂查询进入 agentic path。
+- **Multi-Query / Query Decomposition**：复杂问题拆解后复用既有 HybridSearch，并用 RRF 去重融合。
+- **Evidence-Guided Corrective Retrieval**：证据不足时改写并在预算内重试。
+- **Bounded Agent Execution**：显式 iteration、subquery 和 candidate budget，终止后返回最佳证据。
+- **Agentic Trace & Offline Evaluation**：记录计划、评分、改写、终止与降级，并比较 classic 和 agentic。
 - **Document Ingestion Pipeline**：PDF 加载、切分、转换、Embedding 与持久化。
 - **Hybrid Retrieval**：Dense retrieval + BM25 sparse retrieval。
 - **RRF Fusion**：使用 Reciprocal Rank Fusion 合并不同召回通道。
@@ -38,6 +43,22 @@ RAG as MCP 将 Retrieval-Augmented Generation 的核心链路拆分为可替换�
 - **Container Delivery**：Git tag 驱动 Docker build、MCP smoke test 与 GHCR 发布。
 
 ## 架构
+
+```text
+MCP Query -> Adaptive Router -> Classic --------------------+
+                         \-> Agentic -> Analyze -> Plan      |
+                                      -> Decompose ----------+
+                                                             v
+                                           Dense + BM25 -> RRF
+                                                             |
+                                                    Evidence Grader
+                                                     /          \
+                                                 enough       rewrite
+                                                     \          /
+                                                      Final Rerank
+                                                           |
+                                                      MCP Response
+```
 
 ```text
                          Ingestion
@@ -75,6 +96,7 @@ PDF -> Loader -> Chunker -> Transform -> Embedding -> ChromaDB
 ```text
 src/ingestion/            文档摄取与存储协调
 src/core/query_engine/    查询、混合检索、融合与重排序
+src/core/agentic/         自适应分析、计划、评分、改写与有界编排
 src/mcp_server/           MCP 协议与 tools
 src/observability/        Trace、Dashboard 与评估
 ```
@@ -87,7 +109,7 @@ src/observability/        Trace、Dashboard 与评估
 MCP tools/call
     |
     v
-query_knowledge_hub
+query_knowledge_hub (mode=classic | agentic | auto)
     |
     v
 Query Engine
@@ -112,6 +134,8 @@ Citation / MCP Response
 - BM25 对术语、错误码、服务名等 lexical signal 更敏感
 - RRF 在不依赖两个检索器分数可比性的情况下融合排序
 - reranker 作为独立阶段进一步优化候选顺序
+
+Agentic 模式不是无界 autonomous agent，而是一个 **bounded adaptive retrieval loop**：它有明确的 iteration budget、fallback、termination reason 和 trace。任何智能模块失败都降级到 deterministic 或 classic retrieval，不牺牲服务可用性。
 
 ## MCP 工具
 
@@ -391,7 +415,7 @@ MIT License。详见 [LICENSE](LICENSE)。
 
 ## Overview
 
-RAG as MCP is a modular retrieval engine and MCP knowledge service that covers document ingestion, dense and BM25 retrieval, Reciprocal Rank Fusion, optional reranking, evaluation, and tracing behind a standard Model Context Protocol interface.
+RAG as MCP is a production-oriented Agentic Hybrid RAG engine exposed through MCP. It adds adaptive planning, evidence-guided corrective retrieval, bounded execution, evaluation, and tracing on top of dense + BM25 + RRF retrieval.
 
 The project focuses on the engineering boundaries required to make a RAG pipeline understandable and testable:
 
@@ -407,6 +431,11 @@ It can run as a standalone retrieval service or as the external knowledge backen
 
 ## Highlights
 
+- **Adaptive query planning** with `classic`, `agentic`, and low-latency `auto` routing.
+- **Multi-query and query decomposition** over the existing HybridSearch primitive.
+- **Evidence-guided corrective retrieval** with deterministic offline grading and optional LLM assistance.
+- **Bounded agent execution** with iteration, subquery, and candidate budgets.
+- **Agentic tracing and offline evaluation** including classic-vs-agentic comparison.
 - **Document ingestion pipeline** — PDF loading, chunking, transformation, embeddings, and persistence.
 - **Hybrid retrieval** — dense retrieval combined with BM25 sparse retrieval.
 - **RRF fusion** — Reciprocal Rank Fusion combines independent rankers without requiring directly comparable scores.
@@ -419,6 +448,22 @@ It can run as a standalone retrieval service or as the external knowledge backen
 - **Container delivery** — tag-driven Docker build, MCP smoke testing, and GHCR publishing.
 
 ## Architecture
+
+```text
+MCP Query -> Adaptive Router -> Classic --------------------+
+                         \-> Agentic -> Analyze -> Plan      |
+                                      -> Decompose ----------+
+                                                             v
+                                           Dense + BM25 -> RRF
+                                                             |
+                                                    Evidence Grader
+                                                     /          \
+                                                 enough       rewrite
+                                                     \          /
+                                                      Final Rerank
+                                                           |
+                                                      MCP Response
+```
 
 ```text
                          Ingestion

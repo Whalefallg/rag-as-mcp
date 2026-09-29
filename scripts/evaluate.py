@@ -20,6 +20,12 @@ sys.path.insert(0, str(_ROOT))
 def main() -> int:
     parser = argparse.ArgumentParser(description="运行 RAG 评估并输出指标报告")
     parser.add_argument(
+        "--mode",
+        default="classic",
+        choices=["classic", "agentic", "compare"],
+        help="检索模式（classic、agentic 或并排 compare）",
+    )
+    parser.add_argument(
         "--test-set",
         default="tests/fixtures/golden_test_set.json",
         help="golden test set 路径（default: tests/fixtures/golden_test_set.json）",
@@ -64,17 +70,15 @@ def main() -> int:
         return 1
 
     from src.observability.evaluation.eval_runner import EvalRunner
-    runner = EvalRunner(
-        settings=settings,
-        evaluator=evaluator,
-        collection=args.collection,
-    )
-
     print(f"[INFO] 加载测试集：{args.test_set}")
-    print(f"[INFO] 评估器：{args.evaluator}  集合：{args.collection}\n")
+    print(f"[INFO] 评估器：{args.evaluator}  集合：{args.collection}  模式：{args.mode}\n")
 
     try:
-        report = runner.run(args.test_set)
+        modes = ["classic", "agentic"] if args.mode == "compare" else [args.mode]
+        reports = {}
+        for mode in modes:
+            runner = EvalRunner(settings=settings, evaluator=evaluator, collection=args.collection, mode=mode)
+            reports[mode] = runner.run(args.test_set)
     except FileNotFoundError as exc:
         print(f"[ERROR] {exc}")
         return 1
@@ -82,7 +86,10 @@ def main() -> int:
         print(f"[ERROR] 评估运行失败：{exc}")
         return 1
 
-    report.print_summary()
+    for mode, report in reports.items():
+        print(f"\n## {mode.title()}")
+        report.print_summary()
+    report = reports[modes[-1]]
 
     if args.verbose:
         print("== 逐条结果 ==")
@@ -95,10 +102,13 @@ def main() -> int:
                 print(f"   → 错误：{r.error}")
 
     if args.output:
-        _save_report(report, args.output)
+        if args.mode == "compare":
+            _save_compare_report(reports, args.output)
+        else:
+            _save_report(report, args.output)
 
     # CI 退出码：有失败用例时返回 1（便于流水线检测）
-    return 1 if report.failed_cases > 0 else 0
+    return 1 if any(r.failed_cases > 0 for r in reports.values()) else 0
 
 
 def _build_evaluator(name: str, settings):
@@ -148,6 +158,21 @@ def _save_report(report, output_path: str) -> None:
     Path(output_path).parent.mkdir(parents=True, exist_ok=True)
     Path(output_path).write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"[INFO] 报告已保存：{output_path}")
+
+
+def _save_compare_report(reports, output_path: str) -> None:
+    data = {
+        mode: {
+            "summary": report.summary,
+            "elapsed_ms": report.elapsed_ms,
+            "total_cases": report.total_cases,
+            "failed_cases": report.failed_cases,
+        }
+        for mode, report in reports.items()
+    }
+    Path(output_path).parent.mkdir(parents=True, exist_ok=True)
+    Path(output_path).write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+    print(f"[INFO] 对比报告已保存：{output_path}")
 
 
 if __name__ == "__main__":
