@@ -1,17 +1,4 @@
-"""
-核心数据类型测试 (tests/unit/test_core_types.py)
-=================================================
-为什么需要这个文件：
-  Document/Chunk/ChunkRecord/RetrievalResult 是整个系统的"通用语言"——
-  每个阶段（Ingestion/Retrieval/MCP Tool）都在传递这些对象。
-  如果数据结构定义错了（字段缺失、类型不对），所有模块都会出问题。
-  这里测试序列化、默认值、字段完整性，确保数据契约在源头就是对的。
-
-验收标准（DEV_SPEC C1）：
-  - 所有数据类型可序列化为 dict
-  - metadata 包含 source_path 字段
-  - ChunkRecord 包含 dense_vector + sparse_vector
-"""
+"""核心数据类型测试 (tests/unit/test_core_types.py)"""
 import pytest
 from dataclasses import asdict
 from src.core.types import Document, Chunk, ChunkRecord, ImageRef, DocumentInfo, DeleteResult, IngestionProgress

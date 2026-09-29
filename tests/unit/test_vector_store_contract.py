@@ -1,18 +1,4 @@
-"""
-VectorStore 契约测试 (tests/unit/test_vector_store_contract.py)
-===============================================================
-为什么需要这个文件：
-  向量存储是 RAG 系统的核心数据层，upsert/query/get_by_ids/delete 四个方法
-  被多个上层模块依赖（VectorUpserter/DenseRetriever/SparseRetriever）。
-  "契约测试"的意义：不是测 ChromaDB 的具体实现细节，
-  而是测"所有实现都必须满足的接口约定"——输入什么格式、输出什么格式。
-  这样将来换成 Qdrant 或 Pinecone，只要通过契约测试，上层代码零改动。
-
-验收标准（DEV_SPEC B4）：
-  - 工厂能根据 backend 路由到正确的类
-  - 未知 backend 抛出 ValueError
-  - 契约测试：所有实现都遵守 BaseVectorStore 的接口约定（输入输出 shape 正确）
-"""
+"""VectorStore 契约测试 (tests/unit/test_vector_store_contract.py)"""
 import pytest
 from src.libs.vector_store.base_vector_store import BaseVectorStore
 from src.libs.vector_store.vector_store_factory import register_vector_store, create_vector_store, get_supported_backends

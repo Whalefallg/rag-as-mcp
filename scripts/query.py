@@ -1,26 +1,5 @@
 #!/usr/bin/env python3
-"""
-query.py — 在线查询 CLI 入口 (scripts/query.py)
-================================================
-为什么需要这个脚本：
-  MCP Server（阶段 E）是生产环境的查询入口，但开发阶段需要一个轻量的命令行工具
-  来快速验证检索效果——不用启动完整的 MCP Server，直接在终端跑一条命令
-  就能看到"这个 query 能不能召回到我期望的文档"。
-  这也是调试 Hybrid Search 和 Reranker 效果的标准工作流。
-
-用法：
-    python scripts/query.py --query "如何配置 Azure OpenAI？"
-    python scripts/query.py --query "BM25 算法原理" --top-k 5 --verbose
-    python scripts/query.py --query "test" --collection my_kb --no-rerank
-
-参数说明:
-  --query       : 必填，查询文本
-  --top-k       : 返回结果数量（默认 10）
-  --collection  : 限定检索集合（默认 "default"）
-  --config      : settings.yaml 路径（默认 "config/settings.yaml"）
-  --no-rerank   : 跳过 Reranker 精排阶段
-  --verbose     : 显示 Dense/Sparse 各路中间召回结果
-"""
+"""Command-line client for querying a local collection."""
 import argparse
 import sys
 from pathlib import Path

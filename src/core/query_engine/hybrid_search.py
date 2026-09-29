@@ -1,27 +1,4 @@
-"""
-HybridSearch (src/core/query_engine/hybrid_search.py)
-======================================================
-为什么需要这个模块：
-  这是 Retrieval 阶段的"总导演"。单独用 Dense 或 Sparse 都有盲区：
-    - Dense 只用：无法精确匹配代码函数名、型号、专有名词
-    - Sparse 只用：无法理解语义，"苹果公司"搜不到含 "Apple Inc" 的文档
-  HybridSearch 把两条路的结果用 RRF 融合，取长补短，是工业级 RAG 的标配方案。
-  设计问题：你的 RAG 系统是怎么做检索的？回答混合检索 + RRF 融合会加分。
-
-  设计亮点：
-    - 任一路失败自动降级到另一路（容错）
-    - metadata 后置过滤兜底（应对 VectorStore 前置过滤不完整的情况）
-    - Phase F：trace 注入，每个阶段记录 duration_ms / result_count / method
-
-类说明:
-  - HybridSearch : 混合检索编排器。
-                   search() 的完整流程：
-                     1. QueryProcessor.process()       → ProcessedQuery
-                     2. Dense + Sparse 召回（各自 record_stage）
-                     3. RRFusion.fuse()                → 融合排序（record_stage）
-                     4. _apply_metadata_filters()      → 后置过滤
-                     5. 截取 Top-K 返回
-"""
+"""HybridSearch (src/core/query_engine/hybrid_search.py)"""
 import time
 from typing import Any, Dict, List, Optional
 
@@ -35,15 +12,7 @@ from src.core.query_engine.fusion import RRFusion, create_fusion
 
 
 class HybridSearch:
-    """
-    混合检索编排器：Dense + Sparse + RRF Fusion。
-
-    实现说明：
-      为什么 Dense/Sparse 各自 top_k 设得比最终 top_k 大？
-      因为两路各自召回 Top-20，融合后取 Top-10，
-      这样每路都有"超配额的候选"，融合才有意义——
-      如果每路只召回 10 个，融合后也只有 10 个，没有提升。
-    """
+    """Combine over-fetched dense and sparse candidates using rank fusion."""
 
     def __init__(
         self,
@@ -79,7 +48,7 @@ class HybridSearch:
             top_k: 返回结果数量，不传则使用 settings.retrieval.top_k_final。
             filters: 额外的 metadata 过滤条件。
             collection: 目标 collection 名称。
-            trace: 追踪上下文（可选，Phase F 打点）。
+            trace: Optional trace shared by all retrieval stages.
         Returns:
             按融合分降序排列的 RetrievalResult 列表。
         """

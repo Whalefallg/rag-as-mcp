@@ -201,8 +201,6 @@ Dense
 
 失败路径同样记录 trace，便于定位“召回失败”“fusion 异常”“rerank 异常”或响应阶段问题。
 
-更完整的 correctness 语义见 [`knowledge/CORRECTNESS-HARDENING.md`](knowledge/CORRECTNESS-HARDENING.md)。
-
 ## 环境要求
 
 - Python 3.10+
@@ -389,12 +387,11 @@ ghcr.io/whalefallg/rag-as-mcp:latest
 ## 仓库结构
 
 ```text
-config/          配置模板
-data/            本地文档与持久化数据
-knowledge/       Correctness / design notes
-scripts/         ingest、query、evaluation、dashboard、container smoke test
-src/             核心实现
-tests/           unit / integration / e2e tests
+config/          配置模板与 prompt 配置
+data/            运行时生成的示例文档、索引与持久化数据
+scripts/         摄取、查询、评估、示例数据生成与 smoke test
+src/             Agentic RAG、检索、摄取、MCP 与可观测性实现
+tests/           unit、integration 与真正的 MCP/dashboard E2E tests
 ```
 
 ## Roadmap
@@ -603,8 +600,6 @@ Dense
 
 Failure paths are traced as well, making it easier to distinguish retrieval, fusion, reranking, and response-stage failures.
 
-See [`knowledge/CORRECTNESS-HARDENING.md`](knowledge/CORRECTNESS-HARDENING.md) for the detailed correctness semantics.
-
 ## Requirements
 
 - Python 3.10+
@@ -791,12 +786,11 @@ The container can boot the MCP protocol with the example configuration; producti
 ## Repository Structure
 
 ```text
-config/          configuration templates
-data/            local documents and persisted data
-knowledge/       correctness and design notes
-scripts/         ingestion, query, evaluation, dashboard, and container utilities
-src/             core implementation
-tests/           unit, integration, and E2E coverage
+config/          configuration templates and prompt configuration
+data/            generated sample documents, indexes, and runtime persistence
+scripts/         ingestion, query, evaluation, sample generation, and smoke tests
+src/             Agentic RAG, retrieval, ingestion, MCP, and observability
+tests/           unit, integration, and genuine MCP/dashboard E2E coverage
 ```
 
 ## Roadmap

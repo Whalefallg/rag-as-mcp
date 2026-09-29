@@ -1,16 +1,4 @@
-"""
-CitationGenerator (src/core/response/citation_generator.py)
-============================================================
-为什么需要这个文件：
-  MCP 协议支持 structuredContent，供高级 Client（如 Claude Desktop）解析并渲染
-  结构化引用。CitationGenerator 把 RetrievalResult 列表转换成标准化的 Citation
-  列表，让 Client 能展示"回答来自哪个文档的哪一页"，增强用户对 AI 输出的信任。
-
-  与 Markdown 引用标注的关系：
-    - Markdown [1][2] 是给人看的（TextContent）
-    - structuredContent.citations 是给程序解析的（机器可读）
-    - 两者的 index 保持对应，Client 可以联动高亮
-"""
+"""CitationGenerator (src/core/response/citation_generator.py)"""
 from typing import Any, Dict, List
 
 from src.core.types import RetrievalResult

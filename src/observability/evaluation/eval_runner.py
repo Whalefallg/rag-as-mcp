@@ -1,20 +1,4 @@
-"""
-EvalRunner (src/observability/evaluation/eval_runner.py)
-=========================================================
-为什么需要这个文件：
-  评估不是"跑一条"而是"跑一批"——golden_test_set.json 里有 N 条测试用例，
-  每条都需要走完整的 Retrieval 链路然后打分。
-  EvalRunner 把"读取测试集 → 逐条检索 → 逐条评估 → 汇总报告"串成一次调用，
-  CI 里直接跑 `python scripts/evaluate.py` 即可输出 Hit Rate / MRR 等指标。
-
-  EvalReport 结构：
-    - summary：汇总指标（所有用例的均值）
-    - per_query：每条用例的详细结果
-    - elapsed_ms：总耗时
-    - test_set_path：使用的测试集路径
-
-  离线优先：默认使用 LocalRetrievalEvaluator，无需 API Key 即可在 CI 中运行。
-"""
+"""EvalRunner (src/observability/evaluation/eval_runner.py)"""
 from __future__ import annotations
 
 import json
@@ -64,14 +48,7 @@ class EvalReport:
 
 
 class EvalRunner:
-    """
-    评估运行器：读取 golden_test_set.json，逐条检索并评估。
-
-    Usage:
-        runner = EvalRunner(settings=settings)
-        report = runner.run("tests/fixtures/golden_test_set.json")
-        report.print_summary()
-    """
+    """Run a retrieval implementation against a JSON evaluation set."""
 
     def __init__(
         self,

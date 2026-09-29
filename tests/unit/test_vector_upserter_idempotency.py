@@ -1,18 +1,4 @@
-"""
-VectorUpserter 幂等性测试 (tests/unit/test_vector_upserter_idempotency.py)
-==========================================================================
-为什么需要这个文件：
-  VectorUpserter 的核心设计是"幂等性"：同一个 chunk 无论 upsert 多少次，
-  向量库里只保留一条记录，不会产生重复向量污染检索结果。
-  stable_id 是实现幂等性的关键——用文档内容+位置的哈希作为 ID，
-  相同内容始终得到相同 ID，自然触发 ChromaDB 的 upsert（覆盖而非新增）语义。
-  这里测试 ID 的稳定性和唯一性，是整个幂等设计的基础验证。
-
-验收标准（DEV_SPEC C12）：
-  - 同一 chunk 两次 upsert 产生相同 stable_id
-  - 内容变更时 stable_id 变更
-  - 批量 upsert 顺序稳定
-"""
+"""VectorUpserter 幂等性测试 (tests/unit/test_vector_upserter_idempotency.py)"""
 import pytest
 from src.ingestion.storage.vector_upserter import _stable_chunk_id, VectorUpserter
 from src.core.types import Chunk

@@ -1,15 +1,4 @@
-"""
-DataService (src/observability/dashboard/services/data_service.py)
-===================================================================
-为什么需要这个文件：
-  Dashboard 数据浏览器需要从 ChromaDB 读取文档列表和 Chunk 详情，
-  以及从 ImageStorage 读取图片路径。
-  DataService 封装所有存储层读取逻辑，隔离 Dashboard 对具体存储实现的依赖。
-
-  与 DocumentManager 的区别：
-    - DocumentManager：写操作（删除/统计），是业务逻辑层
-    - DataService：读操作（浏览/预览），是 Dashboard 专用的读取适配层
-"""
+"""DataService (src/observability/dashboard/services/data_service.py)"""
 from __future__ import annotations
 
 from dataclasses import dataclass, field

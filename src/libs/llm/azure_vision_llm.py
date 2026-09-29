@@ -1,25 +1,4 @@
-"""
-Azure Vision LLM 实现 (src/libs/llm/azure_vision_llm.py)
-==========================================================
-为什么需要这个文件：
-  多模态 RAG 需要让 LLM「看」图片。AzureVisionLLM 把图片转为 base64
-  并按 OpenAI Vision API 格式发送，让 ImageCaptioner 能用同一套接口处理文本和图片。
-  自动压缩超大图片，避免触发 API 的尺寸限制。
-
-本文件实现基于 Azure OpenAI 的多模态（图文）LLM 调用。
-
-类说明:
-  - AzureVisionLLM : 继承 BaseVisionLLM，调用 Azure OpenAI 的 GPT-4o / GPT-4-Vision 模型。
-                     支持两种图片输入方式：
-                       - 本地文件路径：自动读取文件并转为 base64
-                       - 原始字节数据：直接转为 base64
-                     图片过大时自动压缩（长边不超过 max_image_size），
-                     避免超出 API 的图片尺寸限制或消耗过多 token。
-                     通过 LLMFactory.create_vision_llm() 创建，
-                     settings.yaml 中设置 vision_llm.provider: azure 时工厂使用此实现。
-                     主要被 ImageCaptioner 调用，传入文档图片，
-                     返回图片的结构化文字描述（流程图逻辑、数据图表数值、截图内容等）。
-"""
+"""Azure Vision LLM 实现 (src/libs/llm/azure_vision_llm.py)"""
 import os
 from typing import Optional
 

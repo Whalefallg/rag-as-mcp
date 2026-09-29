@@ -1,20 +1,4 @@
-"""
-BatchProcessor 实现 (src/ingestion/embedding/batch_processor.py)
-================================================================
-为什么需要这个文件：
-  一篇文档可能切成几百个 chunk，一次性全发给 Embedding API 容易触发限流或 OOM。
-  BatchProcessor 把 chunk 列表按 batch_size 切片，逐批调用 DenseEncoder 和 SparseEncoder，
-  避免单次请求过载。顺序稳定（按切片顺序处理）确保输出向量与输入 chunk 一一对应，
-  上层按下标合并即可，不需要做 ID 匹配。
-
-本文件实现批处理编排器，将 Chunk 列表分批驱动 Dense/Sparse 编码。
-
-类说明:
-  - BatchProcessor : 将 chunks 按 batch_size 分批，依次调用 DenseEncoder 和 SparseEncoder，
-                     合并结果后返回完整编码列表。
-                     批次顺序稳定（slice 按序切割），不做并发，保证输出顺序与输入一致。
-                     每批耗时通过 TraceContext.record_stage 记录，为 Phase F trace 预留钩子。
-"""
+"""BatchProcessor 实现 (src/ingestion/embedding/batch_processor.py)"""
 import time
 from typing import List, Optional
 

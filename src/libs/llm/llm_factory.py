@@ -1,14 +1,4 @@
-"""
-LLM 工厂 (src/libs/llm/llm_factory.py)
-========================================
-为什么需要这个文件：
-  工厂模式让「选择哪个 LLM 实现」的决策集中在一处，由 settings.yaml 驱动。
-  register_llm / register_vision_llm 装饰器让每个实现文件自我注册。
-
-  关键点：
-    由于项目采用装饰器注册，工厂模块在加载时必须主动导入内置实现模块，
-    否则注册表会为空，create_llm()/create_vision_llm() 会报 provider 未注册。
-"""
+"""LLM 工厂 (src/libs/llm/llm_factory.py)"""
 from typing import Dict, Type
 
 from src.libs.llm.base_llm import BaseLLM

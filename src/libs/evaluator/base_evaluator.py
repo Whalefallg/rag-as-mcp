@@ -1,24 +1,4 @@
-"""
-Evaluator 抽象层 (src/libs/evaluator/base_evaluator.py)
-=======================================================
-为什么需要这个文件：
-  RAG 系统的质量需要量化——不能只靠主观感受判断检索好不好。
-  BaseEvaluator 定义评估接口，支持只评估检索（Hit Rate/MRR）
-  或完整 RAG 评估（Faithfulness/Answer Relevancy）。
-  Phase G 的 Dashboard 会调用具体实现来驱动评估面板。
-
-本文件定义 RAG 质量评估的统一抽象接口。
-
-类说明:
-  - BaseEvaluator : 评估器抽象基类。所有具体评估框架（Ragas/DeepEval/自定义指标）
-                    都必须继承它并实现 evaluate() 方法。
-                    evaluate() 接收一次完整的 RAG 问答记录，返回各维度的量化分数。
-                    支持以下评估模式：
-                      - 纯检索评估：只传 query + retrieved_chunks，计算 Hit Rate/MRR 等
-                      - 完整 RAG 评估：加上 generated_answer + ground_truth，
-                        计算 Faithfulness/Answer Relevancy 等
-                    在 EvalRunner 中被调用，结果用于 Dashboard 评估面板展示。
-"""
+"""Evaluator 抽象层 (src/libs/evaluator/base_evaluator.py)"""
 from abc import ABC, abstractmethod
 from typing import Dict, Any, List, Optional
 

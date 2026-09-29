@@ -1,26 +1,4 @@
-"""
-MCP Protocol Handler (src/mcp_server/protocol_handler.py)
-==========================================================
-为什么需要这个文件：
-  server.py 只负责 Stdio I/O 的"搬运"，ProtocolHandler 负责真正的"理解"：
-    - 解析 JSON-RPC 2.0 方法名（initialize/tools/list/tools/call）
-    - 管理 tool 注册表（工厂模式，tool 自我注册）
-    - 把 tool 执行结果包装成合规的 MCP 响应格式
-    - 将任何异常转换成标准 JSON-RPC 错误码，绝不向 Client 泄露裸堆栈
-
-  JSON-RPC 2.0 错误码语义：
-    -32700  Parse error       JSON 解析失败（由 server.py 处理）
-    -32600  Invalid Request   不符合 JSON-RPC 规范的请求
-    -32601  Method not found  未知方法名
-    -32602  Invalid params    参数类型/缺少必填项
-    -32603  Internal error    工具执行期间的未预期异常
-
-  MCP 协议核心方法：
-    initialize      → 能力协商，返回 serverInfo + capabilities
-    tools/list      → 返回所有已注册 tool 的 schema
-    tools/call      → 路由到具体 tool 执行，返回 content 数组
-    notifications/* → 单向通知（无需响应，返回 None）
-"""
+"""MCP Protocol Handler (src/mcp_server/protocol_handler.py)"""
 import traceback
 from typing import Any, Callable, Dict, List, Optional
 

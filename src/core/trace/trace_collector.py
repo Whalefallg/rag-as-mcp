@@ -1,22 +1,4 @@
-"""
-TraceCollector (src/core/trace/trace_collector.py)
-===================================================
-为什么需要这个文件：
-  TraceContext 只负责"收集"数据，不负责"持久化"。
-  TraceCollector 是两者之间的桥梁：
-    1. 接收已 finish() 的 TraceContext
-    2. 调用 write_trace() 写入 logs/traces.jsonl
-    3. 同时写一条人类可读的 INFO 日志到 stderr（供实时调试）
-
-  分离"收集"与"持久化"的好处：
-    - 测试时可替换 collector，让 TraceContext 逻辑与 I/O 独立测试
-    - 未来切换到 OpenTelemetry / Jaeger 只改这一处
-
-设计：
-  TraceCollector 是单例（模块级 global_collector），所有链路共用一个实例，
-  避免在每个调用点传递 collector 引用。
-  需要隔离测试时，可直接实例化 TraceCollector(trace_file=tmp_path)。
-"""
+"""TraceCollector (src/core/trace/trace_collector.py)"""
 from typing import Optional
 
 from src.core.trace.trace_context import TraceContext

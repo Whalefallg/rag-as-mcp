@@ -1,22 +1,4 @@
-"""
-SparseEncoder 实现 (src/ingestion/embedding/sparse_encoder.py)
-==============================================================
-为什么需要这个文件：
-  BM25 检索分两步：Ingestion 时为每个 chunk 计算词频（TF），
-  Retrieval 时再结合全语料的 IDF 算出 BM25 分数。
-  SparseEncoder 负责 Ingestion 侧的 TF 计算，输出 {term: weight} 字典。
-  分两步的原因：IDF 依赖全语料统计，只有所有 chunk 都处理完才能算（BM25Indexer.build 时）；
-  而 TF 是单 chunk 级别的，可以在流水线中逐 chunk 实时计算。
-
-本文件实现 Chunk 的稀疏向量编码器（BM25 统计）。
-
-类说明:
-  - SparseEncoder : 对 Chunk 列表计算 BM25 所需的词频统计，输出 term weights 结构。
-                    输出格式为 {term: tf_normalized} 字典，供 BM25Indexer 消费。
-                    空文本返回空字典，不抛异常。
-                    当前实现：词级别 TF（词频/文档总词数），不依赖外部库。
-                    BM25 的 IDF 部分由 BM25Indexer（C11）在全语料层面计算。
-"""
+"""SparseEncoder 实现 (src/ingestion/embedding/sparse_encoder.py)"""
 import re
 from typing import List, Dict, Optional
 

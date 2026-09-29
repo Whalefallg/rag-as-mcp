@@ -1,19 +1,4 @@
-"""
-TraceService (src/observability/dashboard/services/trace_service.py)
-=====================================================================
-为什么需要这个文件：
-  traces.jsonl 是 Pipeline/Query 链路的持久化记录。
-  Dashboard 的追踪页面需要：
-    1. 按 trace_type 筛选（"ingestion" 或 "query"）
-    2. 按时间倒序排列
-    3. 解析阶段数据，计算耗时分布
-  TraceService 封装所有读取逻辑，Dashboard 页面只调用高层接口，
-  不直接操作文件或解析 JSON。
-
-  性能考量：
-    traces.jsonl 可能有上千行。TraceService 在读取时只解析必要字段，
-    需要完整 stages 时再按需加载（lazy loading 思路）。
-"""
+"""TraceService (src/observability/dashboard/services/trace_service.py)"""
 from __future__ import annotations
 
 import json

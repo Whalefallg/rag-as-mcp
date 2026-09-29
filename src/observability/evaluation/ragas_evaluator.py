@@ -1,23 +1,4 @@
-"""
-RagasEvaluator (src/observability/evaluation/ragas_evaluator.py)
-=================================================================
-为什么需要这个文件：
-  Ragas 是目前最成熟的 RAG 评估框架，提供：
-    - Faithfulness：答案是否忠实于检索内容（不捏造）
-    - Answer Relevancy：答案与问题的相关程度
-    - Context Precision：检索内容中有用部分的比例
-  这三个指标覆盖了 RAG 系统最核心的质量维度。
-
-  优雅降级策略（离线优先）：
-    - Ragas 未安装 → 抛 ImportError，提示安装命令
-    - LLM/Embedding 不可用 → 回退到 LocalRetrievalEvaluator，
-      只计算 Hit Rate / MRR（无需 LLM）
-    - 这样在没有 API Key 的环境里，评估系统依然可以运行
-
-  关于 Mock LLM 测试：
-    Ragas >= 0.2 支持传入 langchain LLM 对象作为 judge_llm，
-    测试时注入 FakeLLM 即可在无网络环境下验证逻辑。
-"""
+"""RagasEvaluator (src/observability/evaluation/ragas_evaluator.py)"""
 from __future__ import annotations
 
 from typing import Any, Dict, List, Optional
@@ -67,7 +48,7 @@ class RagasEvaluator(BaseEvaluator):
             raise ImportError(
                 "Ragas 未安装。请运行：\n"
                 "  pip install ragas\n"
-                "或在 requirements.txt 中取消 ragas>=0.1.0 的注释。"
+                "或运行 pip install -e '.[evaluation]'。"
             )
 
     def evaluate(

@@ -1,17 +1,4 @@
-"""
-LocalRetrievalEvaluator (src/observability/evaluation/local_retrieval_evaluator.py)
-====================================================================================
-为什么需要这个文件：
-  Ragas 需要 LLM judge（有 API 成本和网络依赖），但"检索对不对"
-  可以用纯离线的方式量化——只需把检索结果的 chunk_id/source
-  与 golden_test_set 里的 expected_chunk_ids/expected_sources 对比。
-  LocalRetrievalEvaluator 实现三个离线指标：
-    - hit_rate@k：Top-K 里是否包含至少一个期望 chunk（0 或 1）
-    - mrr（Mean Reciprocal Rank）：期望 chunk 在排名中的倒数位置
-    - precision@k：Top-K 里期望 chunk 占比
-
-  这是 EvalRunner 的默认 Evaluator，在没有 API Key 的 CI 环境里也能运行。
-"""
+"""LocalRetrievalEvaluator (src/observability/evaluation/local_retrieval_evaluator.py)"""
 from __future__ import annotations
 
 from typing import Any, Dict, List, Optional

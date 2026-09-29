@@ -1,19 +1,4 @@
-"""
-PDF Loader 契约测试 (tests/unit/test_loader_pdf_contract.py)
-============================================================
-为什么需要这个文件：
-  PDF 是最常见的知识库文档格式，Loader 是 Ingestion 的第一步。
-  如果 PDF 解析失败（依赖未安装、文件损坏），错误应该早在 Loader 层暴露，
-  而不是在 Pipeline 深处才崩溃。
-  契约测试确保 BaseLoader 的抽象约定被遵守：FileNotFoundError 对应找不到文件，
-  RuntimeError 对应依赖缺失，不会出现静默的 None 返回。
-
-验收标准（DEV_SPEC C3）：
-  - load() 返回 Document，metadata 含 source_path
-  - 对不存在的文件抛出 FileNotFoundError
-  - PdfLoader 在 PyMuPDF 未安装时抛出 RuntimeError（不是 ImportError 崩溃）
-  - BaseLoader 的抽象接口不可直接实例化
-"""
+"""PDF Loader 契约测试 (tests/unit/test_loader_pdf_contract.py)"""
 import pytest
 from src.libs.loader.base_loader import BaseLoader
 from src.libs.loader.pdf_loader import PdfLoader

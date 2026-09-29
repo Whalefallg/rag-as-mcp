@@ -1,12 +1,4 @@
-"""
-ResponseBuilder 单元测试 (tests/unit/test_response_builder.py)
-==============================================================
-为什么需要这个文件：
-  ResponseBuilder 是 MCP 响应格式的核心组装器。
-  它的输出直接影响 Copilot/Claude 展示给用户的内容质量，
-  因此需要严格验证：结果存在时 Markdown 格式正确、引用标注存在、
-  无结果时返回友好提示、图片内容被正确追加。
-"""
+"""ResponseBuilder 单元测试 (tests/unit/test_response_builder.py)"""
 import pytest
 from src.core.types import RetrievalResult
 from src.core.response.response_builder import ResponseBuilder

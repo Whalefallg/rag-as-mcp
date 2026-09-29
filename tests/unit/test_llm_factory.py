@@ -1,19 +1,4 @@
-"""
-LLM Factory 单元测试 (tests/unit/test_llm_factory.py)
-=====================================================
-为什么需要这个文件：
-  LLMFactory 是系统切换 LLM 供应商的唯一入口。
-  测试工厂路由逻辑，确保 settings.yaml 中写 provider: azure 就真的返回 AzureLLM，
-  而不是误返回其他实现或静默失败。
-  FakeLLM 的测试顺便验证了 BaseLLM 的消息校验规则，
-  这样业务代码在调用 chat() 前能放心依赖校验会替它挡住格式错误的消息。
-
-验收标准（DEV_SPEC B1）：
-  - 工厂能根据 provider 名称路由到正确的类
-  - 未知 provider 抛出 ValueError 且错误信息可读
-  - BaseLLM 的消息校验逻辑正确
-  - FakeLLM 的 chat() 正常工作
-"""
+"""LLM Factory 单元测试 (tests/unit/test_llm_factory.py)"""
 import pytest
 from src.libs.llm.base_llm import BaseLLM, ChatMessage, ChatResponse
 from src.libs.llm.llm_factory import register_llm, create_llm, get_supported_providers

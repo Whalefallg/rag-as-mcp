@@ -1,22 +1,4 @@
-"""
-DenseRetriever (src/core/query_engine/dense_retriever.py)
-==========================================================
-为什么需要这个模块：
-  语义检索（Dense Retrieval）是 RAG 的核心竞争力。
-  相比 BM25 只能匹配关键词，Dense Retrieval 能理解"苹果公司"和"Apple Inc"
-  是同一个意思，处理同义词、近义词和概念相关性。
-  原理：把 query 和所有文档 chunk 都转为高维向量，用余弦相似度找最近邻。
-  设计要点：为什么 Dense Retrieval 比 BM25 好？又为什么要混合使用？
-    - Dense 好处：语义理解强，能处理 paraphrase
-    - Dense 缺点：依赖大量训练数据，对罕见词/专有名词不如 BM25 准
-    - 混合使用（Hybrid Search）才能取长补短
-
-类说明:
-  - DenseRetriever  : 语义召回器。
-                      内部流程：query → embed([query]) → vector_store.query() → List[RetrievalResult]
-                      支持依赖注入（embedding_client / vector_store 可从外部传入），
-                      方便单元测试时用 mock 替换，不依赖真实 API。
-"""
+"""DenseRetriever (src/core/query_engine/dense_retriever.py)"""
 from typing import List, Optional, Dict, Any
 
 from src.core.types import RetrievalResult
@@ -27,14 +9,7 @@ from src.libs.vector_store.vector_store_factory import create_vector_store
 
 
 class DenseRetriever:
-    """
-    语义召回器：embed query → 向量检索 → RetrievalResult 列表。
-
-    实现说明：
-      向量检索的核心是 ANN（Approximate Nearest Neighbor），
-      ChromaDB / Qdrant 底层用 HNSW 图结构实现 O(log N) 的近似检索，
-      比暴力 O(N) 快得多，代价是牺牲极小的精度。
-    """
+    """Retrieve vector-nearest chunks using the configured embedding space."""
 
     def __init__(
         self,

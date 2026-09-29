@@ -1,32 +1,4 @@
-"""
-ChromaDB VectorStore 实现 (src/libs/vector_store/chroma_store.py)
-=================================================================
-为什么需要这个文件：
-  ChromaDB 是最易上手的嵌入式向量数据库——pip install 即用，无需部署服务。
-  底层用 HNSW 实现 ANN 检索，持久化到本地目录。
-  ChromaStore 封装了 collection 管理、HNSW 余弦空间配置、
-  距离→相似度转换（1 - distance）等细节。
-
-本文件实现基于 ChromaDB 的向量存储后端。
-
-类说明:
-  - ChromaStore : 继承 BaseVectorStore，使用 ChromaDB 作为向量数据库。
-                  ChromaDB 是嵌入式向量数据库，pip install chromadb 即可使用，
-                  无需单独部署数据库服务，数据持久化到本地 persist_path 目录。
-                  通过 @register_vector_store("chroma") 自动注册到 VectorStoreFactory，
-                  settings.yaml 中设置 vector_store.backend: chroma 时工厂自动创建此实例。
-
-                  内部使用 ChromaDB 的 collection 概念对应项目里的 collection 参数。
-                  每次 upsert/query 都需要指定 collection_name（默认 "default"）。
-
-                  方法说明：
-                    upsert()             : 向 ChromaDB 写入 chunk 记录，包含向量、原文、metadata。
-                                           采用 upsert 语义，同 id 重复写入自动覆盖。
-                    query()              : 用向量做余弦相似度检索，返回 top_k 条最相近记录。
-                    get_by_ids()         : 按 chunk_id 列表取回完整记录（原文 + metadata）。
-                    delete_by_metadata() : 按 metadata 条件批量删除（如按 source 删整篇文档）。
-                    get_or_create_collection(): 内部辅助方法，懒加载 collection 实例。
-"""
+"""ChromaDB VectorStore 实现 (src/libs/vector_store/chroma_store.py)"""
 import os
 from typing import List, Dict, Any, Optional
 

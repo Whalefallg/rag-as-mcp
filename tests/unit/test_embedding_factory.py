@@ -1,18 +1,4 @@
-"""
-Embedding Factory 单元测试 (tests/unit/test_embedding_factory.py)
-================================================================
-为什么需要这个文件：
-  Embedding 模型在 Ingestion（写入）和 Retrieval（查询）两个阶段都会用到，
-  且必须是同一个模型——否则向量空间不一致，相似度计算完全失效。
-  测试工厂确保 provider 路由正确，FakeEmbedding 则让其他模块的测试
-  不需要真实 API 就能验证"向量维度是否正确、数量是否与 input 一致"。
-
-验收标准（DEV_SPEC B2）：
-  - 工厂能根据 provider 路由到正确的类
-  - 未知 provider 抛出 ValueError
-  - BaseEmbedding 的文本校验逻辑正确
-  - FakeEmbedding 的 embed() 返回维度一致的向量
-"""
+"""Embedding Factory 单元测试 (tests/unit/test_embedding_factory.py)"""
 import pytest
 from src.libs.embedding.base_embedding import BaseEmbedding
 from src.libs.embedding.embedding_factory import register_embedding, create_embedding, get_supported_providers

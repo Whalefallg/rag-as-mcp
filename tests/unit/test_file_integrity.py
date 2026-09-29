@@ -1,19 +1,4 @@
-"""
-FileIntegrity 单元测试 (tests/unit/test_file_integrity.py)
-==========================================================
-为什么需要这个文件：
-  重复摄取是 RAG 系统最常见的运营问题之一——同一份文档被摄取两次，
-  向量库里出现重复向量，检索结果出现重复 chunk，答案质量下降。
-  FileIntegrity 用 SHA256 哈希 + SQLite 记录解决这个问题，
-  这里的测试验证"已成功摄取的文件会被跳过"、"失败的文件允许重试"，
-  这两条是幂等性的核心语义。
-
-验收标准（DEV_SPEC C2）：
-  - SHA256 对同一文件结果一致
-  - mark_success 后 should_skip 返回 True
-  - mark_failed 后允许重试（should_skip 返回 False）
-  - 数据库正确创建
-"""
+"""FileIntegrity 单元测试 (tests/unit/test_file_integrity.py)"""
 import os
 import tempfile
 import pytest

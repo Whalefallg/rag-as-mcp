@@ -1,27 +1,4 @@
-"""
-Core Reranker 编排层 (src/core/query_engine/reranker.py)
-=========================================================
-为什么需要这个模块：
-  HybridSearch 融合后得到 Top-K 候选，但 RRF 分数只反映"与 query 有多相关"，
-  不反映"文本内容是否真的回答了这个问题"。Reranker 做精排：
-    - Cross-Encoder：把 (query, chunk) 拼在一起送入模型，比 Bi-Encoder 更准，
-                     但速度慢 10x+，所以只对 Top-K 小集合做（先粗排再精排）。
-    - LLM Reranker：让大模型给出排序，质量最高但成本最贵。
-  设计要点：Bi-Encoder 和 Cross-Encoder 的区别？
-    - Bi-Encoder：query 和文档分别编码，支持离线预计算，速度快（用于初始召回）
-    - Cross-Encoder：联合编码，必须在线计算，但能捕捉 query-doc 交互（用于精排）
-  这个文件是 Core 层的"编排器"，不实现具体模型逻辑，
-  而是调用 libs.reranker 层的具体后端，并在失败时优雅降级。
-
-  Phase F：trace 打点，记录 backend / result_count / fallback / duration_ms。
-
-类说明:
-  - CoreReranker : Core 层 Reranker 编排器。
-                   rerank() 接收 HybridSearch 的输出，调用 libs.reranker 后端精排。
-                   降级机制：后端异常或超时时，直接返回原始融合排序，
-                   并在 metadata 中标记 fallback=True，不抛出致命异常，
-                   不阻塞用户查询。
-"""
+"""Core Reranker 编排层 (src/core/query_engine/reranker.py)"""
 import time
 from typing import List, Optional
 
@@ -36,16 +13,7 @@ Reranker = None   # 在下方 class 定义后覆盖
 
 
 class CoreReranker:
-    """
-    Core 层 Reranker 编排器：调用 libs.reranker 后端精排，失败时降级。
-
-    实现说明：
-      为什么要分 libs 层和 core 层两层？
-      libs.reranker 只关心"给我 (query, texts) 还给我排序"，不关心业务对象。
-      CoreReranker 负责把 List[RetrievalResult] 转为 libs 层需要的格式，
-      拿到结果后再转回来，同时处理异常降级。
-      这种"适配器 + 编排"模式让两层都可以独立测试和替换。
-    """
+    """Adapt retrieval results to a reranker and preserve order on failure."""
 
     def __init__(self, settings: Settings, reranker=None):
         """
@@ -70,7 +38,7 @@ class CoreReranker:
             query:      用户原始查询文本。
             candidates: HybridSearch 返回的候选 RetrievalResult 列表。
             top_k:      精排后保留的结果数量，None 时保留全部。
-            trace:      追踪上下文（Phase F 打点）。
+            trace:      Optional trace for rerank timing and fallback metadata.
         Returns:
             精排后的 RetrievalResult 列表；失败时返回原始顺序并标记 fallback。
         """

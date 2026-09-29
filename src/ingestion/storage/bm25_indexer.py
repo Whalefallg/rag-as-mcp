@@ -1,14 +1,4 @@
-"""
-BM25Indexer 实现 (src/ingestion/storage/bm25_indexer.py)
-=========================================================
-BM25 稀疏检索索引。索引持久化到本地 JSON，并支持增量更新。
-
-关键语义：
-  - Pipeline 摄取新文档时使用 update()，不能用 build() 覆盖已有文档。
-  - collection 是检索隔离边界；同一个 chunk_id 可以同时存在于多个 collection。
-  - BM25 对外返回业务 Chunk.id，与 VectorStore 的记录 ID 保持一致。
-  - query() 的 N / avg_dl / df 均按 collection 计算，其他 collection 不影响排名。
-"""
+"""BM25Indexer 实现 (src/ingestion/storage/bm25_indexer.py)"""
 import json
 import math
 from pathlib import Path
@@ -193,7 +183,7 @@ class BM25Indexer:
             self._index_key(collection, chunk_id)
             for chunk_id in ids
         }
-        # 兼容 Phase 1A 之前的 default 索引格式。
+        # Accept the legacy unscoped default index for backward compatibility.
         if collection == "default":
             candidate_keys.update(ids)
 

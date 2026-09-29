@@ -1,12 +1,4 @@
-"""
-系统总览页面 (src/observability/dashboard/pages/overview.py)
-=============================================================
-为什么需要这个文件：
-  运行前先看"系统健康状态"——当前配置了哪些组件、知识库里有多少数据，
-  是最常见的运维需求。Overview 页面一屏展示所有关键信息，无需进入命令行。
-
-  动态感知：所有组件信息来自 ConfigService，切换 provider 后页面自动更新。
-"""
+"""系统总览页面 (src/observability/dashboard/pages/overview.py)"""
 import streamlit as st
 
 

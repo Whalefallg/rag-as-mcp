@@ -1,19 +1,4 @@
-"""
-ChunkRefiner 单元测试 (tests/unit/test_chunk_refiner.py)
-========================================================
-为什么需要这个文件：
-  原始 PDF 解析出来的文本充满噪音：HTML 标签、分隔线、页码行、多余空格。
-  这些噪音直接进向量库会降低检索质量——Embedding 模型会浪费编码容量在无意义符号上。
-  ChunkRefiner 的规则模式做基础清洗，LLM 模式做更深度的语义整理。
-  降级测试验证 LLM 失败时自动回退到规则结果，保证整个 Pipeline 不会卡在这一步。
-
-验收标准（DEV_SPEC C5）：
-  - 规则模式去除 HTML 注释、分隔线、页码行、多余空白
-  - 代码块内容不被破坏
-  - LLM 模式：mock LLM 调用成功时 refined_by="llm"
-  - 降级：LLM 失败时 refined_by="rule"
-  - 单个 chunk 处理异常不影响其他 chunk
-"""
+"""ChunkRefiner 单元测试 (tests/unit/test_chunk_refiner.py)"""
 import pytest
 from src.core.types import Chunk
 from src.ingestion.transform.chunk_refiner import ChunkRefiner

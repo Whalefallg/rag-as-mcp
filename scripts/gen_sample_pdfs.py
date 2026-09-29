@@ -188,7 +188,7 @@ DOCS = {
             "安装步骤如下。"
             " 第一步：克隆仓库，进入项目目录。"
             " 第二步：创建并激活虚拟环境：python -m venv .venv && source .venv/bin/activate。"
-            " 第三步：安装依赖：pip install -r requirements.txt。"
+            " 第三步：安装依赖：pip install -e '.[dev]'。"
             " 如需 Dashboard，额外安装：pip install streamlit。"
             " 如需 ChromaDB 向量存储：pip install chromadb。"
             " 如需 LangChain 文本切分：pip install langchain-text-splitters。"

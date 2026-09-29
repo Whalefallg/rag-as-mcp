@@ -1,22 +1,4 @@
-"""
-Ollama Embedding 实现 (src/libs/embedding/ollama_embedding.py)
-=============================================================
-为什么需要这个文件：
-  本地部署 RAG 时用 nomic-embed-text/mxbai-embed-large 等开源模型，
-  零 API 成本，数据不出本机。Ollama Embedding 用 /api/embed 接口，
-  与 OllamaLLM 不同（后者用 /v1/chat/completions），注意区分。
-
-本文件实现基于 Ollama 本地服务的文本向量化。
-
-类说明:
-  - OllamaEmbedding : 继承 BaseEmbedding，调用本地 Ollama 的 /api/embed 端点。
-                      注意：Ollama Embedding 使用自己的 /api/embed 接口，
-                      不是 OpenAI 兼容格式，需要直接用 requests 发 HTTP 请求。
-                      通过 @register_embedding("ollama") 自动注册到 EmbeddingFactory，
-                      settings.yaml 中设置 embedding.provider: ollama 时工厂自动创建此实例。
-                      支持 nomic-embed-text / mxbai-embed-large 等本地 Embedding 模型，
-                      适合完全离线部署场景。
-"""
+"""Ollama Embedding 实现 (src/libs/embedding/ollama_embedding.py)"""
 import os
 from typing import List
 

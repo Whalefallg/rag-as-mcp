@@ -1,32 +1,10 @@
-"""
-QueryProcessor (src/core/query_engine/query_processor.py)
-==========================================================
-为什么需要这个模块：
-  用户输入的自然语言 query（比如"如何在 Azure 上配置 OpenAI？"）不能直接丢给
-  BM25 或 VectorStore——BM25 需要分好的关键词列表，VectorStore 需要结构化的
-  filters 字典。QueryProcessor 是这条链路的"入口标准化器"：一次处理，
-  产出所有后续检索组件都能直接消费的 ProcessedQuery，
-  避免 DenseRetriever 和 SparseRetriever 各自重复解析同一个 query。
-
-类说明:
-  - StopWords       : 停用词集合。BM25 实现要点：为什么要过滤停用词？
-                      因为"的"、"是"、"the"、"is" 这类高频词出现在几乎所有文档里，
-                      IDF ≈ 0，对排序没有贡献，还会占用索引空间和查询时间。
-                      这里只内置一个最小集合，生产环境可替换为完整停用词表。
-
-  - QueryProcessor  : 核心处理器。
-                      process() 执行两步：
-                        1. 关键词提取：分词 → 去停用词 → 去重 → 保留有效词
-                        2. filters 解析：从 query 或外部传入的 filters dict 中
-                           提取 collection、doc_type 等过滤条件
-                      输出 ProcessedQuery，被 HybridSearch 直接消费。
-"""
+"""QueryProcessor (src/core/query_engine/query_processor.py)"""
 import re
 from typing import List, Dict, Any, Optional
 
 from src.core.types import ProcessedQuery
 
-# 实现说明：这是一个极简停用词表，真实系统通常用 NLTK / jieba 的停用词词典
+# Deliberately small built-in set; callers can inject a domain-specific set.
 _STOP_WORDS_EN = {
     "a", "an", "the", "is", "are", "was", "were", "be", "been", "being",
     "have", "has", "had", "do", "does", "did", "will", "would", "shall",
@@ -84,12 +62,7 @@ class QueryProcessor:
         )
 
     def _extract_keywords(self, query: str) -> List[str]:
-        """
-        关键词提取：分词 → 小写 → 去停用词 → 去重 → 按原始顺序保留。
-
-        实现说明：这里用正则分词，生产环境可换成 jieba（中文）或
-        spaCy（英文）获得更好的分词效果。
-        """
+        """Extract unique normalized terms while preserving input order."""
         tokens = _TOKENIZE_RE.findall(query)
         seen = set()
         keywords = []

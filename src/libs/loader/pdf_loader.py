@@ -1,23 +1,4 @@
-"""
-PDF Loader 实现 (src/libs/loader/pdf_loader.py)
-================================================
-为什么需要这个文件：
-  PDF 是知识库最常见的文档格式，但解析比纯文本复杂得多——
-  需要处理多栏布局、图片提取、表格识别。
-  PdfLoader 用 PyMuPDF 逐页提取文本和图片，生成 Document 对象供 Pipeline 消费。
-  图片以字节存储在 Document.metadata["images"] 中，供 ImageCaptioner 使用。
-
-本文件实现基于 PyMuPDF (fitz) 的 PDF 文档加载。
-
-类说明:
-  - PdfLoader : 继承 BaseLoader，解析 PDF 文件并输出统一的 Document 对象。
-                文本处理：按页提取文本，拼接为 Markdown 风格的规范化文本。
-                图片处理：提取每页嵌入图片，保存为 PNG 到 data/images/{doc_hash}/，
-                          在文本中对应位置插入 [IMAGE: {image_id}] 占位符，
-                          并在 metadata["images"] 中记录 ImageRef 信息。
-                降级行为：图片提取失败不阻塞文本解析，仅记录 warning 日志。
-                文档 ID：文件路径的 SHA256 前 16 字符，确保同一文件 ID 稳定。
-"""
+"""PDF Loader 实现 (src/libs/loader/pdf_loader.py)"""
 import hashlib
 import os
 from pathlib import Path

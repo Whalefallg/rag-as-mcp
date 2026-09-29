@@ -1,18 +1,4 @@
-"""
-结构化日志模块 (src/observability/logger.py)
-============================================
-为什么需要这个文件：
-  MCP Server 的 stdout 只能写 JSON-RPC 消息，所有业务日志必须走 stderr。
-  Phase F 升级为双轨输出：
-    1. stderr: 人类可读的格式化日志（开发调试用）
-    2. logs/traces.jsonl: JSON Lines 格式的 trace 持久化（Dashboard 读取）
-
-  JSON Lines 格式每行一个独立 JSON 对象，方便 tail -f 实时追踪，
-  也方便 jq/grep 命令行查询，不依赖任何外部存储。
-
-  write_trace() 是 TraceCollector 的底层写入接口，
-  get_trace_logger() 是暴露给 TraceCollector 的专用 logger。
-"""
+"""结构化日志模块 (src/observability/logger.py)"""
 import json
 import logging
 import os

@@ -1,26 +1,4 @@
-"""
-LLM 抽象层 (src/libs/llm/base_llm.py)
-=======================================
-为什么需要这个文件：
-  上层业务代码（MetadataEnricher/ChunkRefiner/LLMReranker）只需要一个
-  「接收消息列表、返回文本」的接口。BaseLLM 定义这个接口，
-  切换 Azure/OpenAI/Ollama/DeepSeek 只需改 settings.yaml，业务代码零修改。
-  这种「依赖倒置」是设计中解释可扩展架构的经典示例。
-
-本文件定义 LLM 调用的统一数据结构和抽象接口。
-
-类说明:
-  - ChatMessage  : 一条聊天消息的数据结构（role + content），是调用 LLM 的基本单元。
-                   role 只能是 "system" / "user" / "assistant" 三种。
-
-  - ChatResponse : LLM 返回结果的数据结构（content + model + token 用量），
-                   所有 Provider 的返回都统一包装成这个格式，上层不需要处理各家差异。
-
-  - BaseLLM      : LLM 抽象基类。所有具体 Provider（Azure/OpenAI/Ollama/DeepSeek）
-                   都必须继承它并实现 chat() 方法。
-                   上层业务代码（MetadataEnricher/Reranker 等）只依赖这个接口，
-                   切换 Provider 只需改 settings.yaml，业务代码零修改。
-"""
+"""LLM 抽象层 (src/libs/llm/base_llm.py)"""
 from abc import ABC, abstractmethod
 from typing import List, Dict, Optional
 from dataclasses import dataclass, field

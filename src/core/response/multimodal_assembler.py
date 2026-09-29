@@ -1,25 +1,4 @@
-"""
-MultimodalAssembler (src/core/response/multimodal_assembler.py)
-================================================================
-为什么需要这个文件：
-  当检索结果中包含图片引用（chunk.metadata["image_refs"]）时，
-  MCP 响应需要同时返回文本和图片。
-  MultimodalAssembler 负责：
-    1. 从 RetrievalResult.metadata["image_refs"] 收集图片 ID
-    2. 通过 ImageStorage 查找本地文件路径
-    3. 读取图片字节并 Base64 编码
-    4. 构建 MCP ImageContent 对象（{"type":"image","data":"<b64>","mimeType":"..."}）
-
-  Client 兼容性：
-    - Claude Desktop：完整支持图片渲染
-    - GitHub Copilot：当前可能仅展示文本，图片作为附加内容
-    - 所有 Client：TextContent 始终在 content[0]，图片在后续位置，保证最低兼容性
-
-  降级策略：
-    - 图片文件不存在 → 跳过，不阻塞文本响应
-    - Base64 编码失败 → 记录日志，跳过该图片
-    - ImageStorage 未配置 → 直接返回空列表
-"""
+"""MultimodalAssembler (src/core/response/multimodal_assembler.py)"""
 import base64
 import json
 import mimetypes

@@ -1,18 +1,4 @@
-"""
-ImageStorage 单元测试 (tests/unit/test_image_storage.py)
-========================================================
-为什么需要这个文件：
-  多模态 RAG 的图片需要持久化存储（不能只放内存），并且在删除文档时要能级联清理。
-  ImageStorage 管理图片文件 + SQLite 索引的双层结构，
-  这里的测试验证两层都正确写入、读取、删除，
-  确保图片的生命周期与文档保持同步，不留"孤儿图片"占用磁盘空间。
-
-验收标准（DEV_SPEC C13）：
-  - save() 后文件存在于磁盘
-  - get_path() 返回正确路径，不存在返回 None
-  - delete_by_doc() 删除文件和索引记录，返回正确数量
-  - 数据库持久化验证
-"""
+"""ImageStorage 单元测试 (tests/unit/test_image_storage.py)"""
 import pytest
 from pathlib import Path
 from src.ingestion.storage.image_storage import ImageStorage

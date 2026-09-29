@@ -1,3 +1,0 @@
-# Compatibility install for environments that consume requirements.txt.
-# The canonical dependency definitions live in pyproject.toml.
--e .[dev]

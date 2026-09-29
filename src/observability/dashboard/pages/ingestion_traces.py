@@ -1,10 +1,4 @@
-"""
-Ingestion 追踪页面 (src/observability/dashboard/pages/ingestion_traces.py)
-==========================================================================
-为什么需要这个文件：
-  摄取后需要诊断"哪一步最慢"——是 Embedding 调用超时、还是写 Chroma 慢。
-  瀑布图让各阶段耗时一目了然，快速定位性能瓶颈。
-"""
+"""Ingestion 追踪页面 (src/observability/dashboard/pages/ingestion_traces.py)"""
 import streamlit as st
 
 

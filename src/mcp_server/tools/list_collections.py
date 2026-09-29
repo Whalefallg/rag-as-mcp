@@ -1,16 +1,4 @@
-"""
-list_collections Tool (src/mcp_server/tools/list_collections.py)
-=================================================================
-为什么需要这个文件：
-  用户在查询前需要知道知识库里有哪些集合（collection）可选。
-  这个 tool 列出所有已摄取的集合名称及其统计信息，
-  让 MCP Client 可以引导用户选择目标集合，或自动推断合适的集合。
-
-  数据来源优先级：
-    1. ChromaStore（最准确，来自实际向量数据）
-    2. data/documents/ 目录（回退，仅有目录结构时使用）
-    3. settings.yaml 默认集合名（最终回退）
-"""
+"""list_collections Tool (src/mcp_server/tools/list_collections.py)"""
 from pathlib import Path
 from typing import Any, Dict, List
 

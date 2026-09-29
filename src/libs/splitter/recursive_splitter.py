@@ -1,24 +1,4 @@
-"""
-Recursive Splitter 实现 (src/libs/splitter/recursive_splitter.py)
-==================================================================
-为什么需要这个文件：
-  「递归」切分优先按大分隔符（Markdown 标题、段落）切，
-  某段还是太长再用小分隔符（句子、字符）继续切，最大程度保留语义完整性。
-  相比 Fixed 切分，它不会在句子中间断开；相比 Semantic 切分，无需额外模型调用。
-  是工业界 RAG 系统最常用的默认切分策略。
-
-本文件实现基于 LangChain RecursiveCharacterTextSplitter 的文本切分策略。
-
-类说明:
-  - RecursiveSplitter : 继承 BaseSplitter，封装 LangChain 的递归字符切分器。
-                        "递归"的含义：优先按大分隔符（Markdown 标题、段落）切分，
-                        如果某段还是太长，再用更小的分隔符（句子、字符）继续切，
-                        直到每段都不超过 chunk_size。这样能最大限度保留语义完整性。
-                        separators 列表专门为 Markdown 格式优化，按优先级排列：
-                        标题 → 段落 → 句子 → 逗号 → 空格 → 单字符。
-                        通过 @register_splitter("recursive") 自动注册到 SplitterFactory，
-                        settings.yaml 中设置 splitter.method: recursive 时工厂自动创建此实例。
-"""
+"""Recursive Splitter 实现 (src/libs/splitter/recursive_splitter.py)"""
 from typing import List
 
 from src.libs.splitter.base_splitter import BaseSplitter
