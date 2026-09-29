@@ -1,21 +1,4 @@
-"""
-ChunkRefiner 实现 (src/ingestion/transform/chunk_refiner.py)
-============================================================
-为什么需要这个文件：
-  原始 PDF 解析文本充满噪音：HTML 标签、页眉页脚、分隔线、多余空格。
-  这些噪音进向量库会浪费 Embedding 模型的编码容量，降低检索相关性。
-  ChunkRefiner 先用规则做基础清洗（快、稳、无成本），
-  再可选地用 LLM 做语义重写（质量更高但有 API 成本）。
-  降级机制：LLM 失败时自动回退到规则结果，整条 Pipeline 不会因此卡住。
-
-本文件实现 Chunk 文本净化器。
-
-类说明:
-  - ChunkRefiner : 继承 BaseTransform，先做规则去噪，再可选调用 LLM 增强。
-                   规则模式：去除页眉/页脚、多余空白、分隔线、HTML 注释。
-                   LLM 模式：使用 prompt 模板调用 LLM 重写 chunk 文本。
-                   降级：LLM 异常时回退规则结果，metadata 记录 refined_by 标记。
-"""
+"""ChunkRefiner 实现 (src/ingestion/transform/chunk_refiner.py)"""
 import re
 from pathlib import Path
 from typing import List, Optional

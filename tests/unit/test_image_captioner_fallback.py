@@ -1,17 +1,4 @@
-"""
-ImageCaptioner 降级测试 (tests/unit/test_image_captioner_fallback.py)
-=====================================================================
-为什么需要这个文件：
-  ImageCaptioner 让纯文本检索链路也能看到图片内容（通过 LLM 生成的文字描述）。
-  但 Vision LLM 可能未配置、可能抛异常，此时系统不应崩溃——
-  降级测试确认：Vision LLM 失败时 chunk 仍然通过，只标记 has_unprocessed_images=True，
-  让调用方知道图片内容没有被处理，而不是静默丢弃或抛出致命错误。
-
-验收标准（DEV_SPEC C7）：
-  - 启用模式：有 image_refs 时调用 Vision LLM，caption 写入 metadata
-  - 降级模式：disabled / 无 vision_llm / 异常时保留 image_refs 并标记 has_unprocessed_images
-  - 无 image_refs 的 chunk 直接通过，不触发 Vision LLM 调用
-"""
+"""ImageCaptioner 降级测试 (tests/unit/test_image_captioner_fallback.py)"""
 import pytest
 from src.core.types import Chunk
 from src.ingestion.transform.image_captioner import ImageCaptioner

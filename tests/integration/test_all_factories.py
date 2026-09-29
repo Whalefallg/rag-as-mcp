@@ -1,12 +1,4 @@
-"""
-所有工厂集成测试 (tests/integration/test_all_factories.py)
-===========================================================
-为什么需要这个文件：
-  各个工厂（LLM/Embedding/Splitter/VectorStore）都是靠注册表动态创建的。
-  单独测试某个工厂只能验证它自己，集成测试验证"所有工厂能同时工作"——
-  比如注册表没有相互污染、Settings 能正确路由到每个工厂。
-  这一个测试跑通，基本能保证 Ingestion Pipeline 的依赖注入链路是通的。
-"""
+"""所有工厂集成测试 (tests/integration/test_all_factories.py)"""
 import pytest
 from src.libs.llm.llm_factory import create_llm, register_llm
 from src.libs.embedding.embedding_factory import create_embedding, register_embedding
@@ -55,11 +47,11 @@ class FactoryEvaluator(BaseEvaluator):
 def test_all_factories_work_together():
     """测试所有工厂可以协同工作"""
     settings = load_settings("config/settings.example.yaml")
-    
+
     # 测试 Reranker（使用默认的 none）
     reranker = create_reranker(settings)
     assert reranker is not None
-    
+
     # 测试 Evaluator
     evaluator = create_evaluator("test_eval")
     assert evaluator is not None

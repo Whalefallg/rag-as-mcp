@@ -1,14 +1,4 @@
-"""
-Query 追踪页面 (src/observability/dashboard/pages/query_traces.py)
-===================================================================
-为什么需要这个文件：
-  调试 RAG 效果时最常见的问题是"为什么没找到我想要的文档"。
-  Query 追踪页面展示：
-    - Dense vs Sparse 各自召回了多少条
-    - 融合后的分布
-    - Rerank 前后排名变化
-  这让工程师无需添加任何日志代码，直接在 Dashboard 里定位问题。
-"""
+"""Query 追踪页面 (src/observability/dashboard/pages/query_traces.py)"""
 import streamlit as st
 
 

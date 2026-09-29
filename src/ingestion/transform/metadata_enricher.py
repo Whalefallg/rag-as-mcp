@@ -1,23 +1,4 @@
-"""
-MetadataEnricher 实现 (src/ingestion/transform/metadata_enricher.py)
-=====================================================================
-为什么需要这个文件：
-  检索结果展示时需要显示「这个结果来自哪里、讲的是什么」——
-  裸露的原始 chunk 文本对用户不友好。MetadataEnricher 为每个 chunk 提取
-  title（标题）、summary（摘要）、tags（标签），存入 chunk.metadata，
-  后续 MCP Tool 的响应可以直接用这些字段渲染结果卡片。
-  LLM 模式提取质量最高，规则模式作为兜底，确保字段永远非空。
-
-本文件实现 Chunk 元数据增强器。
-
-类说明:
-  - MetadataEnricher : 继承 BaseTransform，为每个 Chunk 生成 title/summary/tags。
-                       规则模式（兜底）：取首行作 title，取前 200 字作 summary，
-                                        从高频词中提取 tags。
-                       LLM 模式（核心）：调用 LLM 生成高质量语义元数据，
-                                        输出 JSON 格式：{"title": ..., "summary": ..., "tags": [...]}。
-                       降级行为：LLM 失败时回退到规则结果，metadata 标记 enriched_by。
-"""
+"""MetadataEnricher 实现 (src/ingestion/transform/metadata_enricher.py)"""
 import json
 import re
 from pathlib import Path

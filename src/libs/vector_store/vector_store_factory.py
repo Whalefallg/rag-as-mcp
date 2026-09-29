@@ -1,14 +1,4 @@
-"""
-VectorStore 工厂 (src/libs/vector_store/vector_store_factory.py)
-================================================================
-为什么需要这个文件：
-  与其他工厂对称，persist_path 从 settings 注入，
-  Ingestion 和 Retrieval 两侧调用同一工厂，指向同一个数据库目录。
-
-  关键点：
-    具体实现类依赖 @register_vector_store 自注册，因此工厂模块加载时
-    必须主动导入内置实现模块，触发注册逻辑。
-"""
+"""VectorStore 工厂 (src/libs/vector_store/vector_store_factory.py)"""
 from typing import Dict, Type
 
 from src.libs.vector_store.base_vector_store import BaseVectorStore

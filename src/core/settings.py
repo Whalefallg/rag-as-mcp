@@ -1,29 +1,4 @@
-"""
-配置管理模块 (src/core/settings.py)
-=====================================
-为什么需要这个文件：
-  RAG 系统有很多可变参数——用哪家 LLM、向量库存在哪里、chunk 切多大、召回多少条。
-  如果这些参数散落在各模块的构造函数里，改一个参数就要改多处代码，上线前很容易漏改。
-  把所有参数集中到一份 YAML，只改配置文件就能切换整个系统行为，代码本身不需要动。
-  这种模式叫"外部化配置"（Externalized Configuration），是 12-Factor App 的核心原则之一。
-
-  load_settings() 在读取时立刻做校验（validate_settings）：
-  provider 名称拼错、chunk_overlap 大于 chunk_size 这类低级错误在启动时就会报错，
-  而不是等到运行中途崩溃，让调试更快。
-
-类说明:
-  - LLMConfig / EmbeddingConfig / VectorStoreConfig
-    / SplitterConfig / RetrievalConfig / RerankConfig :
-        各模块的配置 dataclass，字段名与 settings.yaml 中的 key 一一对应。
-        用 dataclass 而非 dict 的好处：IDE 自动补全字段名，拼写错误在开发时就暴露。
-
-  - Settings      : 全局配置容器，持有所有子配置 + raw_config（原始 dict，
-                    供各模块读取 YAML 中的自定义扩展字段，如 ingestion.chunk_refiner.use_llm）。
-
-  - load_settings(): 入口函数，读取 YAML → 解析 → 校验 → 返回 Settings 实例。
-  - validate_settings(): 独立的校验函数，不合法直接 raise ValueError，
-                         错误信息明确指出哪个字段不对，方便快速定位。
-"""
+"""配置管理模块 (src/core/settings.py)"""
 from dataclasses import dataclass, field
 from typing import Optional, Dict, Any
 import os

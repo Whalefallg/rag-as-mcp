@@ -1,16 +1,4 @@
-"""
-评估面板页面 (src/observability/dashboard/pages/evaluation_panel.py)
-====================================================================
-为什么需要这个文件：
-  替换 Phase G 的占位提示，提供完整的 RAG 评估交互界面：
-    1. 选择 golden test set 和评估器类型
-    2. 一键触发评估（调用 EvalRunner）
-    3. 展示 Hit Rate / MRR / Precision@K 等指标
-    4. 逐条查看检索命中详情
-    5. 历史评估结果对比
-
-  离线优先：默认 local evaluator，无需 API Key 即可在演示环境中运行。
-"""
+"""评估面板页面 (src/observability/dashboard/pages/evaluation_panel.py)"""
 from __future__ import annotations
 
 import json

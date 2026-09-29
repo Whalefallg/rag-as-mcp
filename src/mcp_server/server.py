@@ -1,22 +1,4 @@
-"""
-MCP Server 入口 (src/mcp_server/server.py)
-==========================================
-为什么需要这个文件：
-  MCP Server 是整个系统对外的唯一入口。Copilot/Claude Desktop 通过 Stdio
-  Transport 以子进程方式启动这个 server，双方通过 stdin/stdout 交换 JSON-RPC
-  2.0 消息。这里负责：
-    1. 初始化所有依赖（Settings/HybridSearch/Reranker 等）
-    2. 启动读循环（逐行读 stdin，解析 JSON-RPC，分发给 ProtocolHandler）
-    3. 强制约束：stdout 只写合法 MCP 消息，日志全部走 stderr
-
-  关键约束：
-    - stdout 被 MCP Client 解析，任何非 JSON 字节都会使 Client 崩溃
-    - 因此所有 print/logging 必须走 stderr（由 observability/logger.py 保证）
-
-  不依赖官方 mcp SDK：
-    - 纯 Python 实现，零外部依赖，联网后 pip install mcp 可一键切换
-    - JSON-RPC 2.0 协议简单，自研实现更透明、更易调试
-"""
+"""MCP Server 入口 (src/mcp_server/server.py)"""
 import sys
 import json
 import os

@@ -1,11 +1,4 @@
-"""
-数据浏览器页面 (src/observability/dashboard/pages/data_browser.py)
-===================================================================
-为什么需要这个文件：
-  摄取完文档后需要验证"数据是否正确进库"——chunk 内容是否正常、
-  metadata 字段是否完整、图片是否关联正确。
-  数据浏览器提供集合→文档→Chunk 的三级下钻视图。
-"""
+"""数据浏览器页面 (src/observability/dashboard/pages/data_browser.py)"""
 import streamlit as st
 
 

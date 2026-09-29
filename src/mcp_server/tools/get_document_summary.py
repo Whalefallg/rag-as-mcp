@@ -1,17 +1,4 @@
-"""
-get_document_summary Tool (src/mcp_server/tools/get_document_summary.py)
-=========================================================================
-为什么需要这个文件：
-  用户在看到检索结果后，有时需要了解某份文档的整体概况——
-  这份文档是关于什么的？有多少内容？上次更新是什么时候？
-  get_document_summary 通过 doc_id（source_path）从向量库 metadata 中
-  聚合该文档所有 chunk 的元数据，生成一份文档级摘要。
-
-  与 query_knowledge_hub 的区别：
-    - query_knowledge_hub：基于语义相似度，返回与查询最相关的 chunk
-    - get_document_summary：基于文档 ID，返回整份文档的概况
-  两者互补，前者回答"哪里有答案"，后者回答"这份文档是什么"。
-"""
+"""get_document_summary Tool (src/mcp_server/tools/get_document_summary.py)"""
 from typing import Any, Dict, List
 
 from src.core.settings import Settings

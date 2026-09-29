@@ -1,11 +1,4 @@
-"""
-Cross-Encoder Reranker 实现 (src/libs/reranker/cross_encoder_reranker.py)
-=========================================================================
-为什么需要这个文件：
-  Cross-Encoder 把 (query, chunk) 联合编码，能捕捉 query 和文本的交互关系，
-  精排质量远超 Bi-Encoder（Embedding 的余弦相似度）。
-  代价是速度慢 10x+，所以只对 Top-20~30 候选做精排，不用于大规模召回。
-"""
+"""Cross-Encoder Reranker 实现 (src/libs/reranker/cross_encoder_reranker.py)"""
 from typing import List, Dict, Any, Optional
 
 from src.libs.reranker.base_reranker import BaseReranker

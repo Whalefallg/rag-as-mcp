@@ -1,25 +1,4 @@
-"""
-SparseRetriever (src/core/query_engine/sparse_retriever.py)
-===========================================================
-为什么需要这个模块：
-  BM25（Best Match 25）是经典的稀疏检索算法，在是信息检索中的基础内容。
-  它不依赖 Embedding 模型，纯靠词频统计就能工作，对"精确关键词匹配"
-  场景（比如代码函数名、专有名词、型号编码）比 Dense Retrieval 更准。
-  设计问题：BM25 和 TF-IDF 的区别？
-    - TF-IDF：TF 越高分越高，没有上限，长文档天然占优
-    - BM25：TF 增益有上限（k1 参数控制饱和），加了文档长度归一化（b 参数），
-            长文档不再有不公平优势
-
-类说明:
-  - SparseRetriever : BM25 关键词召回器。
-                      内部流程：
-                        1. keywords → bm25_indexer.query() → [{chunk_id, score}]
-                        2. chunk_ids → vector_store.get_by_ids() → [{id, text, metadata}]
-                        3. 合并 score + text/metadata → List[RetrievalResult]
-                      之所以用两步而不是直接在 BM25 里存文本：
-                      文本只存在 VectorStore（单一来源），BM25 只存索引，
-                      避免数据重复存储和同步问题。
-"""
+"""SparseRetriever (src/core/query_engine/sparse_retriever.py)"""
 from typing import List, Optional, Dict
 
 from src.core.types import RetrievalResult

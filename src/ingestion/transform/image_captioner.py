@@ -1,25 +1,4 @@
-"""
-ImageCaptioner 实现 (src/ingestion/transform/image_captioner.py)
-================================================================
-为什么需要这个文件：
-  纯文本的向量检索看不到图片——如果文档里有流程图、数据表格截图，
-  用户查询相关内容时这些信息完全检索不到。
-  ImageCaptioner 用 Vision LLM 为每张图片生成文字描述（caption），
-  把描述缝合进 chunk 正文，让纯文本检索链路也能间接检索到图片内容。
-  降级机制：Vision LLM 未配置或失败时标记 has_unprocessed_images=True，
-  整条 Pipeline 不中断，文本内容仍然正常摄取。
-
-本文件实现图片 caption 生成器。
-
-类说明:
-  - ImageCaptioner : 继承 BaseTransform，为 Chunk 中引用的图片生成文字描述（caption）。
-                     启用模式：当 settings.ingestion.image_captioner.enabled=true 且
-                               chunk.metadata["image_refs"] 非空时，调用 Vision LLM
-                               为每张图片生成 caption，写入 metadata["images"][i]["caption"]。
-                     降级模式：Vision LLM 未配置、调用失败或图片读取失败时，
-                               保留 image_refs 原样，在 metadata 标记
-                               has_unprocessed_images=True，不抛异常，不阻塞 Pipeline。
-"""
+"""ImageCaptioner 实现 (src/ingestion/transform/image_captioner.py)"""
 from pathlib import Path
 from typing import List, Optional
 

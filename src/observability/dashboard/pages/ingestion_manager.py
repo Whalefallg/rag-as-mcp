@@ -1,11 +1,4 @@
-"""
-Ingestion 管理页面 (src/observability/dashboard/pages/ingestion_manager.py)
-==========================================================================
-为什么需要这个文件：
-  提供文件上传 → 触发摄取 → 实时进度 → 完成后浏览结果的完整闭环。
-  进度条由 Pipeline 的 on_progress 回调驱动，在同一个 Streamlit request 内
-  同步更新（Streamlit 的 rerun 机制天然支持）。
-"""
+"""Ingestion 管理页面 (src/observability/dashboard/pages/ingestion_manager.py)"""
 import tempfile
 from pathlib import Path
 

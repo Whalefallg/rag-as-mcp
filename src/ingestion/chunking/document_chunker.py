@@ -1,27 +1,4 @@
-"""
-DocumentChunker 适配器 (src/ingestion/chunking/document_chunker.py)
-====================================================================
-为什么需要这个文件：
-  libs.splitter 是纯工具——只把字符串切成更小的字符串，不知道 Document/Chunk。
-  DocumentChunker 是 Ingestion 业务层和 libs 工具层之间的适配器：
-  把 Document 喂给 splitter，拿到 List[str] 之后补全 Chunk 的所有业务字段。
-  Chunk ID 用内容哈希生成，保证同一 Document 多次切分产生相同 ID（幂等基础）。
-  图片引用分发确保 [IMAGE: xxx] 占位符所在的 chunk 记录对应 image_ref，
-  后续 ImageCaptioner 才知道要为哪个 chunk 补充图片描述。
-
-本文件实现 Document → List[Chunk] 的业务适配器层。
-
-类说明:
-  - DocumentChunker : 连接 libs.splitter（纯文本切分工具）和 Ingestion Pipeline 的适配器。
-                      libs.splitter 只做 str→List[str]，不涉及业务对象。
-                      DocumentChunker 负责 6 个增值职责：
-                        1. Chunk ID 生成（格式：{doc_id}_{index:04d}_{content_hash[:8]}）
-                        2. 元数据继承（从 Document 复制 source_path/collection 等）
-                        3. 添加 chunk_index 字段
-                        4. 建立 source_ref 指向父 Document.id
-                        5. 图片引用按需分发（扫描 [IMAGE: id] 占位符，仅分发该 chunk 引用的图片）
-                        6. 类型转换（List[str] → List[Chunk]）
-"""
+"""DocumentChunker 适配器 (src/ingestion/chunking/document_chunker.py)"""
 import hashlib
 import re
 from typing import List, Dict, Any

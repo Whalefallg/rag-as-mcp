@@ -1,20 +1,4 @@
-"""
-DenseEncoder / SparseEncoder / BatchProcessor 单元测试
-(tests/unit/test_encoders.py)
-=====================================================
-为什么需要这个文件：
-  Ingestion Pipeline 在把 chunk 存入向量库之前，需要为每个 chunk 生成两种向量：
-    - DenseEncoder：调用 Embedding 模型，生成语义向量（用于 Dense Retrieval）
-    - SparseEncoder：基于词频统计，生成稀疏权重字典（用于 BM25 建索引）
-  BatchProcessor 负责把 chunk 列表分批交给上面两个 Encoder，
-  避免一次性把几千个 chunk 发给 API 导致超时或 OOM。
-  这里的测试确保三个组件的输入输出尺寸正确、批处理顺序稳定。
-
-验收标准（DEV_SPEC C8/C9/C10）：
-  - DenseEncoder 输出向量数量与 chunks 数量一致
-  - SparseEncoder 空文本返回空字典
-  - BatchProcessor batch_size=2 对 5 chunks 分 3 批，顺序稳定
-"""
+"""DenseEncoder / SparseEncoder / BatchProcessor 单元测试"""
 import pytest
 from src.core.types import Chunk
 from src.core.settings import Settings, LLMConfig, EmbeddingConfig, VectorStoreConfig, SplitterConfig, RetrievalConfig, RerankConfig

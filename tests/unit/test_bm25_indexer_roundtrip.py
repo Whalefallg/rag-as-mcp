@@ -1,18 +1,4 @@
-"""
-BM25Indexer roundtrip 测试 (tests/unit/test_bm25_indexer_roundtrip.py)
-======================================================================
-为什么需要这个文件：
-  BM25 是 Sparse Retrieval 的核心，索引需要持久化到磁盘（进程重启后仍可查询）。
-  roundtrip 测试验证 build->保存->加载->查询 全链路正确，
-  IDF 测试确认稀有词的权重确实高于高频词（BM25 的核心语义），
-  update 测试确认增量写入后新 chunk 可被检索到——这是摄取新文档时的关键行为。
-
-验收标准（DEV_SPEC C11）：
-  - build 后能 load 并对同一语料查询返回稳定 top ids
-  - IDF 计算：仅在一篇文档中出现的词 IDF > 在所有文档中出现的词 IDF
-  - 增量 update 后查询结果更新
-  - 空语料查询返回空列表
-"""
+"""BM25Indexer roundtrip 测试 (tests/unit/test_bm25_indexer_roundtrip.py)"""
 import pytest
 import tempfile
 import os

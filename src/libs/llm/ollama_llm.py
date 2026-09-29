@@ -1,22 +1,4 @@
-"""
-Ollama LLM 实现 (src/libs/llm/ollama_llm.py)
-=============================================
-为什么需要这个文件：
-  隐私敏感场景或无网络环境需要完全本地部署。Ollama 兼容 OpenAI 接口格式，
-  OllamaLLM 只替换 base_url，复用 OpenAI SDK，实现成本极低。
-  适合在本机跑 llama3/qwen2 等开源模型，零 API 费用。
-
-本文件实现基于 Ollama 本地服务的 LLM 调用。
-
-类说明:
-  - OllamaLLM : 继承 BaseLLM，调用本地运行的 Ollama HTTP API。
-                Ollama 也兼容 OpenAI 的接口格式（/v1/chat/completions），
-                所以复用 OpenAI SDK，只替换 base_url 指向本地端口即可。
-                通过 @register_llm("ollama") 自动注册到 LLMFactory，
-                settings.yaml 中设置 llm.provider: ollama 时工厂自动创建此实例。
-                适合完全离线、隐私敏感场景，无 API 调用费用。
-                使用前需本地安装并启动 Ollama：https://ollama.ai
-"""
+"""Ollama LLM 实现 (src/libs/llm/ollama_llm.py)"""
 import os
 from typing import List
 

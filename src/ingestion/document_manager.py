@@ -1,20 +1,4 @@
-"""
-DocumentManager (src/ingestion/document_manager.py)
-====================================================
-为什么需要这个文件：
-  文档的"删除"操作跨越四个存储：ChromaDB、BM25 索引、ImageStorage、FileIntegrity。
-  如果各存储各自删除，任一步失败就会造成数据不一致（Chroma 删了但 BM25 还在）。
-  DocumentManager 把四个存储的删除封装成一次 best-effort 协调操作，
-  提供明确的成功/失败报告。
-
-  与 DataService 的区别：
-    - DataService：只读，供 Dashboard 数据浏览使用
-    - DocumentManager：读写，管理文档生命周期（list/delete/stats）
-
-  调用方：
-    - Dashboard ingestion_manager.py（删除按钮）
-    - scripts/ingest.py --delete 参数（命令行删除）
-"""
+"""DocumentManager (src/ingestion/document_manager.py)"""
 from __future__ import annotations
 
 from dataclasses import dataclass, field

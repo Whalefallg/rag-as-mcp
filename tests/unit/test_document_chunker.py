@@ -1,20 +1,4 @@
-"""
-DocumentChunker 单元测试 (tests/unit/test_document_chunker.py)
-==============================================================
-为什么需要这个文件：
-  DocumentChunker 是 Ingestion Pipeline 中最关键的一步——
-  它决定了向量库里存储的基本单元的形状：Chunk ID 必须稳定（防止重复摄取产生新 ID），
-  metadata 必须完整继承（检索时需要知道 chunk 来自哪个文件）。
-  图片分发逻辑验证 image_refs 正确归属到包含占位符的 chunk，
-  确保多模态内容在切分后不会丢失。
-
-验收标准（DEV_SPEC C4）：
-  - Chunk ID 唯一且确定性（重复切分同一 Document 产生相同 ID）
-  - 元数据继承：Chunk.metadata 包含 Document.metadata 的所有字段
-  - chunk_index 正确（从 0 开始连续）
-  - 图片分发：含 [IMAGE: id] 的 chunk 有 image_refs，无占位符的 chunk 无 image_refs
-  - 空文档返回空列表
-"""
+"""DocumentChunker 单元测试 (tests/unit/test_document_chunker.py)"""
 import pytest
 from src.core.types import Document, Chunk
 from src.core.settings import Settings, LLMConfig, EmbeddingConfig, VectorStoreConfig, SplitterConfig, RetrievalConfig, RerankConfig

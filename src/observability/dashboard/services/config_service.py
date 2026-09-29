@@ -1,15 +1,4 @@
-"""
-ConfigService (src/observability/dashboard/services/config_service.py)
-=======================================================================
-为什么需要这个文件：
-  Dashboard 各页面都需要展示"当前系统用的什么 LLM / Embedding / VectorStore"。
-  ConfigService 把 Settings 解析成 Dashboard 可直接展示的结构化数据，
-  避免每个页面自己解析 YAML，同时统一错误处理（配置文件缺失时返回 fallback 信息）。
-
-  动态感知设计：
-    页面不硬编码任何 provider 名称，全部从 ConfigService 获取，
-    切换 provider 后 Dashboard 自动展示新配置，无需改 UI 代码。
-"""
+"""ConfigService (src/observability/dashboard/services/config_service.py)"""
 from __future__ import annotations
 
 import os

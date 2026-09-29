@@ -1,12 +1,4 @@
-"""
-冒烟测试 (tests/unit/test_smoke_imports.py)
-===========================================
-为什么需要这个文件：
-  最基础的测试，验证项目各包能正常 import。
-  常见问题：__init__.py 缺失、循环依赖、typo 导致 ModuleNotFoundError。
-  这类错误如果没有冒烟测试，会在运行任何功能测试时才暴露。
-  CI 第一步就跑这个，挂了说明代码根本不可导入，后面的测试也没必要跑。
-"""
+"""冒烟测试 (tests/unit/test_smoke_imports.py)"""
 import pytest
 
 
@@ -61,7 +53,7 @@ def test_all_subpackages_importable():
         "src.observability.dashboard",
         "src.observability.evaluation",
     ]
-    
+
     for package in subpackages:
         try:
             __import__(package)

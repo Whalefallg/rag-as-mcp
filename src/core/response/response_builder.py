@@ -1,17 +1,4 @@
-"""
-ResponseBuilder (src/core/response/response_builder.py)
-========================================================
-为什么需要这个文件：
-  HybridSearch 返回的是 List[RetrievalResult]——纯数据，没有格式。
-  MCP Tool 需要返回 content 数组（TextContent + 可选 ImageContent），
-  格式要求严格，且需要人类可读的 Markdown 引用标注。
-  ResponseBuilder 把"数据"转换成"MCP 响应格式"，职责单一，便于测试和修改。
-
-  输出格式：
-    content[0]: TextContent（Markdown，含 [1][2] 引用标注）
-    content[1..n]: ImageContent（Base64 图片，可选）
-    structuredContent: 机器可读的结构化引用（供高级 Client 解析）
-"""
+"""ResponseBuilder (src/core/response/response_builder.py)"""
 import time
 from typing import Any, Dict, List, Optional
 

@@ -31,7 +31,7 @@
       "query": "如何安装项目依赖？",
       "expected_chunk_ids": [],
       "expected_sources": ["README.md", "setup_guide.pdf"],
-      "expected_answer": "运行 pip install -r requirements.txt 安装所有依赖。",
+      "expected_answer": "运行 pip install -e '.[dev]' 安装项目和开发依赖。",
       "tags": ["setup"]
     },
     {

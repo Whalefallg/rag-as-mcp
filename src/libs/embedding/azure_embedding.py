@@ -1,21 +1,4 @@
-"""
-Azure Embedding 实现 (src/libs/embedding/azure_embedding.py)
-============================================================
-为什么需要这个文件：
-  Azure OpenAI Embeddings 与 OpenAI 直连在 SDK 用法上有差异
-  （需要 azure_endpoint + api_version，model 对应 deployment_name）。
-  AzureEmbedding 封装这些差异，让上层代码无感知地切换到 Azure。
-
-本文件实现基于 Azure OpenAI 服务的文本向量化。
-
-类说明:
-  - AzureEmbedding : 继承 BaseEmbedding，调用 Azure OpenAI Embeddings 端点。
-                     与 OpenAIEmbedding 的区别：需要 azure_endpoint + api_version，
-                     model 参数对应 Azure 里的 deployment_name。
-                     通过 @register_embedding("azure") 自动注册到 EmbeddingFactory，
-                     settings.yaml 中设置 embedding.provider: azure 时工厂自动创建此实例。
-                     内部逻辑与 OpenAIEmbedding 一致，只是 client 换成 AzureOpenAI。
-"""
+"""Azure Embedding 实现 (src/libs/embedding/azure_embedding.py)"""
 import os
 from typing import List
 

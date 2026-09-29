@@ -1,15 +1,4 @@
-"""
-Evaluator 工厂 (src/libs/evaluator/evaluator_factory.py)
-=========================================================
-为什么需要这个文件：
-  与其他工厂对称，按名称创建 Evaluator 实例。
-  CompositeEvaluator 可以同时创建多个 evaluator（如 Ragas + Local）
-  并行执行，结果汇总到 Dashboard。
-
-  关键点：
-    evaluator 实现类依赖 @register_evaluator 自注册，因此工厂模块加载时
-    必须主动导入内置实现模块，触发注册逻辑。
-"""
+"""Evaluator 工厂 (src/libs/evaluator/evaluator_factory.py)"""
 from typing import Dict, Type, Optional
 
 from src.libs.evaluator.base_evaluator import BaseEvaluator

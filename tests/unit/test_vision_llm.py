@@ -1,20 +1,4 @@
-"""
-Vision LLM 单元测试 (tests/unit/test_vision_llm.py)
-====================================================
-为什么需要这个文件：
-  多模态 RAG 的图片理解依赖 Vision LLM，一旦 API 不可用或图片返回为空，
-  就会导致 Chunk 的 caption 缺失，检索时图片内容完全不可见。
-  测试的重点：未提供图片时抛出 ValueError而不是静默失败，
-  base64 工具方法正确（是 Vision API 消费图片的基础），
-  以及工厂路由正确连接 AzureVisionLLM。
-
-验收标准（DEV_SPEC B8/B9）：
-  - BaseVisionLLM 的 base64 工具方法正确
-  - 未提供图片时抛出 ValueError
-  - AzureVisionLLM 的注册装饰器生效（注册进 Vision 工厂）
-  - Vision LLM 工厂路由正确
-  - chat() 在 Vision LLM 上抛出 NotImplementedError（需用 chat_with_image）
-"""
+"""Vision LLM 单元测试 (tests/unit/test_vision_llm.py)"""
 import base64
 import pytest
 from src.libs.llm.base_vision_llm import BaseVisionLLM

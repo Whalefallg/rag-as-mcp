@@ -1,22 +1,4 @@
-"""
-CompositeEvaluator (src/observability/evaluation/composite_evaluator.py)
-=========================================================================
-为什么需要这个文件：
-  单一评估框架各有盲区：
-    - Ragas 擅长 Faithfulness/Answer Relevancy，但需要 LLM judge（有 API 成本）
-    - 自定义 Retrieval Evaluator 擅长 Hit Rate/MRR，完全离线无需 LLM
-  CompositeEvaluator 把多个 Evaluator 并行执行，结果合并——
-  工程师可以自由组合"离线检索指标 + 在线语义指标"，按需取舍成本与深度。
-
-  并行执行策略：
-    使用 concurrent.futures.ThreadPoolExecutor，各 Evaluator 独立运行，
-    任一失败时记录错误但不中断其他 Evaluator。
-
-  指标合并规则：
-    - Key 不冲突：直接合并
-    - Key 冲突：后者覆盖前者（按 evaluators 列表顺序，后注册的优先）
-    - 失败的 Evaluator：在 _errors 字段记录原因
-"""
+"""CompositeEvaluator (src/observability/evaluation/composite_evaluator.py)"""
 from __future__ import annotations
 
 import concurrent.futures

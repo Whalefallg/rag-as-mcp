@@ -1,15 +1,4 @@
-"""
-Reranker 工厂 (src/libs/reranker/reranker_factory.py)
-======================================================
-为什么需要这个文件：
-  NoneReranker 在模块加载时自动注册（不依赖装饰器），
-  保证 backend=none 始终可用，即使所有其他 reranker 实现都没有 import。
-  其他后端用 register_reranker 装饰器自我注册，保持一致的扩展模式。
-
-  关键点：
-    对于 cross_encoder / llm 等装饰器注册的实现，工厂模块加载时必须
-    主动导入内置实现模块，触发注册逻辑。
-"""
+"""Reranker 工厂 (src/libs/reranker/reranker_factory.py)"""
 from typing import Dict, Type
 
 from src.libs.reranker.base_reranker import BaseReranker, NoneReranker

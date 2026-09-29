@@ -1,20 +1,4 @@
-"""
-query_knowledge_hub Tool (src/mcp_server/tools/query_knowledge_hub.py)
-=======================================================================
-为什么需要这个文件：
-  这是整个 MCP Server 最核心的 tool——用户通过它查询知识库。
-  它把 HybridSearch + Reranker + ResponseBuilder + MultimodalAssembler
-  串联成一次完整的 RAG 查询，并以 MCP 规范格式返回带引用的结果。
-
-  tool 参数设计：
-    query      必填  用户的自然语言查询
-    top_k      可选  返回结果数量（默认 10）
-    collection 可选  限定检索的知识库集合（默认 "default"）
-
-  延迟初始化：
-    HybridSearch/Reranker 依赖 VectorStore 和 Embedding，
-    首次调用时才初始化（懒加载），避免 Server 启动时因缺少数据而失败。
-"""
+"""query_knowledge_hub Tool (src/mcp_server/tools/query_knowledge_hub.py)"""
 from typing import Any, Dict, List
 
 from src.core.settings import Settings

@@ -1,13 +1,4 @@
-"""
-Regression tests for Phase 1A correctness hardening.
-
-Covers:
-  - Dense/Sparse physical collection routing
-  - HybridSearch propagation of collection
-  - BM25 incremental updates and collection isolation
-  - VectorStore/BM25 chunk-id alignment
-  - FileIntegrity collection scoping and legacy-schema migration
-"""
+"""Regression tests for collection isolation and replacement semantics."""
 import sqlite3
 from types import SimpleNamespace
 

@@ -1,16 +1,4 @@
-"""
-Splitter 工厂 (src/libs/splitter/splitter_factory.py)
-======================================================
-为什么需要这个文件：
-  与其他工厂对称，确保 chunk_size/chunk_overlap 从 settings
-  正确注入到具体实现，不会被默认值覆盖或静默丢失。
-
-  关键点：
-    splitter 的具体实现类（如 RecursiveSplitter）依赖装饰器
-    `@register_splitter("recursive")` 自注册。
-    因此工厂模块在加载时必须主动导入这些内置实现，
-    否则注册装饰器永远不会执行，注册表会是空的。
-"""
+"""Splitter 工厂 (src/libs/splitter/splitter_factory.py)"""
 from typing import Dict, Type
 
 from src.libs.splitter.base_splitter import BaseSplitter

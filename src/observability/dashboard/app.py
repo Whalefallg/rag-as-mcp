@@ -1,17 +1,4 @@
-"""
-Dashboard 入口 (src/observability/dashboard/app.py)
-====================================================
-为什么需要这个文件：
-  Streamlit 多页面应用需要一个统一的入口来注册所有页面、初始化共享服务。
-  app.py 使用 st.navigation() 把六个页面串联成一个有序导航，
-  共享服务（ConfigService / DataService / TraceService）在这里实例化后
-  通过函数参数传入各页面，避免每个页面各自重建连接。
-
-  启动方式：
-    streamlit run src/observability/dashboard/app.py
-  或通过脚本：
-    python scripts/start_dashboard.py
-"""
+"""Dashboard 入口 (src/observability/dashboard/app.py)"""
 import sys
 from pathlib import Path
 

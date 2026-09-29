@@ -1,18 +1,4 @@
-"""
-Reranker Factory 单元测试 (tests/unit/test_reranker_factory.py)
-===============================================================
-为什么需要这个文件：
-  Reranker 是 RAG 系统中成本最高的组件之一（Cross-Encoder 每次都要过模型）。
-  "backend=none 时跳过精排"是必须保证的行为——测试 NoneReranker 的 passthrough 语义，
-  确保关闭精排不会影响系统其他部分的正确性。
-  降级测试则验证"精排失败时系统仍能返回 RRF 融合结果"，不让精排成为单点故障。
-
-验收标准（DEV_SPEC B5）：
-  - backend=none 时返回 NoneReranker，原样返回 candidates
-  - 未知 backend 抛出 ValueError
-  - NoneReranker 保持原始顺序不变
-  - CrossEncoderReranker 和 LLMReranker 降级回退逻辑正确
-"""
+"""Reranker Factory 单元测试 (tests/unit/test_reranker_factory.py)"""
 import pytest
 from src.libs.reranker.base_reranker import BaseReranker, NoneReranker
 from src.libs.reranker.reranker_factory import create_reranker, get_supported_backends

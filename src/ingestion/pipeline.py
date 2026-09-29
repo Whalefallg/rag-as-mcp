@@ -1,27 +1,4 @@
-"""
-Ingestion Pipeline 编排 (src/ingestion/pipeline.py)
-====================================================
-为什么需要这个文件：
-  把「加载→切分→清洗→编码→写入」这条链路串在一起的编排器。
-  没有 Pipeline 的话，每次调用方都要手动依次调 Loader/Chunker/Encoder/Upserter，
-  步骤顺序容易搞错，错误处理也会散落各处。
-  IngestionPipeline 封装成一次 ingest(file_path) 调用，
-  内置幂等跳过（SHA256 检查）、每步失败打标记、进度回调。
-
-  Phase F 新增：
-    - trace 注入（trace_type="ingestion"），各阶段 record_stage
-    - on_progress 回调签名：(stage_name, current, total) → None
-    - trace.finish() + TraceCollector.collect() 在 run() 末尾自动持久化
-
-  设计问题：Pipeline 模式有什么好处？
-    → 关注点分离、步骤可替换、错误处理集中、测试时可 mock 单步。
-
-类说明:
-  - PipelineError      : 阶段性错误，携带 stage 名和原始异常。
-  - IngestionPipeline  : 串行执行七步：
-                           integrity → load → split → transform →
-                           encode → upsert → store_images
-"""
+"""Ingestion Pipeline 编排 (src/ingestion/pipeline.py)"""
 import time
 from pathlib import Path
 from typing import Callable, List, Optional

@@ -1,19 +1,4 @@
-"""
-MetadataEnricher 契约测试 (tests/unit/test_metadata_enricher_contract.py)
-=========================================================================
-为什么需要这个文件：
-  检索结果的 metadata（title/summary/tags）直接影响用户体验：
-  UI 展示结果时需要显示标题和摘要，而不是裸露的原始文本。
-  LLM 模式提取的 metadata 质量最高，但 LLM 可能返回格式错误的 JSON。
-  契约测试确保无论 LLM 成功还是失败，title/summary/tags 字段一定存在且非空，
-  上层代码可以无防御性地直接访问这三个字段。
-
-验收标准（DEV_SPEC C6）：
-  - 规则模式输出必须包含非空的 title/summary/tags
-  - LLM 模式：mock LLM 返回有效 JSON 时 enriched_by="llm"
-  - 降级：LLM 失败时回退到规则结果，enriched_by="rule"
-  - LLM 返回无效 JSON 时降级到规则模式
-"""
+"""MetadataEnricher 契约测试 (tests/unit/test_metadata_enricher_contract.py)"""
 import pytest
 from src.core.types import Chunk
 from src.ingestion.transform.metadata_enricher import MetadataEnricher

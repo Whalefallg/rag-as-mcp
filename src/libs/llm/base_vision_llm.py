@@ -1,22 +1,4 @@
-"""
-Vision LLM 抽象层 (src/libs/llm/base_vision_llm.py)
-=====================================================
-为什么需要这个文件：
-  Vision LLM 比普通 LLM 多一个「图片输入」参数，接口签名不同。
-  BaseVisionLLM 继承 BaseLLM 并新增 chat_with_image()，
-  让 ImageCaptioner 可以用统一接口调用不同的 Vision 后端，
-  同时 base64 工具方法复用，不需要每个实现重复写。
-
-本文件定义多模态（图文）LLM 调用的统一抽象接口，是 BaseLLM 的扩展。
-
-类说明:
-  - BaseVisionLLM : Vision LLM 抽象基类，专门处理"文字 + 图片"的多模态输入。
-                    普通 BaseLLM 只能接受文本，BaseVisionLLM 额外支持传入图片
-                    （本地文件路径 或 base64 编码的字节串）。
-                    在 Ingestion Pipeline 的 ImageCaptioner 阶段被调用：
-                    传入图片 + 文档上下文文字，让 Vision LLM 生成图片的文字描述（Caption），
-                    描述会被缝合进 Chunk 正文，让纯文本检索链路也能检索到图片内容。
-"""
+"""Vision LLM 抽象层 (src/libs/llm/base_vision_llm.py)"""
 import base64
 from abc import abstractmethod
 from pathlib import Path

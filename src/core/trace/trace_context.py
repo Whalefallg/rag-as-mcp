@@ -1,24 +1,4 @@
-"""
-TraceContext 增强实现 (src/core/trace/trace_context.py)
-========================================================
-为什么需要这个文件：
-  每次查询或摄取调用都是一条链路，经过多个组件。
-  TraceContext 在链路启动时生成唯一 trace_id，各组件把耗时/结果写入同一个 context，
-  调试时能把分散的日志关联在一起。Phase F 完善了持久化和序列化能力。
-
-  Phase F 新增内容：
-    - trace_type 字段区分 "query" / "ingestion" 两类链路
-    - finish() 方法标记链路结束，计算总耗时
-    - to_dict() 输出完整的可 JSON 序列化字典（含 ISO 时间戳）
-    - elapsed_ms() 查询指定阶段或总耗时
-    - record_stage() 扩展为支持直接传入耗时（不强制用 span() 上下文管理器）
-
-类说明:
-  - SpanRecord   : 单个执行阶段的记录，含 stage/data/duration_ms/error。
-  - TraceContext : 追踪上下文，贯穿单次 Pipeline 全链路。
-                   trace_type="query"     → Query 链路（HybridSearch/Reranker）
-                   trace_type="ingestion" → Ingestion 链路（Pipeline 七步）
-"""
+"""TraceContext 增强实现 (src/core/trace/trace_context.py)"""
 import uuid
 import time
 from contextlib import contextmanager
@@ -38,25 +18,7 @@ class SpanRecord:
 
 
 class TraceContext:
-    """
-    Pipeline 追踪上下文。
-
-    Usage（Query 链路）：
-        trace = TraceContext(trace_type="query")
-        with trace.span("dense_retrieval") as span:
-            span.data["top_k"] = 20
-            results = dense_retriever.retrieve(...)
-        trace.finish()
-        collector.collect(trace)   # 持久化到 traces.jsonl
-
-    Usage（显式记录，不用 span）：
-        trace = TraceContext(trace_type="ingestion")
-        t0 = time.monotonic()
-        chunks = chunker.split(doc)
-        trace.record_stage("split", duration_ms=(time.monotonic()-t0)*1000,
-                           chunk_count=len(chunks))
-        trace.finish()
-    """
+    """Collect serializable metadata and timed stages for one pipeline run."""
 
     def __init__(
         self,

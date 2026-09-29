@@ -1,22 +1,4 @@
-"""
-Azure OpenAI LLM 实现 (src/libs/llm/azure_llm.py)
-===================================================
-为什么需要这个文件：
-  企业环境中常用 Azure OpenAI 而非直连 OpenAI——
-  数据不出租户、有 SLA 保障、支持私有网络部署。
-  AzureLLM 封装 Azure SDK 的 endpoint/deployment_name/api_version 差异，
-  让上层代码感受不到与 OpenAILLM 的区别。
-
-本文件实现基于 Azure OpenAI 服务的 LLM 调用。
-
-类说明:
-  - AzureLLM : 继承 BaseLLM，调用 Azure OpenAI 端点。
-               与 OpenAILLM 的区别：需要额外的 azure_endpoint 和 api_version，
-               model 参数对应 Azure 里的 deployment_name（部署名称，不是模型名）。
-               通过 @register_llm("azure") 自动注册到 LLMFactory，
-               settings.yaml 中设置 llm.provider: azure 时工厂自动创建此实例。
-               适合企业合规场景，数据不出 Azure 租户。
-"""
+"""Azure OpenAI LLM 实现 (src/libs/llm/azure_llm.py)"""
 import os
 from typing import List
 

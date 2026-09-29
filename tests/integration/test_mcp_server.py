@@ -1,13 +1,4 @@
-"""
-MCP Server 集成测试 (tests/integration/test_mcp_server.py)
-==========================================================
-为什么需要这个文件：
-  MCP Server 的核心行为是"接受 JSON-RPC 消息 → 路由 → 返回合规响应"。
-  这里以 ProtocolHandler 为单元，测试完整的协议交互流程，
-  不依赖真实网络或 MCP SDK，纯 Python dict 驱动。
-  覆盖：initialize、tools/list、tools/call（含 query_knowledge_hub 的 mock 路径）、
-  错误处理（未知方法、无效参数、工具执行失败）。
-"""
+"""MCP Server 集成测试 (tests/integration/test_mcp_server.py)"""
 import pytest
 from unittest.mock import MagicMock, patch
 

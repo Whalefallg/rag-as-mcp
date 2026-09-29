@@ -1,11 +1,4 @@
-"""
-LLM Reranker 实现 (src/libs/reranker/llm_reranker.py)
-======================================================
-为什么需要这个文件：
-  LLM 对候选文本的「理解力」最强，能考虑语境和推理关系，
-  精排质量最高但 API 成本也最高。适合对召回质量要求极高、候选数量少的场景。
-  失败时静默回退到原始顺序，不阻塞整条 Retrieval 链路。
-"""
+"""LLM Reranker 实现 (src/libs/reranker/llm_reranker.py)"""
 import json
 from pathlib import Path
 from typing import List, Dict, Any, Optional

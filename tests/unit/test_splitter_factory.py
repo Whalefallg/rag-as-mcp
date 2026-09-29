@@ -1,17 +1,4 @@
-"""
-Splitter Factory 单元测试 (tests/unit/test_splitter_factory.py)
-===============================================================
-为什么需要这个文件：
-  chunk_size 和 chunk_overlap 直接决定检索质量：
-  太大则一个 chunk 塞太多信息，检索噪音多；太小则语义被截断，上下文缺失。
-  测试工厂确保这两个关键参数从 settings.yaml 正确传递到具体的切分器实现，
-  不会被默认值覆盖或静默丢失。
-
-验收标准（DEV_SPEC B3）：
-  - 工厂能根据 method 路由到正确的类
-  - 未知 method 抛出 ValueError
-  - BaseSplitter 的 chunk_size / chunk_overlap 正确传递
-"""
+"""Splitter Factory 单元测试 (tests/unit/test_splitter_factory.py)"""
 import pytest
 from src.libs.splitter.base_splitter import BaseSplitter
 from src.libs.splitter.splitter_factory import register_splitter, create_splitter, get_supported_methods
