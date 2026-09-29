@@ -27,7 +27,7 @@ logger = get_logger(__name__)
 TOOL_NAME = "query_knowledge_hub"
 
 TOOL_DESCRIPTION = (
-    "在本地知识库中执行混合检索（语义向量 + 关键词 BM25），"
+    "在本地知识库中执行自适应 Agentic Hybrid RAG（语义向量 + 关键词 BM25），"
     "返回最相关的文档片段及其来源引用。"
     "支持多模态：若相关片段含有图片，会同时返回图片内容。"
 )
@@ -51,6 +51,11 @@ TOOL_INPUT_SCHEMA: Dict[str, Any] = {
             "description": "目标知识库集合名称（默认 'default'）",
             "default": "default",
         },
+        "mode": {
+            "type": "string",
+            "enum": ["auto", "classic", "agentic"],
+            "description": "检索模式；默认使用服务配置（auto/classic/agentic）",
+        },
     },
     "required": ["query"],
 }
@@ -67,6 +72,7 @@ def _get_components(settings: Settings):
         from src.core.query_engine.reranker import Reranker
         from src.core.response.response_builder import ResponseBuilder
         from src.core.response.multimodal_assembler import MultimodalAssembler
+        from src.core.agentic.orchestrator import AgenticRAGOrchestrator
 
         try:
             from src.ingestion.storage.image_storage import ImageStorage
@@ -74,9 +80,16 @@ def _get_components(settings: Settings):
         except Exception:
             image_storage = None
 
+        hybrid_search = HybridSearch(settings)
+        reranker = Reranker(settings)
         _cache[cache_key] = {
-            "hybrid_search": HybridSearch(settings),
-            "reranker": Reranker(settings),
+            "hybrid_search": hybrid_search,
+            "reranker": reranker,
+            "agentic": AgenticRAGOrchestrator(
+                settings=settings,
+                hybrid_search=hybrid_search,
+                reranker=reranker,
+            ),
             "builder": ResponseBuilder(),
             "assembler": MultimodalAssembler(image_storage=image_storage),
         }
@@ -88,12 +101,20 @@ def execute(arguments: Dict[str, Any], settings: Settings) -> List[Dict[str, Any
     query: str = arguments.get("query", "").strip()
     top_k: int = min(int(arguments.get("top_k", 10)), 50)
     collection: str = arguments.get("collection", "default")
+    agentic_cfg = getattr(settings, "agentic", None)
+    requested_mode = arguments.get("mode") or (
+        agentic_cfg.default_mode if agentic_cfg is not None else "classic"
+    )
+    mode = requested_mode if requested_mode in {"auto", "classic", "agentic"} else "auto"
+    if agentic_cfg is not None and not agentic_cfg.enabled and mode != "classic":
+        mode = "classic"
 
     trace = TraceContext(trace_type="query")
     trace.set_metadata("user_query", query)
     trace.set_metadata("collection", collection)
     trace.set_metadata("top_k", top_k)
     trace.set_metadata("status", "running")
+    trace.set_metadata("requested_mode", requested_mode)
 
     try:
         if not query:
@@ -143,12 +164,43 @@ def execute(arguments: Dict[str, Any], settings: Settings) -> List[Dict[str, Any
         trace.set_metadata("rerank_backend", settings.rerank.backend)
 
         try:
-            results = hybrid_search.search(
-                query=query,
-                top_k=candidate_k,
-                collection=collection,
-                trace=trace,
-            )
+            effective_mode = mode
+            if mode == "auto":
+                from src.core.agentic.query_analyzer import QueryAnalyzer
+                route_analysis = QueryAnalyzer().analyze(query)
+                effective_mode = "agentic" if QueryAnalyzer.should_use_agentic(route_analysis) else "classic"
+                trace.record_stage(
+                    "adaptive_route",
+                    selected_mode=effective_mode,
+                    intent=route_analysis.intent.value,
+                    complexity=route_analysis.complexity_score,
+                    reasoning_summary=route_analysis.reasoning_summary,
+                )
+            trace.set_metadata("retrieval_mode", effective_mode)
+            if effective_mode == "agentic":
+                try:
+                    agent_result = components["agentic"].search(
+                        query=query,
+                        top_k=top_k,
+                        collection=collection,
+                        trace=trace,
+                    )
+                    results = agent_result.results
+                except Exception as exc:
+                    trace.record_stage("agent_orchestrator_fallback", status="degraded", error=str(exc), fallback="classic")
+                    trace.set_metadata("degraded", True)
+                    trace.set_metadata("termination_reason", "error_fallback")
+                    results = hybrid_search.search(query=query, top_k=candidate_k, collection=collection, trace=trace)
+                    if results:
+                        results = reranker.rerank(query=query, candidates=results, top_k=top_k, trace=trace)
+            else:
+                trace.set_metadata("termination_reason", "classic_route")
+                results = hybrid_search.search(
+                    query=query,
+                    top_k=candidate_k,
+                    collection=collection,
+                    trace=trace,
+                )
         except Exception as exc:
             trace.record_stage(
                 "hybrid_search",
@@ -162,7 +214,7 @@ def execute(arguments: Dict[str, Any], settings: Settings) -> List[Dict[str, Any
                 "text": f"检索时发生错误：{exc}",
             }]
 
-        if results:
+        if results and effective_mode == "classic":
             try:
                 results = reranker.rerank(
                     query=query,
@@ -198,4 +250,3 @@ def execute(arguments: Dict[str, Any], settings: Settings) -> List[Dict[str, Any
         return content
     finally:
         global_collector.collect(trace)
-

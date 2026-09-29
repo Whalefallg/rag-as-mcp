@@ -37,6 +37,21 @@ rerank:
   model: ""
   top_m: 30
 
+agentic:
+  enabled: true
+  default_mode: auto
+  max_iterations: 2
+  max_subqueries: 3
+  max_candidate_results: 30
+  planner:
+    use_llm: false
+  grader:
+    use_llm: false
+    min_results: 2
+    min_confidence: 0.45
+  rewriter:
+    use_llm: false
+
 ingestion:
   chunk_refiner:
     enabled: true

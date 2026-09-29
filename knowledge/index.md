@@ -212,6 +212,12 @@
 - **D10.3** Collection management: DocumentManager coordinates deletion across 4 stores (Chroma/BM25/Images/Integrity)
 - **D10.4** State tracking: never ingested / ingested / failed / deleted; WAL-mode SQLite for concurrency safety
 
+### D11 — Agentic RAG & Adaptive Retrieval
+- **D11.1** Adaptive routing: simple queries use classic retrieval; complex queries enter a bounded agent loop
+- **D11.2** Query analysis, retrieval planning, decomposition, and multi-query RRF fusion
+- **D11.3** Evidence grading, corrective rewrite, explicit budgets, and termination reasons
+- **D11.4** Deterministic fallback, Agentic TraceContext stages, and classic-vs-agentic evaluation
+
 ---
 
 ## High-Frequency Interview Questions (English)

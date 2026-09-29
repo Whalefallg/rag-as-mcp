@@ -138,6 +138,11 @@ class TestToolsList:
             assert "description" in tool
             assert "inputSchema" in tool
 
+    def test_real_query_tool_schema_supports_modes(self):
+        from src.mcp_server.tools.query_knowledge_hub import TOOL_INPUT_SCHEMA
+        mode = TOOL_INPUT_SCHEMA["properties"]["mode"]
+        assert mode["enum"] == ["auto", "classic", "agentic"]
+
 
 # ─── tools/call ──────────────────────────────────────────────────────────────
 
