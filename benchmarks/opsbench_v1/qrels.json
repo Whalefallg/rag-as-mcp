@@ -1,0 +1,382 @@
+{
+  "lexical-001": {
+    "redis-oom#diagnosis": 3,
+    "redis-oom#signals": 3,
+    "redis-oom#mitigation": 2
+  },
+  "lexical-002": {
+    "redis-latency#diagnosis": 3,
+    "redis-latency#signals": 3,
+    "redis-latency#mitigation": 2
+  },
+  "lexical-003": {
+    "redis-eviction#diagnosis": 3,
+    "redis-eviction#signals": 3,
+    "redis-eviction#mitigation": 2
+  },
+  "lexical-004": {
+    "postgres-pool-exhaustion#diagnosis": 3,
+    "postgres-pool-exhaustion#signals": 3,
+    "postgres-pool-exhaustion#mitigation": 2
+  },
+  "lexical-005": {
+    "postgres-deadlock#diagnosis": 3,
+    "postgres-deadlock#signals": 3,
+    "postgres-deadlock#mitigation": 2
+  },
+  "lexical-006": {
+    "postgres-replica-lag#diagnosis": 3,
+    "postgres-replica-lag#signals": 3,
+    "postgres-replica-lag#mitigation": 2
+  },
+  "lexical-007": {
+    "kubernetes-oomkilled#diagnosis": 3,
+    "kubernetes-oomkilled#signals": 3,
+    "kubernetes-oomkilled#mitigation": 2
+  },
+  "lexical-008": {
+    "kubernetes-crashloop#diagnosis": 3,
+    "kubernetes-crashloop#signals": 3,
+    "kubernetes-crashloop#mitigation": 2
+  },
+  "lexical-009": {
+    "kubernetes-cpu-throttling#diagnosis": 3,
+    "kubernetes-cpu-throttling#signals": 3,
+    "kubernetes-cpu-throttling#mitigation": 2
+  },
+  "lexical-010": {
+    "payment-gateway-timeout#diagnosis": 3,
+    "payment-gateway-timeout#signals": 3,
+    "payment-gateway-timeout#mitigation": 2
+  },
+  "lexical-011": {
+    "payment-rate-limit#diagnosis": 3,
+    "payment-rate-limit#signals": 3,
+    "payment-rate-limit#mitigation": 2
+  },
+  "lexical-012": {
+    "payment-webhook-failure#diagnosis": 3,
+    "payment-webhook-failure#signals": 3,
+    "payment-webhook-failure#mitigation": 2
+  },
+  "lexical-013": {
+    "checkout-5xx#diagnosis": 3,
+    "checkout-5xx#signals": 3,
+    "checkout-5xx#mitigation": 2
+  },
+  "lexical-014": {
+    "checkout-latency#diagnosis": 3,
+    "checkout-latency#signals": 3,
+    "checkout-latency#mitigation": 2
+  },
+  "lexical-015": {
+    "checkout-deployment-regression#diagnosis": 3,
+    "checkout-deployment-regression#signals": 3,
+    "checkout-deployment-regression#mitigation": 2
+  },
+  "lexical-016": {
+    "lambda-timeout#diagnosis": 3,
+    "lambda-timeout#signals": 3,
+    "lambda-timeout#mitigation": 2
+  },
+  "semantic-001": {
+    "postgres-replica-lag#diagnosis": 3,
+    "postgres-replica-lag#signals": 3,
+    "postgres-replica-lag#mitigation": 2
+  },
+  "semantic-002": {
+    "kubernetes-oomkilled#diagnosis": 3,
+    "kubernetes-oomkilled#signals": 3,
+    "kubernetes-oomkilled#mitigation": 2
+  },
+  "semantic-003": {
+    "kubernetes-crashloop#diagnosis": 3,
+    "kubernetes-crashloop#signals": 3,
+    "kubernetes-crashloop#mitigation": 2
+  },
+  "semantic-004": {
+    "kubernetes-cpu-throttling#diagnosis": 3,
+    "kubernetes-cpu-throttling#signals": 3,
+    "kubernetes-cpu-throttling#mitigation": 2
+  },
+  "semantic-005": {
+    "payment-gateway-timeout#diagnosis": 3,
+    "payment-gateway-timeout#signals": 3,
+    "payment-gateway-timeout#mitigation": 2
+  },
+  "semantic-006": {
+    "payment-rate-limit#diagnosis": 3,
+    "payment-rate-limit#signals": 3,
+    "payment-rate-limit#mitigation": 2
+  },
+  "semantic-007": {
+    "payment-webhook-failure#diagnosis": 3,
+    "payment-webhook-failure#signals": 3,
+    "payment-webhook-failure#mitigation": 2
+  },
+  "semantic-008": {
+    "checkout-5xx#diagnosis": 3,
+    "checkout-5xx#signals": 3,
+    "checkout-5xx#mitigation": 2
+  },
+  "semantic-009": {
+    "checkout-latency#diagnosis": 3,
+    "checkout-latency#signals": 3,
+    "checkout-latency#mitigation": 2
+  },
+  "semantic-010": {
+    "checkout-deployment-regression#diagnosis": 3,
+    "checkout-deployment-regression#signals": 3,
+    "checkout-deployment-regression#mitigation": 2
+  },
+  "semantic-011": {
+    "lambda-timeout#diagnosis": 3,
+    "lambda-timeout#signals": 3,
+    "lambda-timeout#mitigation": 2
+  },
+  "semantic-012": {
+    "lambda-cold-start#diagnosis": 3,
+    "lambda-cold-start#signals": 3,
+    "lambda-cold-start#mitigation": 2
+  },
+  "semantic-013": {
+    "lambda-concurrency-throttling#diagnosis": 3,
+    "lambda-concurrency-throttling#signals": 3,
+    "lambda-concurrency-throttling#mitigation": 2
+  },
+  "semantic-014": {
+    "kafka-consumer-lag#diagnosis": 3,
+    "kafka-consumer-lag#signals": 3,
+    "kafka-consumer-lag#mitigation": 2
+  },
+  "semantic-015": {
+    "kafka-rebalance-storm#diagnosis": 3,
+    "kafka-rebalance-storm#signals": 3,
+    "kafka-rebalance-storm#mitigation": 2
+  },
+  "semantic-016": {
+    "kafka-under-replicated#diagnosis": 3,
+    "kafka-under-replicated#signals": 3,
+    "kafka-under-replicated#mitigation": 2
+  },
+  "hard-negative-001": {
+    "payment-webhook-failure#diagnosis": 3,
+    "payment-webhook-failure#signals": 3,
+    "payment-webhook-failure#mitigation": 2
+  },
+  "hard-negative-002": {
+    "checkout-5xx#diagnosis": 3,
+    "checkout-5xx#signals": 3,
+    "checkout-5xx#mitigation": 2
+  },
+  "hard-negative-003": {
+    "checkout-latency#diagnosis": 3,
+    "checkout-latency#signals": 3,
+    "checkout-latency#mitigation": 2
+  },
+  "hard-negative-004": {
+    "checkout-deployment-regression#diagnosis": 3,
+    "checkout-deployment-regression#signals": 3,
+    "checkout-deployment-regression#mitigation": 2
+  },
+  "hard-negative-005": {
+    "lambda-timeout#diagnosis": 3,
+    "lambda-timeout#signals": 3,
+    "lambda-timeout#mitigation": 2
+  },
+  "hard-negative-006": {
+    "lambda-cold-start#diagnosis": 3,
+    "lambda-cold-start#signals": 3,
+    "lambda-cold-start#mitigation": 2
+  },
+  "hard-negative-007": {
+    "lambda-concurrency-throttling#diagnosis": 3,
+    "lambda-concurrency-throttling#signals": 3,
+    "lambda-concurrency-throttling#mitigation": 2
+  },
+  "hard-negative-008": {
+    "kafka-consumer-lag#diagnosis": 3,
+    "kafka-consumer-lag#signals": 3,
+    "kafka-consumer-lag#mitigation": 2
+  },
+  "hard-negative-009": {
+    "kafka-rebalance-storm#diagnosis": 3,
+    "kafka-rebalance-storm#signals": 3,
+    "kafka-rebalance-storm#mitigation": 2
+  },
+  "hard-negative-010": {
+    "kafka-under-replicated#diagnosis": 3,
+    "kafka-under-replicated#signals": 3,
+    "kafka-under-replicated#mitigation": 2
+  },
+  "hard-negative-011": {
+    "gateway-502#diagnosis": 3,
+    "gateway-502#signals": 3,
+    "gateway-502#mitigation": 2
+  },
+  "hard-negative-012": {
+    "gateway-504#diagnosis": 3,
+    "gateway-504#signals": 3,
+    "gateway-504#mitigation": 2
+  },
+  "hard-negative-013": {
+    "gateway-connection-reset#diagnosis": 3,
+    "gateway-connection-reset#signals": 3,
+    "gateway-connection-reset#mitigation": 2
+  },
+  "hard-negative-014": {
+    "redis-oom#diagnosis": 3,
+    "redis-oom#signals": 3,
+    "redis-oom#mitigation": 2
+  },
+  "hard-negative-015": {
+    "redis-latency#diagnosis": 3,
+    "redis-latency#signals": 3,
+    "redis-latency#mitigation": 2
+  },
+  "hard-negative-016": {
+    "redis-eviction#diagnosis": 3,
+    "redis-eviction#signals": 3,
+    "redis-eviction#mitigation": 2
+  },
+  "multi-hop-001": {
+    "redis-eviction#diagnosis": 3,
+    "redis-eviction#signals": 3,
+    "redis-eviction#mitigation": 2,
+    "redis-eviction#escalation": 2
+  },
+  "multi-hop-002": {
+    "postgres-pool-exhaustion#diagnosis": 3,
+    "postgres-pool-exhaustion#signals": 3,
+    "postgres-pool-exhaustion#mitigation": 2,
+    "postgres-pool-exhaustion#escalation": 2
+  },
+  "multi-hop-003": {
+    "postgres-deadlock#diagnosis": 3,
+    "postgres-deadlock#signals": 3,
+    "postgres-deadlock#mitigation": 2,
+    "postgres-deadlock#escalation": 2
+  },
+  "multi-hop-004": {
+    "postgres-replica-lag#diagnosis": 3,
+    "postgres-replica-lag#signals": 3,
+    "postgres-replica-lag#mitigation": 2,
+    "postgres-replica-lag#escalation": 2
+  },
+  "multi-hop-005": {
+    "kubernetes-oomkilled#diagnosis": 3,
+    "kubernetes-oomkilled#signals": 3,
+    "kubernetes-oomkilled#mitigation": 2,
+    "kubernetes-oomkilled#escalation": 2
+  },
+  "multi-hop-006": {
+    "kubernetes-crashloop#diagnosis": 3,
+    "kubernetes-crashloop#signals": 3,
+    "kubernetes-crashloop#mitigation": 2,
+    "kubernetes-crashloop#escalation": 2
+  },
+  "multi-hop-007": {
+    "kubernetes-cpu-throttling#diagnosis": 3,
+    "kubernetes-cpu-throttling#signals": 3,
+    "kubernetes-cpu-throttling#mitigation": 2,
+    "kubernetes-cpu-throttling#escalation": 2
+  },
+  "multi-hop-008": {
+    "payment-gateway-timeout#diagnosis": 3,
+    "payment-gateway-timeout#signals": 3,
+    "payment-gateway-timeout#mitigation": 2,
+    "payment-gateway-timeout#escalation": 2
+  },
+  "multi-hop-009": {
+    "payment-rate-limit#diagnosis": 3,
+    "payment-rate-limit#signals": 3,
+    "payment-rate-limit#mitigation": 2,
+    "payment-rate-limit#escalation": 2
+  },
+  "multi-hop-010": {
+    "payment-webhook-failure#diagnosis": 3,
+    "payment-webhook-failure#signals": 3,
+    "payment-webhook-failure#mitigation": 2,
+    "payment-webhook-failure#escalation": 2
+  },
+  "multi-hop-011": {
+    "checkout-5xx#diagnosis": 3,
+    "checkout-5xx#signals": 3,
+    "checkout-5xx#mitigation": 2,
+    "checkout-5xx#escalation": 2
+  },
+  "multi-hop-012": {
+    "checkout-latency#diagnosis": 3,
+    "checkout-latency#signals": 3,
+    "checkout-latency#mitigation": 2,
+    "checkout-latency#escalation": 2
+  },
+  "noisy-001": {
+    "kubernetes-crashloop#diagnosis": 3,
+    "kubernetes-crashloop#signals": 3,
+    "kubernetes-crashloop#mitigation": 2
+  },
+  "noisy-002": {
+    "kubernetes-cpu-throttling#diagnosis": 3,
+    "kubernetes-cpu-throttling#signals": 3,
+    "kubernetes-cpu-throttling#mitigation": 2
+  },
+  "noisy-003": {
+    "payment-gateway-timeout#diagnosis": 3,
+    "payment-gateway-timeout#signals": 3,
+    "payment-gateway-timeout#mitigation": 2
+  },
+  "noisy-004": {
+    "payment-rate-limit#diagnosis": 3,
+    "payment-rate-limit#signals": 3,
+    "payment-rate-limit#mitigation": 2
+  },
+  "noisy-005": {
+    "payment-webhook-failure#diagnosis": 3,
+    "payment-webhook-failure#signals": 3,
+    "payment-webhook-failure#mitigation": 2
+  },
+  "noisy-006": {
+    "checkout-5xx#diagnosis": 3,
+    "checkout-5xx#signals": 3,
+    "checkout-5xx#mitigation": 2
+  },
+  "noisy-007": {
+    "checkout-latency#diagnosis": 3,
+    "checkout-latency#signals": 3,
+    "checkout-latency#mitigation": 2
+  },
+  "noisy-008": {
+    "checkout-deployment-regression#diagnosis": 3,
+    "checkout-deployment-regression#signals": 3,
+    "checkout-deployment-regression#mitigation": 2
+  },
+  "noisy-009": {
+    "lambda-timeout#diagnosis": 3,
+    "lambda-timeout#signals": 3,
+    "lambda-timeout#mitigation": 2
+  },
+  "noisy-010": {
+    "lambda-cold-start#diagnosis": 3,
+    "lambda-cold-start#signals": 3,
+    "lambda-cold-start#mitigation": 2
+  },
+  "noisy-011": {
+    "lambda-concurrency-throttling#diagnosis": 3,
+    "lambda-concurrency-throttling#signals": 3,
+    "lambda-concurrency-throttling#mitigation": 2
+  },
+  "noisy-012": {
+    "kafka-consumer-lag#diagnosis": 3,
+    "kafka-consumer-lag#signals": 3,
+    "kafka-consumer-lag#mitigation": 2
+  },
+  "no-answer-001": {},
+  "no-answer-002": {},
+  "no-answer-003": {},
+  "no-answer-004": {},
+  "no-answer-005": {},
+  "no-answer-006": {},
+  "no-answer-007": {},
+  "no-answer-008": {}
+}

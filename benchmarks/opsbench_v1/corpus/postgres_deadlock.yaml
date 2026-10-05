@@ -1,0 +1,30 @@
+document_id: postgres-deadlock-runbook
+title: PostgreSQL transaction deadlock
+domain: postgres
+sections:
+  symptoms:
+    kb_id: postgres-deadlock#symptoms
+    text: Operators observe SQLSTATE 40P01 and deadlock detected errors appear. Related
+      postgres incidents may also show latency, errors, saturation, retries, or reduced
+      throughput, so symptoms alone are not sufficient.
+  signals:
+    kb_id: postgres-deadlock#signals
+    text: 'Primary discriminator: SQLSTATE 40P01 and deadlock detected errors appear.
+      Correlate rates over the same time window and compare affected and healthy instances.'
+  diagnosis:
+    kb_id: postgres-deadlock#diagnosis
+    text: Inspect PostgreSQL deadlock logs, pg_locks wait graph, transaction ordering,
+      and lock scope. Establish a timeline before changing capacity or retry policy.
+  mitigation:
+    kb_id: postgres-deadlock#mitigation
+    text: Retry aborted transactions with jitter and enforce consistent lock ordering.
+      Verify recovery using the primary discriminator and customer impact metrics.
+  escalation:
+    kb_id: postgres-deadlock#escalation
+    text: Escalate to the postgres service owner when impact persists after safe mitigation,
+      data integrity is at risk, or privileged provider action is required. Include
+      timestamps, graphs, traces, and changes.
+  common_confusions:
+    kb_id: postgres-deadlock#common-confusions
+    text: Pool exhaustion has waiting sessions but does not emit SQLSTATE 40P01. Avoid
+      selecting a runbook from a shared keyword without the discriminator.

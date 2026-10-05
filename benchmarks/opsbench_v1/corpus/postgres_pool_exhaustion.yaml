@@ -1,0 +1,34 @@
+document_id: postgres-connection-pool-runbook
+title: PostgreSQL connection pool exhaustion
+domain: postgres
+sections:
+  symptoms:
+    kb_id: postgres-pool-exhaustion#symptoms
+    text: Operators observe pool waiters and acquisition timeouts rise while database
+      connections approach the pool cap. Related postgres incidents may also show
+      latency, errors, saturation, retries, or reduced throughput, so symptoms alone
+      are not sufficient.
+  signals:
+    kb_id: postgres-pool-exhaustion#signals
+    text: 'Primary discriminator: pool waiters and acquisition timeouts rise while
+      database connections approach the pool cap. Correlate rates over the same time
+      window and compare affected and healthy instances.'
+  diagnosis:
+    kb_id: postgres-pool-exhaustion#diagnosis
+    text: Compare active, idle, waiting, max pool size, long transactions, and connection
+      leaks. Establish a timeline before changing capacity or retry policy.
+  mitigation:
+    kb_id: postgres-pool-exhaustion#mitigation
+    text: Release leaked connections, bound request concurrency, tune pool sizing,
+      and shorten transactions. Verify recovery using the primary discriminator and
+      customer impact metrics.
+  escalation:
+    kb_id: postgres-pool-exhaustion#escalation
+    text: Escalate to the postgres service owner when impact persists after safe mitigation,
+      data integrity is at risk, or privileged provider action is required. Include
+      timestamps, graphs, traces, and changes.
+  common_confusions:
+    kb_id: postgres-pool-exhaustion#common-confusions
+    text: Database latency can create waiters but pool acquisition timeout is distinct
+      from lock deadlock. Avoid selecting a runbook from a shared keyword without
+      the discriminator.

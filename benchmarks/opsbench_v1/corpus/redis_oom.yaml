@@ -1,0 +1,33 @@
+document_id: redis-oom-runbook
+title: Redis OOM and maxmemory exhaustion
+domain: redis
+sections:
+  symptoms:
+    kb_id: redis-oom#symptoms
+    text: Operators observe OOM command errors; used_memory reaches maxmemory; writes
+      rejected. Related redis incidents may also show latency, errors, saturation,
+      retries, or reduced throughput, so symptoms alone are not sufficient.
+  signals:
+    kb_id: redis-oom#signals
+    text: 'Primary discriminator: OOM command errors; used_memory reaches maxmemory;
+      writes rejected. Correlate rates over the same time window and compare affected
+      and healthy instances.'
+  diagnosis:
+    kb_id: redis-oom#diagnosis
+    text: Compare used_memory, maxmemory, allocator fragmentation, and largest keys;
+      inspect OOM errors. Establish a timeline before changing capacity or retry policy.
+  mitigation:
+    kb_id: redis-oom#mitigation
+    text: Remove or expire safe large keys, raise maxmemory only with headroom, then
+      correct retention. Verify recovery using the primary discriminator and customer
+      impact metrics.
+  escalation:
+    kb_id: redis-oom#escalation
+    text: Escalate to the redis service owner when impact persists after safe mitigation,
+      data integrity is at risk, or privileged provider action is required. Include
+      timestamps, graphs, traces, and changes.
+  common_confusions:
+    kb_id: redis-oom#common-confusions
+    text: Evictions may coexist, but OOM is identified by rejected allocations and
+      oom error counters. Avoid selecting a runbook from a shared keyword without
+      the discriminator.

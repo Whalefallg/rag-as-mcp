@@ -1,0 +1,32 @@
+document_id: postgres-replica-lag-runbook
+title: PostgreSQL replica lag
+domain: postgres
+sections:
+  symptoms:
+    kb_id: postgres-replica-lag#symptoms
+    text: Operators observe replica replay delay grows and reads are stale. Related
+      postgres incidents may also show latency, errors, saturation, retries, or reduced
+      throughput, so symptoms alone are not sufficient.
+  signals:
+    kb_id: postgres-replica-lag#signals
+    text: 'Primary discriminator: replica replay delay grows and reads are stale.
+      Correlate rates over the same time window and compare affected and healthy instances.'
+  diagnosis:
+    kb_id: postgres-replica-lag#diagnosis
+    text: Compare pg_last_wal_receive_lsn and replay LSN; inspect apply rate, IO,
+      long queries, and WAL volume. Establish a timeline before changing capacity
+      or retry policy.
+  mitigation:
+    kb_id: postgres-replica-lag#mitigation
+    text: Route consistency-sensitive reads to primary, remove replica bottlenecks,
+      and add capacity. Verify recovery using the primary discriminator and customer
+      impact metrics.
+  escalation:
+    kb_id: postgres-replica-lag#escalation
+    text: Escalate to the postgres service owner when impact persists after safe mitigation,
+      data integrity is at risk, or privileged provider action is required. Include
+      timestamps, graphs, traces, and changes.
+  common_confusions:
+    kb_id: postgres-replica-lag#common-confusions
+    text: Primary query latency is not replica lag unless WAL receive or replay distance
+      grows. Avoid selecting a runbook from a shared keyword without the discriminator.

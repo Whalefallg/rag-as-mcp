@@ -1,0 +1,32 @@
+document_id: payment-gateway-timeout-runbook
+title: Payment gateway timeout
+domain: payment
+sections:
+  symptoms:
+    kb_id: payment-gateway-timeout#symptoms
+    text: Operators observe gateway calls exceed deadline and return timeout or HTTP
+      504. Related payment incidents may also show latency, errors, saturation, retries,
+      or reduced throughput, so symptoms alone are not sufficient.
+  signals:
+    kb_id: payment-gateway-timeout#signals
+    text: 'Primary discriminator: gateway calls exceed deadline and return timeout
+      or HTTP 504. Correlate rates over the same time window and compare affected
+      and healthy instances.'
+  diagnosis:
+    kb_id: payment-gateway-timeout#diagnosis
+    text: Trace upstream connect, TLS, first-byte and total time; compare provider
+      status. Establish a timeline before changing capacity or retry policy.
+  mitigation:
+    kb_id: payment-gateway-timeout#mitigation
+    text: Use bounded retries only for idempotent requests, circuit break, and fail
+      safely. Verify recovery using the primary discriminator and customer impact
+      metrics.
+  escalation:
+    kb_id: payment-gateway-timeout#escalation
+    text: Escalate to the payment service owner when impact persists after safe mitigation,
+      data integrity is at risk, or privileged provider action is required. Include
+      timestamps, graphs, traces, and changes.
+  common_confusions:
+    kb_id: payment-gateway-timeout#common-confusions
+    text: Rate limiting emits 429 and Retry-After; timeout is deadline exhaustion.
+      Avoid selecting a runbook from a shared keyword without the discriminator.

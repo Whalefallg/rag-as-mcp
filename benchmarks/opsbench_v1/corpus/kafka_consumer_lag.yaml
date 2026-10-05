@@ -1,0 +1,32 @@
+document_id: kafka-consumer-lag-runbook
+title: Kafka consumer lag
+domain: kafka
+sections:
+  symptoms:
+    kb_id: kafka-consumer-lag#symptoms
+    text: Operators observe consumer group lag grows while production continues. Related
+      kafka incidents may also show latency, errors, saturation, retries, or reduced
+      throughput, so symptoms alone are not sufficient.
+  signals:
+    kb_id: kafka-consumer-lag#signals
+    text: 'Primary discriminator: consumer group lag grows while production continues.
+      Correlate rates over the same time window and compare affected and healthy instances.'
+  diagnosis:
+    kb_id: kafka-consumer-lag#diagnosis
+    text: Inspect per-partition lag, consume rate, processing latency, assignments,
+      and poison messages. Establish a timeline before changing capacity or retry
+      policy.
+  mitigation:
+    kb_id: kafka-consumer-lag#mitigation
+    text: Scale consumers up to partition count, fix slow processing, and handle poison
+      messages. Verify recovery using the primary discriminator and customer impact
+      metrics.
+  escalation:
+    kb_id: kafka-consumer-lag#escalation
+    text: Escalate to the kafka service owner when impact persists after safe mitigation,
+      data integrity is at risk, or privileged provider action is required. Include
+      timestamps, graphs, traces, and changes.
+  common_confusions:
+    kb_id: kafka-consumer-lag#common-confusions
+    text: A rebalance can cause transient lag; persistent growth after stability is
+      consumer lag. Avoid selecting a runbook from a shared keyword without the discriminator.

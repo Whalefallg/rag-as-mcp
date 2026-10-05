@@ -1,0 +1,33 @@
+document_id: payment-webhook-failure-runbook
+title: Payment webhook delivery failure
+domain: payment
+sections:
+  symptoms:
+    kb_id: payment-webhook-failure#symptoms
+    text: Operators observe signed webhook deliveries fail or are not acknowledged
+      with 2xx. Related payment incidents may also show latency, errors, saturation,
+      retries, or reduced throughput, so symptoms alone are not sufficient.
+  signals:
+    kb_id: payment-webhook-failure#signals
+    text: 'Primary discriminator: signed webhook deliveries fail or are not acknowledged
+      with 2xx. Correlate rates over the same time window and compare affected and
+      healthy instances.'
+  diagnosis:
+    kb_id: payment-webhook-failure#diagnosis
+    text: Verify signature timestamp, endpoint logs, delivery attempts, DNS, TLS,
+      and processing deadline. Establish a timeline before changing capacity or retry
+      policy.
+  mitigation:
+    kb_id: payment-webhook-failure#mitigation
+    text: Acknowledge quickly, enqueue idempotently, repair signature validation,
+      and replay events. Verify recovery using the primary discriminator and customer
+      impact metrics.
+  escalation:
+    kb_id: payment-webhook-failure#escalation
+    text: Escalate to the payment service owner when impact persists after safe mitigation,
+      data integrity is at risk, or privileged provider action is required. Include
+      timestamps, graphs, traces, and changes.
+  common_confusions:
+    kb_id: payment-webhook-failure#common-confusions
+    text: Checkout 5xx is a synchronous customer path; webhooks are asynchronous callbacks.
+      Avoid selecting a runbook from a shared keyword without the discriminator.

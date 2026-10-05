@@ -1,0 +1,365 @@
+{
+  "dataset_version": "1.0.0",
+  "documents": [
+    {
+      "document_id": "redis-oom-runbook",
+      "title": "Redis OOM and maxmemory exhaustion",
+      "domain": "redis",
+      "source": "benchmarks/opsbench_v1/corpus/redis_oom.yaml",
+      "generated": "data/documents/opsbench_v1/redis-oom-runbook.pdf",
+      "kb_ids": [
+        "redis-oom#symptoms",
+        "redis-oom#signals",
+        "redis-oom#diagnosis",
+        "redis-oom#mitigation",
+        "redis-oom#escalation",
+        "redis-oom#common-confusions"
+      ]
+    },
+    {
+      "document_id": "redis-latency-runbook",
+      "title": "Redis latency degradation",
+      "domain": "redis",
+      "source": "benchmarks/opsbench_v1/corpus/redis_latency.yaml",
+      "generated": "data/documents/opsbench_v1/redis-latency-runbook.pdf",
+      "kb_ids": [
+        "redis-latency#symptoms",
+        "redis-latency#signals",
+        "redis-latency#diagnosis",
+        "redis-latency#mitigation",
+        "redis-latency#escalation",
+        "redis-latency#common-confusions"
+      ]
+    },
+    {
+      "document_id": "redis-eviction-runbook",
+      "title": "Redis eviction pressure",
+      "domain": "redis",
+      "source": "benchmarks/opsbench_v1/corpus/redis_eviction.yaml",
+      "generated": "data/documents/opsbench_v1/redis-eviction-runbook.pdf",
+      "kb_ids": [
+        "redis-eviction#symptoms",
+        "redis-eviction#signals",
+        "redis-eviction#diagnosis",
+        "redis-eviction#mitigation",
+        "redis-eviction#escalation",
+        "redis-eviction#common-confusions"
+      ]
+    },
+    {
+      "document_id": "postgres-connection-pool-runbook",
+      "title": "PostgreSQL connection pool exhaustion",
+      "domain": "postgres",
+      "source": "benchmarks/opsbench_v1/corpus/postgres_pool_exhaustion.yaml",
+      "generated": "data/documents/opsbench_v1/postgres-connection-pool-runbook.pdf",
+      "kb_ids": [
+        "postgres-pool-exhaustion#symptoms",
+        "postgres-pool-exhaustion#signals",
+        "postgres-pool-exhaustion#diagnosis",
+        "postgres-pool-exhaustion#mitigation",
+        "postgres-pool-exhaustion#escalation",
+        "postgres-pool-exhaustion#common-confusions"
+      ]
+    },
+    {
+      "document_id": "postgres-deadlock-runbook",
+      "title": "PostgreSQL transaction deadlock",
+      "domain": "postgres",
+      "source": "benchmarks/opsbench_v1/corpus/postgres_deadlock.yaml",
+      "generated": "data/documents/opsbench_v1/postgres-deadlock-runbook.pdf",
+      "kb_ids": [
+        "postgres-deadlock#symptoms",
+        "postgres-deadlock#signals",
+        "postgres-deadlock#diagnosis",
+        "postgres-deadlock#mitigation",
+        "postgres-deadlock#escalation",
+        "postgres-deadlock#common-confusions"
+      ]
+    },
+    {
+      "document_id": "postgres-replica-lag-runbook",
+      "title": "PostgreSQL replica lag",
+      "domain": "postgres",
+      "source": "benchmarks/opsbench_v1/corpus/postgres_replica_lag.yaml",
+      "generated": "data/documents/opsbench_v1/postgres-replica-lag-runbook.pdf",
+      "kb_ids": [
+        "postgres-replica-lag#symptoms",
+        "postgres-replica-lag#signals",
+        "postgres-replica-lag#diagnosis",
+        "postgres-replica-lag#mitigation",
+        "postgres-replica-lag#escalation",
+        "postgres-replica-lag#common-confusions"
+      ]
+    },
+    {
+      "document_id": "kubernetes-oomkilled-runbook",
+      "title": "Kubernetes OOMKilled containers",
+      "domain": "kubernetes",
+      "source": "benchmarks/opsbench_v1/corpus/kubernetes_oomkilled.yaml",
+      "generated": "data/documents/opsbench_v1/kubernetes-oomkilled-runbook.pdf",
+      "kb_ids": [
+        "kubernetes-oomkilled#symptoms",
+        "kubernetes-oomkilled#signals",
+        "kubernetes-oomkilled#diagnosis",
+        "kubernetes-oomkilled#mitigation",
+        "kubernetes-oomkilled#escalation",
+        "kubernetes-oomkilled#common-confusions"
+      ]
+    },
+    {
+      "document_id": "kubernetes-crashloop-runbook",
+      "title": "Kubernetes CrashLoopBackOff",
+      "domain": "kubernetes",
+      "source": "benchmarks/opsbench_v1/corpus/kubernetes_crashloop.yaml",
+      "generated": "data/documents/opsbench_v1/kubernetes-crashloop-runbook.pdf",
+      "kb_ids": [
+        "kubernetes-crashloop#symptoms",
+        "kubernetes-crashloop#signals",
+        "kubernetes-crashloop#diagnosis",
+        "kubernetes-crashloop#mitigation",
+        "kubernetes-crashloop#escalation",
+        "kubernetes-crashloop#common-confusions"
+      ]
+    },
+    {
+      "document_id": "kubernetes-cpu-throttling-runbook",
+      "title": "Kubernetes CPU throttling",
+      "domain": "kubernetes",
+      "source": "benchmarks/opsbench_v1/corpus/kubernetes_cpu_throttling.yaml",
+      "generated": "data/documents/opsbench_v1/kubernetes-cpu-throttling-runbook.pdf",
+      "kb_ids": [
+        "kubernetes-cpu-throttling#symptoms",
+        "kubernetes-cpu-throttling#signals",
+        "kubernetes-cpu-throttling#diagnosis",
+        "kubernetes-cpu-throttling#mitigation",
+        "kubernetes-cpu-throttling#escalation",
+        "kubernetes-cpu-throttling#common-confusions"
+      ]
+    },
+    {
+      "document_id": "payment-gateway-timeout-runbook",
+      "title": "Payment gateway timeout",
+      "domain": "payment",
+      "source": "benchmarks/opsbench_v1/corpus/payment_gateway_timeout.yaml",
+      "generated": "data/documents/opsbench_v1/payment-gateway-timeout-runbook.pdf",
+      "kb_ids": [
+        "payment-gateway-timeout#symptoms",
+        "payment-gateway-timeout#signals",
+        "payment-gateway-timeout#diagnosis",
+        "payment-gateway-timeout#mitigation",
+        "payment-gateway-timeout#escalation",
+        "payment-gateway-timeout#common-confusions"
+      ]
+    },
+    {
+      "document_id": "payment-rate-limit-runbook",
+      "title": "Payment provider rate limiting",
+      "domain": "payment",
+      "source": "benchmarks/opsbench_v1/corpus/payment_rate_limit.yaml",
+      "generated": "data/documents/opsbench_v1/payment-rate-limit-runbook.pdf",
+      "kb_ids": [
+        "payment-rate-limit#symptoms",
+        "payment-rate-limit#signals",
+        "payment-rate-limit#diagnosis",
+        "payment-rate-limit#mitigation",
+        "payment-rate-limit#escalation",
+        "payment-rate-limit#common-confusions"
+      ]
+    },
+    {
+      "document_id": "payment-webhook-failure-runbook",
+      "title": "Payment webhook delivery failure",
+      "domain": "payment",
+      "source": "benchmarks/opsbench_v1/corpus/payment_webhook_failure.yaml",
+      "generated": "data/documents/opsbench_v1/payment-webhook-failure-runbook.pdf",
+      "kb_ids": [
+        "payment-webhook-failure#symptoms",
+        "payment-webhook-failure#signals",
+        "payment-webhook-failure#diagnosis",
+        "payment-webhook-failure#mitigation",
+        "payment-webhook-failure#escalation",
+        "payment-webhook-failure#common-confusions"
+      ]
+    },
+    {
+      "document_id": "checkout-5xx-runbook",
+      "title": "Checkout HTTP 5xx errors",
+      "domain": "checkout",
+      "source": "benchmarks/opsbench_v1/corpus/checkout_5xx.yaml",
+      "generated": "data/documents/opsbench_v1/checkout-5xx-runbook.pdf",
+      "kb_ids": [
+        "checkout-5xx#symptoms",
+        "checkout-5xx#signals",
+        "checkout-5xx#diagnosis",
+        "checkout-5xx#mitigation",
+        "checkout-5xx#escalation",
+        "checkout-5xx#common-confusions"
+      ]
+    },
+    {
+      "document_id": "checkout-latency-runbook",
+      "title": "Checkout latency regression",
+      "domain": "checkout",
+      "source": "benchmarks/opsbench_v1/corpus/checkout_latency.yaml",
+      "generated": "data/documents/opsbench_v1/checkout-latency-runbook.pdf",
+      "kb_ids": [
+        "checkout-latency#symptoms",
+        "checkout-latency#signals",
+        "checkout-latency#diagnosis",
+        "checkout-latency#mitigation",
+        "checkout-latency#escalation",
+        "checkout-latency#common-confusions"
+      ]
+    },
+    {
+      "document_id": "checkout-deployment-regression-runbook",
+      "title": "Checkout deployment regression",
+      "domain": "checkout",
+      "source": "benchmarks/opsbench_v1/corpus/checkout_deployment_regression.yaml",
+      "generated": "data/documents/opsbench_v1/checkout-deployment-regression-runbook.pdf",
+      "kb_ids": [
+        "checkout-deployment-regression#symptoms",
+        "checkout-deployment-regression#signals",
+        "checkout-deployment-regression#diagnosis",
+        "checkout-deployment-regression#mitigation",
+        "checkout-deployment-regression#escalation",
+        "checkout-deployment-regression#common-confusions"
+      ]
+    },
+    {
+      "document_id": "lambda-execution-timeout-runbook",
+      "title": "Lambda execution timeout",
+      "domain": "lambda",
+      "source": "benchmarks/opsbench_v1/corpus/lambda_timeout.yaml",
+      "generated": "data/documents/opsbench_v1/lambda-execution-timeout-runbook.pdf",
+      "kb_ids": [
+        "lambda-timeout#symptoms",
+        "lambda-timeout#signals",
+        "lambda-timeout#diagnosis",
+        "lambda-timeout#mitigation",
+        "lambda-timeout#escalation",
+        "lambda-timeout#common-confusions"
+      ]
+    },
+    {
+      "document_id": "lambda-cold-start-runbook",
+      "title": "Lambda cold start latency",
+      "domain": "lambda",
+      "source": "benchmarks/opsbench_v1/corpus/lambda_cold_start.yaml",
+      "generated": "data/documents/opsbench_v1/lambda-cold-start-runbook.pdf",
+      "kb_ids": [
+        "lambda-cold-start#symptoms",
+        "lambda-cold-start#signals",
+        "lambda-cold-start#diagnosis",
+        "lambda-cold-start#mitigation",
+        "lambda-cold-start#escalation",
+        "lambda-cold-start#common-confusions"
+      ]
+    },
+    {
+      "document_id": "lambda-concurrency-throttling-runbook",
+      "title": "Lambda concurrency throttling",
+      "domain": "lambda",
+      "source": "benchmarks/opsbench_v1/corpus/lambda_concurrency_throttling.yaml",
+      "generated": "data/documents/opsbench_v1/lambda-concurrency-throttling-runbook.pdf",
+      "kb_ids": [
+        "lambda-concurrency-throttling#symptoms",
+        "lambda-concurrency-throttling#signals",
+        "lambda-concurrency-throttling#diagnosis",
+        "lambda-concurrency-throttling#mitigation",
+        "lambda-concurrency-throttling#escalation",
+        "lambda-concurrency-throttling#common-confusions"
+      ]
+    },
+    {
+      "document_id": "kafka-consumer-lag-runbook",
+      "title": "Kafka consumer lag",
+      "domain": "kafka",
+      "source": "benchmarks/opsbench_v1/corpus/kafka_consumer_lag.yaml",
+      "generated": "data/documents/opsbench_v1/kafka-consumer-lag-runbook.pdf",
+      "kb_ids": [
+        "kafka-consumer-lag#symptoms",
+        "kafka-consumer-lag#signals",
+        "kafka-consumer-lag#diagnosis",
+        "kafka-consumer-lag#mitigation",
+        "kafka-consumer-lag#escalation",
+        "kafka-consumer-lag#common-confusions"
+      ]
+    },
+    {
+      "document_id": "kafka-rebalance-storm-runbook",
+      "title": "Kafka rebalance storm",
+      "domain": "kafka",
+      "source": "benchmarks/opsbench_v1/corpus/kafka_rebalance_storm.yaml",
+      "generated": "data/documents/opsbench_v1/kafka-rebalance-storm-runbook.pdf",
+      "kb_ids": [
+        "kafka-rebalance-storm#symptoms",
+        "kafka-rebalance-storm#signals",
+        "kafka-rebalance-storm#diagnosis",
+        "kafka-rebalance-storm#mitigation",
+        "kafka-rebalance-storm#escalation",
+        "kafka-rebalance-storm#common-confusions"
+      ]
+    },
+    {
+      "document_id": "kafka-under-replicated-runbook",
+      "title": "Kafka under-replicated partitions",
+      "domain": "kafka",
+      "source": "benchmarks/opsbench_v1/corpus/kafka_under_replicated.yaml",
+      "generated": "data/documents/opsbench_v1/kafka-under-replicated-runbook.pdf",
+      "kb_ids": [
+        "kafka-under-replicated#symptoms",
+        "kafka-under-replicated#signals",
+        "kafka-under-replicated#diagnosis",
+        "kafka-under-replicated#mitigation",
+        "kafka-under-replicated#escalation",
+        "kafka-under-replicated#common-confusions"
+      ]
+    },
+    {
+      "document_id": "gateway-502-runbook",
+      "title": "Gateway HTTP 502 bad gateway",
+      "domain": "gateway",
+      "source": "benchmarks/opsbench_v1/corpus/gateway_502.yaml",
+      "generated": "data/documents/opsbench_v1/gateway-502-runbook.pdf",
+      "kb_ids": [
+        "gateway-502#symptoms",
+        "gateway-502#signals",
+        "gateway-502#diagnosis",
+        "gateway-502#mitigation",
+        "gateway-502#escalation",
+        "gateway-502#common-confusions"
+      ]
+    },
+    {
+      "document_id": "gateway-504-runbook",
+      "title": "Gateway HTTP 504 timeout",
+      "domain": "gateway",
+      "source": "benchmarks/opsbench_v1/corpus/gateway_504.yaml",
+      "generated": "data/documents/opsbench_v1/gateway-504-runbook.pdf",
+      "kb_ids": [
+        "gateway-504#symptoms",
+        "gateway-504#signals",
+        "gateway-504#diagnosis",
+        "gateway-504#mitigation",
+        "gateway-504#escalation",
+        "gateway-504#common-confusions"
+      ]
+    },
+    {
+      "document_id": "gateway-connection-reset-runbook",
+      "title": "Gateway upstream connection reset",
+      "domain": "gateway",
+      "source": "benchmarks/opsbench_v1/corpus/gateway_connection_reset.yaml",
+      "generated": "data/documents/opsbench_v1/gateway-connection-reset-runbook.pdf",
+      "kb_ids": [
+        "gateway-connection-reset#symptoms",
+        "gateway-connection-reset#signals",
+        "gateway-connection-reset#diagnosis",
+        "gateway-connection-reset#mitigation",
+        "gateway-connection-reset#escalation",
+        "gateway-connection-reset#common-confusions"
+      ]
+    }
+  ]
+}

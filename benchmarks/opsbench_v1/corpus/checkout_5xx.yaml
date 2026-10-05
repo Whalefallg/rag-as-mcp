@@ -1,0 +1,31 @@
+document_id: checkout-5xx-runbook
+title: Checkout HTTP 5xx errors
+domain: checkout
+sections:
+  symptoms:
+    kb_id: checkout-5xx#symptoms
+    text: Operators observe checkout endpoint error rate rises with HTTP 500 or 503.
+      Related checkout incidents may also show latency, errors, saturation, retries,
+      or reduced throughput, so symptoms alone are not sufficient.
+  signals:
+    kb_id: checkout-5xx#signals
+    text: 'Primary discriminator: checkout endpoint error rate rises with HTTP 500
+      or 503. Correlate rates over the same time window and compare affected and healthy
+      instances.'
+  diagnosis:
+    kb_id: checkout-5xx#diagnosis
+    text: Slice errors by route, exception, dependency, instance, and release; inspect
+      traces. Establish a timeline before changing capacity or retry policy.
+  mitigation:
+    kb_id: checkout-5xx#mitigation
+    text: Rollback a bad release, shed load, or isolate the failing dependency. Verify
+      recovery using the primary discriminator and customer impact metrics.
+  escalation:
+    kb_id: checkout-5xx#escalation
+    text: Escalate to the checkout service owner when impact persists after safe mitigation,
+      data integrity is at risk, or privileged provider action is required. Include
+      timestamps, graphs, traces, and changes.
+  common_confusions:
+    kb_id: checkout-5xx#common-confusions
+    text: Latency alone is not a 5xx incident; confirm server error status. Avoid
+      selecting a runbook from a shared keyword without the discriminator.

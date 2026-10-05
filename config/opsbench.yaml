@@ -1,0 +1,47 @@
+llm:
+  provider: deepseek
+  model: deepseek-chat
+  api_key: ""
+embedding:
+  provider: local_hash
+  model: feature-hash-384-v1
+  api_key: ""
+vector_store:
+  backend: chroma
+  persist_path: ./data/db/chroma
+splitter:
+  method: recursive
+  chunk_size: 1000
+  chunk_overlap: 200
+retrieval:
+  sparse_backend: bm25
+  fusion_algorithm: rrf
+  top_k_dense: 20
+  top_k_sparse: 20
+  top_k_final: 10
+rerank:
+  backend: none
+  model: ""
+  top_m: 30
+agentic:
+  enabled: true
+  default_mode: auto
+  max_iterations: 2
+  max_subqueries: 3
+  max_candidate_results: 30
+  planner: {use_llm: false}
+  grader: {use_llm: false, min_results: 2, min_confidence: 0.45}
+  rewriter: {use_llm: false}
+ingestion:
+  chunk_refiner: {enabled: true, use_llm: false}
+  metadata_enricher: {enabled: true, use_llm: false}
+  image_captioner: {enabled: false}
+evaluation:
+  backends: [custom]
+  golden_test_set: ./tests/fixtures/golden_test_set.json
+observability:
+  enabled: true
+  log_file: ./logs/traces.jsonl
+  log_level: INFO
+  detail_level: standard
+dashboard: {enabled: false, port: 8501, traces_dir: ./logs, auto_refresh: false, refresh_interval: 5}

@@ -1,0 +1,31 @@
+document_id: payment-rate-limit-runbook
+title: Payment provider rate limiting
+domain: payment
+sections:
+  symptoms:
+    kb_id: payment-rate-limit#symptoms
+    text: Operators observe HTTP 429 and Retry-After responses increase. Related payment
+      incidents may also show latency, errors, saturation, retries, or reduced throughput,
+      so symptoms alone are not sufficient.
+  signals:
+    kb_id: payment-rate-limit#signals
+    text: 'Primary discriminator: HTTP 429 and Retry-After responses increase. Correlate
+      rates over the same time window and compare affected and healthy instances.'
+  diagnosis:
+    kb_id: payment-rate-limit#diagnosis
+    text: Inspect provider quota, Retry-After, tenant burst, retry amplification,
+      and idempotency keys. Establish a timeline before changing capacity or retry
+      policy.
+  mitigation:
+    kb_id: payment-rate-limit#mitigation
+    text: Honor Retry-After with jitter, queue work, reduce bursts, and request quota.
+      Verify recovery using the primary discriminator and customer impact metrics.
+  escalation:
+    kb_id: payment-rate-limit#escalation
+    text: Escalate to the payment service owner when impact persists after safe mitigation,
+      data integrity is at risk, or privileged provider action is required. Include
+      timestamps, graphs, traces, and changes.
+  common_confusions:
+    kb_id: payment-rate-limit#common-confusions
+    text: Timeout retries can amplify load, but 429 is the discriminating signal.
+      Avoid selecting a runbook from a shared keyword without the discriminator.

@@ -1,0 +1,34 @@
+document_id: lambda-cold-start-runbook
+title: Lambda cold start latency
+domain: lambda
+sections:
+  symptoms:
+    kb_id: lambda-cold-start#symptoms
+    text: Operators observe Init Duration and first-invocation latency rise after
+      idle periods or deployments. Related lambda incidents may also show latency,
+      errors, saturation, retries, or reduced throughput, so symptoms alone are not
+      sufficient.
+  signals:
+    kb_id: lambda-cold-start#signals
+    text: 'Primary discriminator: Init Duration and first-invocation latency rise
+      after idle periods or deployments. Correlate rates over the same time window
+      and compare affected and healthy instances.'
+  diagnosis:
+    kb_id: lambda-cold-start#diagnosis
+    text: Compare Init Duration, runtime initialization, package size, VPC attach,
+      and warm invocations. Establish a timeline before changing capacity or retry
+      policy.
+  mitigation:
+    kb_id: lambda-cold-start#mitigation
+    text: Reduce package and initialization work, provision concurrency, or avoid
+      unnecessary VPC setup. Verify recovery using the primary discriminator and customer
+      impact metrics.
+  escalation:
+    kb_id: lambda-cold-start#escalation
+    text: Escalate to the lambda service owner when impact persists after safe mitigation,
+      data integrity is at risk, or privileged provider action is required. Include
+      timestamps, graphs, traces, and changes.
+  common_confusions:
+    kb_id: lambda-cold-start#common-confusions
+    text: Steady-state timeouts are not cold starts when Init Duration is absent.
+      Avoid selecting a runbook from a shared keyword without the discriminator.

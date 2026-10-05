@@ -1,0 +1,31 @@
+document_id: checkout-deployment-regression-runbook
+title: Checkout deployment regression
+domain: checkout
+sections:
+  symptoms:
+    kb_id: checkout-deployment-regression#symptoms
+    text: Operators observe errors or latency begin immediately after a checkout release
+      or flag change. Related checkout incidents may also show latency, errors, saturation,
+      retries, or reduced throughput, so symptoms alone are not sufficient.
+  signals:
+    kb_id: checkout-deployment-regression#signals
+    text: 'Primary discriminator: errors or latency begin immediately after a checkout
+      release or flag change. Correlate rates over the same time window and compare
+      affected and healthy instances.'
+  diagnosis:
+    kb_id: checkout-deployment-regression#diagnosis
+    text: Compare canary and prior version, release timestamp, config diff, and feature
+      flags. Establish a timeline before changing capacity or retry policy.
+  mitigation:
+    kb_id: checkout-deployment-regression#mitigation
+    text: Rollback or disable the implicated flag, then bisect the change. Verify
+      recovery using the primary discriminator and customer impact metrics.
+  escalation:
+    kb_id: checkout-deployment-regression#escalation
+    text: Escalate to the checkout service owner when impact persists after safe mitigation,
+      data integrity is at risk, or privileged provider action is required. Include
+      timestamps, graphs, traces, and changes.
+  common_confusions:
+    kb_id: checkout-deployment-regression#common-confusions
+    text: Coincidental dependency failure can overlap a deploy; require version-specific
+      evidence. Avoid selecting a runbook from a shared keyword without the discriminator.

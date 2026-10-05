@@ -1,0 +1,32 @@
+document_id: gateway-connection-reset-runbook
+title: Gateway upstream connection reset
+domain: gateway
+sections:
+  symptoms:
+    kb_id: gateway-connection-reset#symptoms
+    text: Operators observe connection reset by peer or premature close appears in
+      proxy logs. Related gateway incidents may also show latency, errors, saturation,
+      retries, or reduced throughput, so symptoms alone are not sufficient.
+  signals:
+    kb_id: gateway-connection-reset#signals
+    text: 'Primary discriminator: connection reset by peer or premature close appears
+      in proxy logs. Correlate rates over the same time window and compare affected
+      and healthy instances.'
+  diagnosis:
+    kb_id: gateway-connection-reset#diagnosis
+    text: Inspect reset timing, keepalive mismatch, upstream restarts, load balancer
+      idle timeout, and TCP errors. Establish a timeline before changing capacity
+      or retry policy.
+  mitigation:
+    kb_id: gateway-connection-reset#mitigation
+    text: Align keepalive and idle timeouts, drain restarts, and repair unstable upstreams.
+      Verify recovery using the primary discriminator and customer impact metrics.
+  escalation:
+    kb_id: gateway-connection-reset#escalation
+    text: Escalate to the gateway service owner when impact persists after safe mitigation,
+      data integrity is at risk, or privileged provider action is required. Include
+      timestamps, graphs, traces, and changes.
+  common_confusions:
+    kb_id: gateway-connection-reset#common-confusions
+    text: A reset may be rendered as 502, but transport reset evidence determines
+      this runbook. Avoid selecting a runbook from a shared keyword without the discriminator.

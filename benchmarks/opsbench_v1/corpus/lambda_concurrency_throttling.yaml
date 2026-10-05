@@ -1,0 +1,33 @@
+document_id: lambda-concurrency-throttling-runbook
+title: Lambda concurrency throttling
+domain: lambda
+sections:
+  symptoms:
+    kb_id: lambda-concurrency-throttling#symptoms
+    text: Operators observe Throttles rise as concurrent executions reach reserved
+      or account concurrency. Related lambda incidents may also show latency, errors,
+      saturation, retries, or reduced throughput, so symptoms alone are not sufficient.
+  signals:
+    kb_id: lambda-concurrency-throttling#signals
+    text: 'Primary discriminator: Throttles rise as concurrent executions reach reserved
+      or account concurrency. Correlate rates over the same time window and compare
+      affected and healthy instances.'
+  diagnosis:
+    kb_id: lambda-concurrency-throttling#diagnosis
+    text: Inspect ConcurrentExecutions, Throttles, reserved concurrency, event source
+      backlog, and account quota. Establish a timeline before changing capacity or
+      retry policy.
+  mitigation:
+    kb_id: lambda-concurrency-throttling#mitigation
+    text: Raise or rebalance concurrency, smooth producers, and configure event-source
+      backpressure. Verify recovery using the primary discriminator and customer impact
+      metrics.
+  escalation:
+    kb_id: lambda-concurrency-throttling#escalation
+    text: Escalate to the lambda service owner when impact persists after safe mitigation,
+      data integrity is at risk, or privileged provider action is required. Include
+      timestamps, graphs, traces, and changes.
+  common_confusions:
+    kb_id: lambda-concurrency-throttling#common-confusions
+    text: Provider API rate limits may also say throttled; confirm Lambda concurrency
+      metrics. Avoid selecting a runbook from a shared keyword without the discriminator.

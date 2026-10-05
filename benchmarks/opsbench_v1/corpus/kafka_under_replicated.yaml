@@ -1,0 +1,31 @@
+document_id: kafka-under-replicated-runbook
+title: Kafka under-replicated partitions
+domain: kafka
+sections:
+  symptoms:
+    kb_id: kafka-under-replicated#symptoms
+    text: Operators observe UnderReplicatedPartitions rises and ISR shrinks. Related
+      kafka incidents may also show latency, errors, saturation, retries, or reduced
+      throughput, so symptoms alone are not sufficient.
+  signals:
+    kb_id: kafka-under-replicated#signals
+    text: 'Primary discriminator: UnderReplicatedPartitions rises and ISR shrinks.
+      Correlate rates over the same time window and compare affected and healthy instances.'
+  diagnosis:
+    kb_id: kafka-under-replicated#diagnosis
+    text: Inspect ISR, offline replicas, broker disk/network, controller logs, and
+      replica fetch lag. Establish a timeline before changing capacity or retry policy.
+  mitigation:
+    kb_id: kafka-under-replicated#mitigation
+    text: Restore broker capacity or connectivity and throttle recovery to protect
+      availability. Verify recovery using the primary discriminator and customer impact
+      metrics.
+  escalation:
+    kb_id: kafka-under-replicated#escalation
+    text: Escalate to the kafka service owner when impact persists after safe mitigation,
+      data integrity is at risk, or privileged provider action is required. Include
+      timestamps, graphs, traces, and changes.
+  common_confusions:
+    kb_id: kafka-under-replicated#common-confusions
+    text: Consumer lag concerns application progress; ISR shrink concerns broker replication.
+      Avoid selecting a runbook from a shared keyword without the discriminator.
