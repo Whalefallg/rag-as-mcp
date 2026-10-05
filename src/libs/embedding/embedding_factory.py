@@ -10,7 +10,7 @@ def register_embedding(provider: str):
         return cls
     return decorator
 
-from src.libs.embedding import openai_embedding, azure_embedding, ollama_embedding  # noqa: F401,E402
+from src.libs.embedding import openai_embedding, azure_embedding, ollama_embedding, local_hash_embedding  # noqa: F401,E402
 
 def create_embedding(settings: Settings) -> BaseEmbedding:
     provider = settings.embedding.provider

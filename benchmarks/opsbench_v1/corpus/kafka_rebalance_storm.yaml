@@ -1,0 +1,32 @@
+document_id: kafka-rebalance-storm-runbook
+title: Kafka rebalance storm
+domain: kafka
+sections:
+  symptoms:
+    kb_id: kafka-rebalance-storm#symptoms
+    text: Operators observe consumer group repeatedly revokes and reassigns partitions.
+      Related kafka incidents may also show latency, errors, saturation, retries,
+      or reduced throughput, so symptoms alone are not sufficient.
+  signals:
+    kb_id: kafka-rebalance-storm#signals
+    text: 'Primary discriminator: consumer group repeatedly revokes and reassigns
+      partitions. Correlate rates over the same time window and compare affected and
+      healthy instances.'
+  diagnosis:
+    kb_id: kafka-rebalance-storm#diagnosis
+    text: Inspect group generation changes, heartbeats, session timeout, poll interval,
+      and member churn. Establish a timeline before changing capacity or retry policy.
+  mitigation:
+    kb_id: kafka-rebalance-storm#mitigation
+    text: Fix slow polls or unstable members, use cooperative assignment, and tune
+      timeouts cautiously. Verify recovery using the primary discriminator and customer
+      impact metrics.
+  escalation:
+    kb_id: kafka-rebalance-storm#escalation
+    text: Escalate to the kafka service owner when impact persists after safe mitigation,
+      data integrity is at risk, or privileged provider action is required. Include
+      timestamps, graphs, traces, and changes.
+  common_confusions:
+    kb_id: kafka-rebalance-storm#common-confusions
+    text: Lag is a symptom of rebalances but does not prove member churn. Avoid selecting
+      a runbook from a shared keyword without the discriminator.

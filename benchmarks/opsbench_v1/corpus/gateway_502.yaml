@@ -1,0 +1,32 @@
+document_id: gateway-502-runbook
+title: Gateway HTTP 502 bad gateway
+domain: gateway
+sections:
+  symptoms:
+    kb_id: gateway-502#symptoms
+    text: Operators observe proxy returns 502 after invalid or reset upstream response.
+      Related gateway incidents may also show latency, errors, saturation, retries,
+      or reduced throughput, so symptoms alone are not sufficient.
+  signals:
+    kb_id: gateway-502#signals
+    text: 'Primary discriminator: proxy returns 502 after invalid or reset upstream
+      response. Correlate rates over the same time window and compare affected and
+      healthy instances.'
+  diagnosis:
+    kb_id: gateway-502#diagnosis
+    text: Inspect upstream status, connect resets, response headers, target health,
+      and proxy error logs. Establish a timeline before changing capacity or retry
+      policy.
+  mitigation:
+    kb_id: gateway-502#mitigation
+    text: Remove unhealthy targets, repair upstream protocol/TLS, and use safe retries.
+      Verify recovery using the primary discriminator and customer impact metrics.
+  escalation:
+    kb_id: gateway-502#escalation
+    text: Escalate to the gateway service owner when impact persists after safe mitigation,
+      data integrity is at risk, or privileged provider action is required. Include
+      timestamps, graphs, traces, and changes.
+  common_confusions:
+    kb_id: gateway-502#common-confusions
+    text: A 504 is an upstream deadline; a 502 is an invalid or failed upstream response.
+      Avoid selecting a runbook from a shared keyword without the discriminator.

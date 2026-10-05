@@ -1,0 +1,32 @@
+document_id: gateway-504-runbook
+title: Gateway HTTP 504 timeout
+domain: gateway
+sections:
+  symptoms:
+    kb_id: gateway-504#symptoms
+    text: Operators observe proxy returns 504 when upstream exceeds gateway deadline.
+      Related gateway incidents may also show latency, errors, saturation, retries,
+      or reduced throughput, so symptoms alone are not sufficient.
+  signals:
+    kb_id: gateway-504#signals
+    text: 'Primary discriminator: proxy returns 504 when upstream exceeds gateway
+      deadline. Correlate rates over the same time window and compare affected and
+      healthy instances.'
+  diagnosis:
+    kb_id: gateway-504#diagnosis
+    text: Compare gateway timeout, upstream duration, queueing, connect time, and
+      dependency traces. Establish a timeline before changing capacity or retry policy.
+  mitigation:
+    kb_id: gateway-504#mitigation
+    text: Reduce upstream latency, align deadlines, shed load, and retry only idempotent
+      requests. Verify recovery using the primary discriminator and customer impact
+      metrics.
+  escalation:
+    kb_id: gateway-504#escalation
+    text: Escalate to the gateway service owner when impact persists after safe mitigation,
+      data integrity is at risk, or privileged provider action is required. Include
+      timestamps, graphs, traces, and changes.
+  common_confusions:
+    kb_id: gateway-504#common-confusions
+    text: Payment timeout can surface as 504; identify the timing boundary and owning
+      upstream. Avoid selecting a runbook from a shared keyword without the discriminator.

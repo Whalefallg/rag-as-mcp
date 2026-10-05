@@ -1,0 +1,31 @@
+document_id: checkout-latency-runbook
+title: Checkout latency regression
+domain: checkout
+sections:
+  symptoms:
+    kb_id: checkout-latency#symptoms
+    text: Operators observe checkout p95 and p99 rise while success rate may remain
+      normal. Related checkout incidents may also show latency, errors, saturation,
+      retries, or reduced throughput, so symptoms alone are not sufficient.
+  signals:
+    kb_id: checkout-latency#signals
+    text: 'Primary discriminator: checkout p95 and p99 rise while success rate may
+      remain normal. Correlate rates over the same time window and compare affected
+      and healthy instances.'
+  diagnosis:
+    kb_id: checkout-latency#diagnosis
+    text: Break down traces by database, payment, inventory, cache, and queue time.
+      Establish a timeline before changing capacity or retry policy.
+  mitigation:
+    kb_id: checkout-latency#mitigation
+    text: Remove the slow dependency, reduce fanout, cache safe reads, or scale bottlenecks.
+      Verify recovery using the primary discriminator and customer impact metrics.
+  escalation:
+    kb_id: checkout-latency#escalation
+    text: Escalate to the checkout service owner when impact persists after safe mitigation,
+      data integrity is at risk, or privileged provider action is required. Include
+      timestamps, graphs, traces, and changes.
+  common_confusions:
+    kb_id: checkout-latency#common-confusions
+    text: A deployment can cause latency, but timing correlation must be supported
+      by traces. Avoid selecting a runbook from a shared keyword without the discriminator.

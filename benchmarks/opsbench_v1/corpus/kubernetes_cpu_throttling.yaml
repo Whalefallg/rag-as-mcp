@@ -1,0 +1,30 @@
+document_id: kubernetes-cpu-throttling-runbook
+title: Kubernetes CPU throttling
+domain: kubernetes
+sections:
+  symptoms:
+    kb_id: kubernetes-cpu-throttling#symptoms
+    text: Operators observe latency rises with container_cpu_cfs_throttled_seconds_total.
+      Related kubernetes incidents may also show latency, errors, saturation, retries,
+      or reduced throughput, so symptoms alone are not sufficient.
+  signals:
+    kb_id: kubernetes-cpu-throttling#signals
+    text: 'Primary discriminator: latency rises with container_cpu_cfs_throttled_seconds_total.
+      Correlate rates over the same time window and compare affected and healthy instances.'
+  diagnosis:
+    kb_id: kubernetes-cpu-throttling#diagnosis
+    text: Compare CPU quota, throttled periods, runnable load, limits, and node contention.
+      Establish a timeline before changing capacity or retry policy.
+  mitigation:
+    kb_id: kubernetes-cpu-throttling#mitigation
+    text: Remove an overly tight CPU limit, optimize hot work, or scale replicas.
+      Verify recovery using the primary discriminator and customer impact metrics.
+  escalation:
+    kb_id: kubernetes-cpu-throttling#escalation
+    text: Escalate to the kubernetes service owner when impact persists after safe
+      mitigation, data integrity is at risk, or privileged provider action is required.
+      Include timestamps, graphs, traces, and changes.
+  common_confusions:
+    kb_id: kubernetes-cpu-throttling#common-confusions
+    text: High CPU utilization without CFS throttling requires a different capacity
+      diagnosis. Avoid selecting a runbook from a shared keyword without the discriminator.

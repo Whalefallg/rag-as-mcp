@@ -1,0 +1,32 @@
+document_id: redis-latency-runbook
+title: Redis latency degradation
+domain: redis
+sections:
+  symptoms:
+    kb_id: redis-latency#symptoms
+    text: Operators observe p99 command latency rises without sustained memory rejection.
+      Related redis incidents may also show latency, errors, saturation, retries,
+      or reduced throughput, so symptoms alone are not sufficient.
+  signals:
+    kb_id: redis-latency#signals
+    text: 'Primary discriminator: p99 command latency rises without sustained memory
+      rejection. Correlate rates over the same time window and compare affected and
+      healthy instances.'
+  diagnosis:
+    kb_id: redis-latency#diagnosis
+    text: Run LATENCY DOCTOR and SLOWLOG; correlate fork, blocked clients, hot keys,
+      and network RTT. Establish a timeline before changing capacity or retry policy.
+  mitigation:
+    kb_id: redis-latency#mitigation
+    text: Remove blocking commands, shard hot keys, tune persistence, and cap client
+      concurrency. Verify recovery using the primary discriminator and customer impact
+      metrics.
+  escalation:
+    kb_id: redis-latency#escalation
+    text: Escalate to the redis service owner when impact persists after safe mitigation,
+      data integrity is at risk, or privileged provider action is required. Include
+      timestamps, graphs, traces, and changes.
+  common_confusions:
+    kb_id: redis-latency#common-confusions
+    text: High memory and evictions can add latency, but latency alone does not prove
+      exhaustion. Avoid selecting a runbook from a shared keyword without the discriminator.

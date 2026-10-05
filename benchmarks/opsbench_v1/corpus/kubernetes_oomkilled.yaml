@@ -1,0 +1,32 @@
+document_id: kubernetes-oomkilled-runbook
+title: Kubernetes OOMKilled containers
+domain: kubernetes
+sections:
+  symptoms:
+    kb_id: kubernetes-oomkilled#symptoms
+    text: Operators observe pod terminates with reason OOMKilled and exit code 137.
+      Related kubernetes incidents may also show latency, errors, saturation, retries,
+      or reduced throughput, so symptoms alone are not sufficient.
+  signals:
+    kb_id: kubernetes-oomkilled#signals
+    text: 'Primary discriminator: pod terminates with reason OOMKilled and exit code
+      137. Correlate rates over the same time window and compare affected and healthy
+      instances.'
+  diagnosis:
+    kb_id: kubernetes-oomkilled#diagnosis
+    text: Inspect last termination state, memory limit, working set, events, and heap
+      growth. Establish a timeline before changing capacity or retry policy.
+  mitigation:
+    kb_id: kubernetes-oomkilled#mitigation
+    text: Raise a justified memory limit, fix leaks, reduce concurrency, and set realistic
+      requests. Verify recovery using the primary discriminator and customer impact
+      metrics.
+  escalation:
+    kb_id: kubernetes-oomkilled#escalation
+    text: Escalate to the kubernetes service owner when impact persists after safe
+      mitigation, data integrity is at risk, or privileged provider action is required.
+      Include timestamps, graphs, traces, and changes.
+  common_confusions:
+    kb_id: kubernetes-oomkilled#common-confusions
+    text: CrashLoopBackOff describes restart behavior; exit code 137 identifies memory
+      termination. Avoid selecting a runbook from a shared keyword without the discriminator.

@@ -1,0 +1,33 @@
+document_id: redis-eviction-runbook
+title: Redis eviction pressure
+domain: redis
+sections:
+  symptoms:
+    kb_id: redis-eviction#symptoms
+    text: Operators observe evicted_keys rises continuously as memory approaches maxmemory.
+      Related redis incidents may also show latency, errors, saturation, retries,
+      or reduced throughput, so symptoms alone are not sufficient.
+  signals:
+    kb_id: redis-eviction#signals
+    text: 'Primary discriminator: evicted_keys rises continuously as memory approaches
+      maxmemory. Correlate rates over the same time window and compare affected and
+      healthy instances.'
+  diagnosis:
+    kb_id: redis-eviction#diagnosis
+    text: Inspect maxmemory-policy, evicted_keys rate, TTL coverage, hit ratio, and
+      volatile key population. Establish a timeline before changing capacity or retry
+      policy.
+  mitigation:
+    kb_id: redis-eviction#mitigation
+    text: Fix TTLs, choose an intentional eviction policy, reduce cache footprint,
+      or add capacity. Verify recovery using the primary discriminator and customer
+      impact metrics.
+  escalation:
+    kb_id: redis-eviction#escalation
+    text: Escalate to the redis service owner when impact persists after safe mitigation,
+      data integrity is at risk, or privileged provider action is required. Include
+      timestamps, graphs, traces, and changes.
+  common_confusions:
+    kb_id: redis-eviction#common-confusions
+    text: OOM and latency share high memory; a rising eviction counter is the decisive
+      signal. Avoid selecting a runbook from a shared keyword without the discriminator.

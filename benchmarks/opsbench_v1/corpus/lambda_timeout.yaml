@@ -1,0 +1,32 @@
+document_id: lambda-timeout-runbook
+title: Lambda execution timeout
+domain: lambda
+sections:
+  symptoms:
+    kb_id: lambda-timeout#symptoms
+    text: Operators observe invocations reach configured duration and end Task timed
+      out. Related lambda incidents may also show latency, errors, saturation, retries,
+      or reduced throughput, so symptoms alone are not sufficient.
+  signals:
+    kb_id: lambda-timeout#signals
+    text: 'Primary discriminator: invocations reach configured duration and end Task
+      timed out. Correlate rates over the same time window and compare affected and
+      healthy instances.'
+  diagnosis:
+    kb_id: lambda-timeout#diagnosis
+    text: Inspect duration near timeout, downstream spans, remaining time, memory,
+      and retries. Establish a timeline before changing capacity or retry policy.
+  mitigation:
+    kb_id: lambda-timeout#mitigation
+    text: Shorten blocking work, tune client deadlines, increase timeout deliberately,
+      or use async workflow. Verify recovery using the primary discriminator and customer
+      impact metrics.
+  escalation:
+    kb_id: lambda-timeout#escalation
+    text: Escalate to the lambda service owner when impact persists after safe mitigation,
+      data integrity is at risk, or privileged provider action is required. Include
+      timestamps, graphs, traces, and changes.
+  common_confusions:
+    kb_id: lambda-timeout#common-confusions
+    text: Cold starts add init duration but do not always consume the full timeout.
+      Avoid selecting a runbook from a shared keyword without the discriminator.

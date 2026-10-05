@@ -1,0 +1,33 @@
+document_id: kubernetes-crashloop-runbook
+title: Kubernetes CrashLoopBackOff
+domain: kubernetes
+sections:
+  symptoms:
+    kb_id: kubernetes-crashloop#symptoms
+    text: Operators observe restart backoff increases after repeated application exits.
+      Related kubernetes incidents may also show latency, errors, saturation, retries,
+      or reduced throughput, so symptoms alone are not sufficient.
+  signals:
+    kb_id: kubernetes-crashloop#signals
+    text: 'Primary discriminator: restart backoff increases after repeated application
+      exits. Correlate rates over the same time window and compare affected and healthy
+      instances.'
+  diagnosis:
+    kb_id: kubernetes-crashloop#diagnosis
+    text: Inspect previous container logs, exit code, probes, command, configuration,
+      and mounted secrets. Establish a timeline before changing capacity or retry
+      policy.
+  mitigation:
+    kb_id: kubernetes-crashloop#mitigation
+    text: Fix the failing startup dependency or configuration; adjust probes only
+      when justified. Verify recovery using the primary discriminator and customer
+      impact metrics.
+  escalation:
+    kb_id: kubernetes-crashloop#escalation
+    text: Escalate to the kubernetes service owner when impact persists after safe
+      mitigation, data integrity is at risk, or privileged provider action is required.
+      Include timestamps, graphs, traces, and changes.
+  common_confusions:
+    kb_id: kubernetes-crashloop#common-confusions
+    text: OOMKilled may cause a crash loop, but many crash loops have non-memory exit
+      codes. Avoid selecting a runbook from a shared keyword without the discriminator.
