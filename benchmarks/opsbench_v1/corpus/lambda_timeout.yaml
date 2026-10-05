@@ -1,4 +1,4 @@
-document_id: lambda-timeout-runbook
+document_id: lambda-execution-timeout-runbook
 title: Lambda execution timeout
 domain: lambda
 sections:

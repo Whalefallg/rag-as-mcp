@@ -6,7 +6,7 @@
       "title": "Redis OOM and maxmemory exhaustion",
       "domain": "redis",
       "source": "benchmarks/opsbench_v1/corpus/redis_oom.yaml",
-      "generated": "data/documents/opsbench_v1/redis-oom.pdf",
+      "generated": "data/documents/opsbench_v1/redis-oom-runbook.pdf",
       "kb_ids": [
         "redis-oom#symptoms",
         "redis-oom#signals",
@@ -21,7 +21,7 @@
       "title": "Redis latency degradation",
       "domain": "redis",
       "source": "benchmarks/opsbench_v1/corpus/redis_latency.yaml",
-      "generated": "data/documents/opsbench_v1/redis-latency.pdf",
+      "generated": "data/documents/opsbench_v1/redis-latency-runbook.pdf",
       "kb_ids": [
         "redis-latency#symptoms",
         "redis-latency#signals",
@@ -36,7 +36,7 @@
       "title": "Redis eviction pressure",
       "domain": "redis",
       "source": "benchmarks/opsbench_v1/corpus/redis_eviction.yaml",
-      "generated": "data/documents/opsbench_v1/redis-eviction.pdf",
+      "generated": "data/documents/opsbench_v1/redis-eviction-runbook.pdf",
       "kb_ids": [
         "redis-eviction#symptoms",
         "redis-eviction#signals",
@@ -47,11 +47,11 @@
       ]
     },
     {
-      "document_id": "postgres-pool-exhaustion-runbook",
+      "document_id": "postgres-connection-pool-runbook",
       "title": "PostgreSQL connection pool exhaustion",
       "domain": "postgres",
       "source": "benchmarks/opsbench_v1/corpus/postgres_pool_exhaustion.yaml",
-      "generated": "data/documents/opsbench_v1/postgres-pool-exhaustion.pdf",
+      "generated": "data/documents/opsbench_v1/postgres-connection-pool-runbook.pdf",
       "kb_ids": [
         "postgres-pool-exhaustion#symptoms",
         "postgres-pool-exhaustion#signals",
@@ -66,7 +66,7 @@
       "title": "PostgreSQL transaction deadlock",
       "domain": "postgres",
       "source": "benchmarks/opsbench_v1/corpus/postgres_deadlock.yaml",
-      "generated": "data/documents/opsbench_v1/postgres-deadlock.pdf",
+      "generated": "data/documents/opsbench_v1/postgres-deadlock-runbook.pdf",
       "kb_ids": [
         "postgres-deadlock#symptoms",
         "postgres-deadlock#signals",
@@ -81,7 +81,7 @@
       "title": "PostgreSQL replica lag",
       "domain": "postgres",
       "source": "benchmarks/opsbench_v1/corpus/postgres_replica_lag.yaml",
-      "generated": "data/documents/opsbench_v1/postgres-replica-lag.pdf",
+      "generated": "data/documents/opsbench_v1/postgres-replica-lag-runbook.pdf",
       "kb_ids": [
         "postgres-replica-lag#symptoms",
         "postgres-replica-lag#signals",
@@ -96,7 +96,7 @@
       "title": "Kubernetes OOMKilled containers",
       "domain": "kubernetes",
       "source": "benchmarks/opsbench_v1/corpus/kubernetes_oomkilled.yaml",
-      "generated": "data/documents/opsbench_v1/kubernetes-oomkilled.pdf",
+      "generated": "data/documents/opsbench_v1/kubernetes-oomkilled-runbook.pdf",
       "kb_ids": [
         "kubernetes-oomkilled#symptoms",
         "kubernetes-oomkilled#signals",
@@ -111,7 +111,7 @@
       "title": "Kubernetes CrashLoopBackOff",
       "domain": "kubernetes",
       "source": "benchmarks/opsbench_v1/corpus/kubernetes_crashloop.yaml",
-      "generated": "data/documents/opsbench_v1/kubernetes-crashloop.pdf",
+      "generated": "data/documents/opsbench_v1/kubernetes-crashloop-runbook.pdf",
       "kb_ids": [
         "kubernetes-crashloop#symptoms",
         "kubernetes-crashloop#signals",
@@ -126,7 +126,7 @@
       "title": "Kubernetes CPU throttling",
       "domain": "kubernetes",
       "source": "benchmarks/opsbench_v1/corpus/kubernetes_cpu_throttling.yaml",
-      "generated": "data/documents/opsbench_v1/kubernetes-cpu-throttling.pdf",
+      "generated": "data/documents/opsbench_v1/kubernetes-cpu-throttling-runbook.pdf",
       "kb_ids": [
         "kubernetes-cpu-throttling#symptoms",
         "kubernetes-cpu-throttling#signals",
@@ -141,7 +141,7 @@
       "title": "Payment gateway timeout",
       "domain": "payment",
       "source": "benchmarks/opsbench_v1/corpus/payment_gateway_timeout.yaml",
-      "generated": "data/documents/opsbench_v1/payment-gateway-timeout.pdf",
+      "generated": "data/documents/opsbench_v1/payment-gateway-timeout-runbook.pdf",
       "kb_ids": [
         "payment-gateway-timeout#symptoms",
         "payment-gateway-timeout#signals",
@@ -156,7 +156,7 @@
       "title": "Payment provider rate limiting",
       "domain": "payment",
       "source": "benchmarks/opsbench_v1/corpus/payment_rate_limit.yaml",
-      "generated": "data/documents/opsbench_v1/payment-rate-limit.pdf",
+      "generated": "data/documents/opsbench_v1/payment-rate-limit-runbook.pdf",
       "kb_ids": [
         "payment-rate-limit#symptoms",
         "payment-rate-limit#signals",
@@ -171,7 +171,7 @@
       "title": "Payment webhook delivery failure",
       "domain": "payment",
       "source": "benchmarks/opsbench_v1/corpus/payment_webhook_failure.yaml",
-      "generated": "data/documents/opsbench_v1/payment-webhook-failure.pdf",
+      "generated": "data/documents/opsbench_v1/payment-webhook-failure-runbook.pdf",
       "kb_ids": [
         "payment-webhook-failure#symptoms",
         "payment-webhook-failure#signals",
@@ -186,7 +186,7 @@
       "title": "Checkout HTTP 5xx errors",
       "domain": "checkout",
       "source": "benchmarks/opsbench_v1/corpus/checkout_5xx.yaml",
-      "generated": "data/documents/opsbench_v1/checkout-5xx.pdf",
+      "generated": "data/documents/opsbench_v1/checkout-5xx-runbook.pdf",
       "kb_ids": [
         "checkout-5xx#symptoms",
         "checkout-5xx#signals",
@@ -201,7 +201,7 @@
       "title": "Checkout latency regression",
       "domain": "checkout",
       "source": "benchmarks/opsbench_v1/corpus/checkout_latency.yaml",
-      "generated": "data/documents/opsbench_v1/checkout-latency.pdf",
+      "generated": "data/documents/opsbench_v1/checkout-latency-runbook.pdf",
       "kb_ids": [
         "checkout-latency#symptoms",
         "checkout-latency#signals",
@@ -216,7 +216,7 @@
       "title": "Checkout deployment regression",
       "domain": "checkout",
       "source": "benchmarks/opsbench_v1/corpus/checkout_deployment_regression.yaml",
-      "generated": "data/documents/opsbench_v1/checkout-deployment-regression.pdf",
+      "generated": "data/documents/opsbench_v1/checkout-deployment-regression-runbook.pdf",
       "kb_ids": [
         "checkout-deployment-regression#symptoms",
         "checkout-deployment-regression#signals",
@@ -227,11 +227,11 @@
       ]
     },
     {
-      "document_id": "lambda-timeout-runbook",
+      "document_id": "lambda-execution-timeout-runbook",
       "title": "Lambda execution timeout",
       "domain": "lambda",
       "source": "benchmarks/opsbench_v1/corpus/lambda_timeout.yaml",
-      "generated": "data/documents/opsbench_v1/lambda-timeout.pdf",
+      "generated": "data/documents/opsbench_v1/lambda-execution-timeout-runbook.pdf",
       "kb_ids": [
         "lambda-timeout#symptoms",
         "lambda-timeout#signals",
@@ -246,7 +246,7 @@
       "title": "Lambda cold start latency",
       "domain": "lambda",
       "source": "benchmarks/opsbench_v1/corpus/lambda_cold_start.yaml",
-      "generated": "data/documents/opsbench_v1/lambda-cold-start.pdf",
+      "generated": "data/documents/opsbench_v1/lambda-cold-start-runbook.pdf",
       "kb_ids": [
         "lambda-cold-start#symptoms",
         "lambda-cold-start#signals",
@@ -261,7 +261,7 @@
       "title": "Lambda concurrency throttling",
       "domain": "lambda",
       "source": "benchmarks/opsbench_v1/corpus/lambda_concurrency_throttling.yaml",
-      "generated": "data/documents/opsbench_v1/lambda-concurrency-throttling.pdf",
+      "generated": "data/documents/opsbench_v1/lambda-concurrency-throttling-runbook.pdf",
       "kb_ids": [
         "lambda-concurrency-throttling#symptoms",
         "lambda-concurrency-throttling#signals",
@@ -276,7 +276,7 @@
       "title": "Kafka consumer lag",
       "domain": "kafka",
       "source": "benchmarks/opsbench_v1/corpus/kafka_consumer_lag.yaml",
-      "generated": "data/documents/opsbench_v1/kafka-consumer-lag.pdf",
+      "generated": "data/documents/opsbench_v1/kafka-consumer-lag-runbook.pdf",
       "kb_ids": [
         "kafka-consumer-lag#symptoms",
         "kafka-consumer-lag#signals",
@@ -291,7 +291,7 @@
       "title": "Kafka rebalance storm",
       "domain": "kafka",
       "source": "benchmarks/opsbench_v1/corpus/kafka_rebalance_storm.yaml",
-      "generated": "data/documents/opsbench_v1/kafka-rebalance-storm.pdf",
+      "generated": "data/documents/opsbench_v1/kafka-rebalance-storm-runbook.pdf",
       "kb_ids": [
         "kafka-rebalance-storm#symptoms",
         "kafka-rebalance-storm#signals",
@@ -306,7 +306,7 @@
       "title": "Kafka under-replicated partitions",
       "domain": "kafka",
       "source": "benchmarks/opsbench_v1/corpus/kafka_under_replicated.yaml",
-      "generated": "data/documents/opsbench_v1/kafka-under-replicated.pdf",
+      "generated": "data/documents/opsbench_v1/kafka-under-replicated-runbook.pdf",
       "kb_ids": [
         "kafka-under-replicated#symptoms",
         "kafka-under-replicated#signals",
@@ -321,7 +321,7 @@
       "title": "Gateway HTTP 502 bad gateway",
       "domain": "gateway",
       "source": "benchmarks/opsbench_v1/corpus/gateway_502.yaml",
-      "generated": "data/documents/opsbench_v1/gateway-502.pdf",
+      "generated": "data/documents/opsbench_v1/gateway-502-runbook.pdf",
       "kb_ids": [
         "gateway-502#symptoms",
         "gateway-502#signals",
@@ -336,7 +336,7 @@
       "title": "Gateway HTTP 504 timeout",
       "domain": "gateway",
       "source": "benchmarks/opsbench_v1/corpus/gateway_504.yaml",
-      "generated": "data/documents/opsbench_v1/gateway-504.pdf",
+      "generated": "data/documents/opsbench_v1/gateway-504-runbook.pdf",
       "kb_ids": [
         "gateway-504#symptoms",
         "gateway-504#signals",
@@ -351,7 +351,7 @@
       "title": "Gateway upstream connection reset",
       "domain": "gateway",
       "source": "benchmarks/opsbench_v1/corpus/gateway_connection_reset.yaml",
-      "generated": "data/documents/opsbench_v1/gateway-connection-reset.pdf",
+      "generated": "data/documents/opsbench_v1/gateway-connection-reset-runbook.pdf",
       "kb_ids": [
         "gateway-connection-reset#symptoms",
         "gateway-connection-reset#signals",

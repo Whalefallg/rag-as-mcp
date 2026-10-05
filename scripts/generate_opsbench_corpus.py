@@ -10,6 +10,10 @@ ROOT = Path(__file__).resolve().parents[1]
 BENCH = ROOT / "benchmarks" / "opsbench_v1"
 OUT = ROOT / "data" / "documents" / "opsbench_v1"
 SECTIONS = ("symptoms", "signals", "diagnosis", "mitigation", "escalation", "common_confusions")
+DOCUMENT_ID_ALIASES = {
+    "postgres-pool-exhaustion": "postgres-connection-pool-runbook",
+    "lambda-timeout": "lambda-execution-timeout-runbook",
+}
 
 # slug, title, discriminating signal, diagnosis, mitigation, common confusion
 CASES = [
@@ -65,14 +69,18 @@ def main():
     query_rows=[]; qrels={}
     for idx,(slug,title,signal,diagnosis,mitigation,confusion) in enumerate(CASES):
         secs=sections(slug,title,signal,diagnosis,mitigation,confusion)
-        data={"document_id":f"{slug}-runbook","title":title,"domain":slug.split('-')[0],"sections":{}}
+        document_id=DOCUMENT_ID_ALIASES.get(slug,f"{slug}-runbook")
+        data={"document_id":document_id,"title":title,"domain":slug.split('-')[0],"sections":{}}
         lines=[]; ids=[]
         for name in SECTIONS:
             kid=f"{slug}#{name.replace('_','-')}"; ids.append(kid); data["sections"][name]={"kb_id":kid,"text":secs[name]}
             lines += [f"[KB_ID: {kid}]", name.replace('_',' ').title(), secs[name], ""]
         yaml_path=corpus/f"{slug.replace('-','_')}.yaml"; yaml_path.write_text(yaml.safe_dump(data,sort_keys=False,allow_unicode=True),encoding="utf-8")
-        pdf_path=OUT/f"{slug}.pdf"; write_pdf(pdf_path,title,"\n".join(lines))
+        pdf_path=OUT/f"{document_id}.pdf"; write_pdf(pdf_path,title,"\n".join(lines))
         manifest["documents"].append({"document_id":data["document_id"],"title":title,"domain":data["domain"],"source":str(yaml_path.relative_to(ROOT)),"generated":str(pdf_path.relative_to(ROOT)),"kb_ids":ids})
+    expected_pdfs={f"{DOCUMENT_ID_ALIASES.get(slug,slug+'-runbook')}.pdf" for slug,*_ in CASES}
+    for stale in OUT.glob("*.pdf"):
+        if stale.name not in expected_pdfs: stale.unlink()
     # Four answerable query styles per case = 96 candidates; select exact fixed distribution below.
     specs={"lexical":16,"semantic":16,"hard_negative":16,"multi_hop":12,"noisy":12}
     offsets={"lexical":0,"semantic":5,"hard_negative":11,"multi_hop":2,"noisy":7}

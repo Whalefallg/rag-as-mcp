@@ -1,4 +1,4 @@
-document_id: postgres-pool-exhaustion-runbook
+document_id: postgres-connection-pool-runbook
 title: PostgreSQL connection pool exhaustion
 domain: postgres
 sections:
